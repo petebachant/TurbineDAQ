@@ -5,10 +5,10 @@ U = 1.0
 
 rpm = tsr*U/0.5*60/6.28318530718
 
-offset = 0 	! Offset caused by ADV traverse (m)
-target = 24.9 	! Do not exceed 24.9 for traverse at x/D = 1
-endpos = 0	! Where to move carriage at end of tow
-tacc = 5		! Time (in seconds) for turbine angular acceleration
+offset = 0      ! Offset caused by ADV traverse (m)
+target = 24.9   ! Do not exceed 24.9 for traverse at x/D = 1
+endpos = 0      ! Where to move carriage at end of tow
+tacc = 5        ! Time (in seconds) for turbine angular acceleration
 
 ACC(tow) = 1
 DEC(tow) = 0.5

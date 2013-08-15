@@ -7,54 +7,29 @@ Created on Mon Aug 05 14:17:51 2013
 This module contains classes for experiment run types
 
 """
-# Strings for ACS programs that stay constant each run
-acs_prg_init = "local real target, offset, tsr, U, rpm, tacc, endpos \n \n"
-acs_prg_exec = \
-"""
-rpm = tsr*U/0.5*60/6.28318530718
+import acsprgs
+import acsc
 
-offset = 0      ! Offset caused by ADV traverse (m)
-target = 24.9   ! Do not exceed 24.9 for traverse at x/D = 1
-endpos = 0      ! Where to move carriage at end of tow
-tacc = 5        ! Time (in seconds) for turbine angular acceleration
-
-ACC(tow) = 1
-DEC(tow) = 0.5
-VEL(tow) = U
-JERK(tow)= ACC(tow)*10
-
-ACC(turbine) = rpm/tacc
-VEL(turbine) = rpm
-DEC(turbine) = ACC(turbine)
-JERK(turbine)= ACC(turbine)*10
-
-jog/v turbine, rpm
-wait (tacc)*1000
-ptp/e tow, target-offset
-HALT(turbine)
-VEL(tow) = 0.5
-VEL(turbine) = 10
-ptp tow, endpos
-ptp/e turbine, 60
-
-STOP
-"""
-
-
-class TowRun(object):
+class TurbineTow(object):
     def __init__(self, towspeed, tsr, y_R, z_H):
+        """Turbine tow run object."""
         self.towspeed = towspeed
         self.tsr = tsr
         self.y_R = y_R
         self.z_H = z_H
-        
-        self.acs_prg = acs_prg_init + "tsr = " + str(self.tsr) + "\n" +\
-        "U = " + str(self.towspeed) + "\n" + acs_prg_exec
+        self.acs_prg = acsprgs.build_turbine_tow(self.towspeed, self.tsr)
+        self.name = "Something" # Come up with a naming scheme
 
-    def go(self):
-        pass
+    def start_tow(self):
+        """Start the run. Comms should be open already with the controller"""
+        acs_buff = 15
+        self.acs_hcomm = acsc.OpenCommDirect()
+        acsc.LoadBuffer(self.acs_hcomm, acs_buff, self.acs_prg, 512)
     
     def halt(self):
+        pass
+    
+    def start_daq(self):
         pass
     
     def process(self):
@@ -65,10 +40,7 @@ class TowRun(object):
     
 
 def main():
-    run = TowRun(1.0, 1.5, 1, 1)
-    file = open("testing/test.prg", "w")
-    file.write(run.acs_prg)
-    file.close()
+    run = TurbineTow(1.0, 1.5, 1, 1)
     print run.acs_prg
     
 if __name__ == "__main__":
