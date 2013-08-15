@@ -11,8 +11,9 @@ import acsprgs
 import acsc
 
 class TurbineTow(object):
-    def __init__(self, towspeed, tsr, y_R, z_H):
+    def __init__(self, towspeed, tsr, y_R, z_H, creator=None):
         """Turbine tow run object."""
+        self.creator = creator
         self.towspeed = towspeed
         self.tsr = tsr
         self.y_R = y_R
@@ -23,8 +24,15 @@ class TurbineTow(object):
     def start_tow(self):
         """Start the run. Comms should be open already with the controller"""
         acs_buff = 15
-        self.acs_hcomm = acsc.OpenCommDirect()
+        axis = 0
+        if self.creator == None:
+            self.acs_hcomm = acsc.OpenCommDirect()
+        else:
+            self.acs_hcomm = self.creator.acs_hcomm
+            
         acsc.LoadBuffer(self.acs_hcomm, acs_buff, self.acs_prg, 512)
+        acsc.Enable(self.acs_hcomm, axis)
+        acsc.RunBuffer(self.acs_hcomm, 0)
     
     def halt(self):
         pass
