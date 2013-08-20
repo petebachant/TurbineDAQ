@@ -11,7 +11,7 @@ import acsprgs
 import acsc
 
 class TurbineTow(object):
-    def __init__(self, towspeed, tsr, y_R, z_H, creator=None):
+    def __init__(self, towspeed, tsr, y_R=None, z_H=None, creator=None):
         """Turbine tow run object."""
         self.creator = creator
         self.towspeed = towspeed
@@ -26,13 +26,13 @@ class TurbineTow(object):
         acs_buff = 15
         axis = 0
         if self.creator == None:
-            self.acs_hcomm = acsc.OpenCommDirect()
+            self.acs_hcomm = acsc.openCommDirect()
         else:
             self.acs_hcomm = self.creator.acs_hcomm
             
-        acsc.LoadBuffer(self.acs_hcomm, acs_buff, self.acs_prg, 512)
-        acsc.Enable(self.acs_hcomm, axis)
-        acsc.RunBuffer(self.acs_hcomm, 0)
+        acsc.loadBuffer(self.acs_hcomm, acs_buff, self.acs_prg, 512)
+        acsc.enable(self.acs_hcomm, axis)
+        acsc.runBuffer(self.acs_hcomm, acs_buff)
     
     def halt(self):
         pass
@@ -45,6 +45,7 @@ class TurbineTow(object):
     
     def plot(self):
         pass
+
     
 
 def main():
