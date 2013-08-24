@@ -15,6 +15,7 @@ import PyQt4.Qwt5 as qwt
 import numpy as np
 from acsc import acsc
 import daqtasks
+import vectasks
 
 
 # Log run metadata as JSON
@@ -30,7 +31,9 @@ def movetraverse(y, z):
 
 
 def main():
-    pass
+    vecrun = vectasks.VectrinoRun("Some name")
+    vecrun.comport = "COM1"
+    vecrun.start()
 
 if __name__ == "__main__":
     main()

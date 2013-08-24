@@ -40,6 +40,9 @@ class TurbineTow(object):
     def start_daq(self):
         pass
     
+    def start_vec(self):
+        pass
+    
     def process(self):
         pass
     

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1158</width>
-    <height>850</height>
+    <width>1168</width>
+    <height>978</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,11 +26,6 @@
     <property name="currentIndex">
      <number>3</number>
     </property>
-    <widget class="QWidget" name="tabSignalMonitoring">
-     <attribute name="title">
-      <string>Signal Monitoring</string>
-     </attribute>
-    </widget>
     <widget class="QWidget" name="tabTareDrag">
      <attribute name="title">
       <string>Tare Drag</string>
@@ -306,7 +301,7 @@
       <x>450</x>
       <y>0</y>
       <width>360</width>
-      <height>581</height>
+      <height>471</height>
      </rect>
     </property>
     <property name="floating">
@@ -415,7 +410,7 @@
      <bool>false</bool>
     </property>
     <property name="windowTitle">
-     <string>Motion Controller</string>
+     <string>Motion Control</string>
     </property>
     <widget class="QWidget" name="dockWidgetContents_3">
      <widget class="QGroupBox" name="groupBox_TowAxis">
@@ -504,7 +499,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1158</width>
+     <width>1168</width>
      <height>21</height>
     </rect>
    </property>
@@ -552,7 +547,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionStart"/>
-   <addaction name="actionEnable_Tow"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetVectrino">
    <property name="minimumSize">
@@ -598,7 +592,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>270</y>
+       <y>280</y>
        <width>311</width>
        <height>111</height>
       </rect>
@@ -610,8 +604,8 @@
     <widget class="QwtThermo" name="Thermo">
      <property name="geometry">
       <rect>
-       <x>40</x>
-       <y>540</y>
+       <x>30</x>
+       <y>440</y>
        <width>48</width>
        <height>151</height>
       </rect>
@@ -620,8 +614,8 @@
     <widget class="QLabel" name="label_5">
      <property name="geometry">
       <rect>
-       <x>50</x>
-       <y>520</y>
+       <x>40</x>
+       <y>420</y>
        <width>46</width>
        <height>13</height>
       </rect>
@@ -630,20 +624,94 @@
       <string>SNR (dB)</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_9">
+    <widget class="QLabel" name="label_vecu">
      <property name="geometry">
       <rect>
-       <x>120</x>
-       <y>520</y>
-       <width>71</width>
+       <x>170</x>
+       <y>0</y>
+       <width>46</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>u (m/s)</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>130</y>
+       <width>46</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string>Velocity Range</string>
+      <string>v (m/s)</string>
      </property>
     </widget>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>610</y>
+       <width>251</width>
+       <height>141</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Settings</string>
+     </property>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Velocity Range</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
+  </widget>
+  <widget class="QToolBar" name="toolBar_DAQ">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionMonitor_NI"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_motion">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionEnable_Tow"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_directory">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
   </widget>
   <action name="actionStart">
    <property name="text">
@@ -691,6 +759,22 @@
   <action name="actionEdit_Configuration">
    <property name="text">
     <string>Edit Configuration...</string>
+   </property>
+  </action>
+  <action name="actionMonitor_NI">
+   <property name="text">
+    <string>Monitor NI Signals</string>
+   </property>
+   <property name="toolTip">
+    <string>Monitor NI Signals</string>
+   </property>
+  </action>
+  <action name="actionMonitor_Vectrino">
+   <property name="text">
+    <string>Monitor Vectrino</string>
+   </property>
+   <property name="toolTip">
+    <string>Monitor Vectrino Signals</string>
    </property>
   </action>
  </widget>

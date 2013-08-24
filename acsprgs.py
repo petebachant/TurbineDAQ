@@ -32,6 +32,8 @@ VEL(turbine) = rpm
 DEC(turbine) = ACC(turbine)
 JERK(turbine)= ACC(turbine)*10
 
+! If turbine is not at 0 degrees RPOS, move it there
+
 ! Send trigger pulse for data acquisition
 wait tzero*1000
 jog/v turbine, rpm

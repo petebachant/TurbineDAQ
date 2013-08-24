@@ -51,7 +51,7 @@ class TurbineTowDAQ(QThread):
         daqmx.CreateTask("", self.turbangtask)
         
         # Add channels to tasks
-        self.analogchans = ["Force", "DragLOld", "DragROld"]
+        self.analogchans = ["Voltage"]
         self.carposchan = "LinEnc"
         self.turbangchan = "Angle"
         daqmx.AddGlobalChansToTask(self.analogtask, self.analogchans)
@@ -141,8 +141,8 @@ class TurbineTowDAQ(QThread):
             callbackdata.extend(data.tolist())
             self.data["torque_trans"] = np.append(self.data["torque_trans"], 
                                                   data[:,0], axis=0)
-            self.data["torque_arm"] = np.append(self.data["torque_arm"], 
-                                                data[:,1], axis=0)
+#            self.data["torque_arm"] = np.append(self.data["torque_arm"], 
+#                                                data[:,1], axis=0)
                                                 
             carpos, cpoints = daqmx.ReadCounterF64(self.carpostask,
                                                    int(self.sr/10), 10.0,
