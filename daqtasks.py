@@ -8,7 +8,7 @@ This module contains the DAQ stuff for TurbineDAQ
 
 """
 
-from PyQt4.QtCore import *
+from PyQt4 import QtCore
 import numpy as np
 import daqmx.daqmx as daqmx
 import time
@@ -16,9 +16,9 @@ import json
 from scipy.io import savemat
 
 
-class TurbineTowDAQ(QThread):
+class TurbineTowDAQ(QtCore.QThread):
     def __init__(self, name=None):
-        QThread.__init__(self)
+        QtCore.QThread.__init__(self)
         
         # Crete some meta data for the run
         self.name = name
@@ -50,7 +50,7 @@ class TurbineTowDAQ(QThread):
         daqmx.CreateTask("", self.carpostask)
         daqmx.CreateTask("", self.turbangtask)
         
-        # Add channels to tasks
+        # Add channels to tasks -- rename global channels
         self.analogchans = ["Voltage"]
         self.carposchan = "LinEnc"
         self.turbangchan = "Angle"
@@ -113,6 +113,11 @@ class TurbineTowDAQ(QThread):
         daqmx.SetDigEdgeStartTrigSrc(self.turbangtask, trigsrc)
         daqmx.SetDigEdgeStartTrigEdge(self.carpostask, daqmx.Val_Rising)
         daqmx.SetDigEdgeStartTrigEdge(self.turbangtask, daqmx.Val_Rising)
+        
+        
+    def set_analog_trigger(self):
+        """Sets the analog signals to be triggered from the chassis PFI"""
+        # Setup trigger for analog channels
         
 
     def run(self):
@@ -186,11 +191,16 @@ class TurbineTowDAQ(QThread):
         fmdata.close()
         savemat(savedir+self.name, self.data)
     
-    def cleartasks(self):
+    def clear(self):
         daqmx.ClearTask(self.analogtask)
         daqmx.ClearTask(self.carpostask)
         daqmx.ClearTask(self.turbangtask)
-        
+
+class TareTorqueDAQ(QtCore.QThread):
+    pass
+
+class TareDragDAQ(QtCore.QThread):
+    pass
 
 def main():
     turbdaq = TurbineTowDAQ("run2_yz32")

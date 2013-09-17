@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Aug 14 21:13:07 2013
+Created on Sun Sep 08 12:20:14 2013
 
 @author: Pete
-
-This module contains functions for generating ACS programs
 """
+from acspy.prgs import ACSPLplusPrg
 
 def build_turbine_tow(towspeed, tsr, y_R=None, z_H=None):
     """This function builds an ACS program for turbine towing. Turbine
@@ -58,3 +57,9 @@ STOP
     # Set this up as a linear 2 ax-s move?
     prg += prgbody
     return prg
+    
+
+class TurbineTow(ACSPLplusPrg):
+    """A class for creating turbine tows."""
+    def __init__(self, towspeed, tsr, y_R=None, z_H=None):
+        ACSPLplusPrg.__init__(self)

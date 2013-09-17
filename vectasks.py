@@ -6,7 +6,7 @@ Created on Tue Aug 20 18:58:38 2013
 """
 
 import pdcommpy.pdcommpy as pd
-from PyQt4.QtCore import *
+from PyQt4 import QtCore
 import numpy as np
 import time
 
@@ -16,11 +16,11 @@ class DataGet(pd.EventHandler):
         print "Got new data"
 
 
-class VectrinoRun(QThread):
-    def __init__(self, name=None):
-        QThread.__init__(self)
+class VectrinoRun(QtCore.QThread):
+    def __init__(self, usetrigger=True):
+        QtCore.QThread.__init__(self)
         
-        self.usetrigger = True
+        self.usetrigger = usetrigger
         self.comport = "COM5"
         self.record = True
         self.isconnected = pd.is_connected()
@@ -66,17 +66,20 @@ class VectrinoRun(QThread):
 
     def getstatus(self):
         self.status = pd.inquire_state()
+        return self.status
         
-        
-class VectrinoConnect(QThread):
+class VectrinoConnect(QtCore.QThread):
     def __init__(self, vecrun):
-        QThread.__init__(self)
+        QtCore.QThread.__init__(self)
         self.vecrun = vecrun
         
     def run(self):
         pd.connect()
-        vecrun.isconnected = pd.is_connected()
-        while not vecrun.isconnected:
+        self.vecrun.isconnected = pd.is_connected()
+        while not self.vecrun.isconnected:
             time.sleep(0.3)
-            vecrun.isconnected = pd.is_connected()
+            self.vecrun.isconnected = pd.is_connected()
             
+            
+if __name__ == "__main__":
+    print "Yo"
