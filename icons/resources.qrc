@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="icons">
+    <file>pause.png</file>
+    <file>button_cancel.png</file>
+    <file>button_ok.png</file>
     <file>agt_back.png</file>
     <file>tow_icon_b.ico</file>
     <file>up.png</file>

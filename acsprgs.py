@@ -7,7 +7,7 @@ Created on Sun Sep 08 12:20:14 2013
 from acspy.prgs import ACSPLplusPrg
 
 def build_turbine_tow(towspeed, tsr, y_R=None, z_H=None):
-    """This function builds an ACS program for turbine towing. Turbine
+    """This function builds an ACSPL+ program for turbine towing. Turbine
     radius is assumed to be 0.5 m"""
     
     initvars = "local real target, offset, tsr, U, rpm, tacc, endpos, tzero \n \n"

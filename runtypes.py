@@ -24,11 +24,7 @@ class TurbineTow(object):
         self.z_H = z_H
         self.name = "Something" # Come up with a naming scheme
         self.vectrino = True
-        self.nidaq = True
-        
-        if self.acs_hcomm == None:
-            self.acs_hcomm = acsc.openCommDirect()
-        
+        self.nidaq = True        
         self.build_acsprg()
         
     def build_acsprg(self):
