@@ -11,9 +11,11 @@ import time
 
 
 class VectrinoThread(QtCore.QThread):
+    collecting = QtCore.pyqtSignal()
+    connectsignal = QtCore.pyqtSignal(bool)
     def __init__(self, usetrigger=True):
         QtCore.QThread.__init__(self)
-        print "Vectrino thread initiated..."
+        print "Vectrino thread initialized"
         self.vec = PdControl()
         self.usetrigger = usetrigger
         self.comport = "COM2"
@@ -34,7 +36,6 @@ class VectrinoThread(QtCore.QThread):
         print "Vectrino configuration set"
 
     def run(self):
-        print "Vectrino thread started..."
         self.vec.set_serial_port(self.comport)
         self.vec.connect()
         tstart = time.time()
@@ -46,14 +47,19 @@ class VectrinoThread(QtCore.QThread):
             if time.time() - tstart > 10:
                 print "Vectrino timed out"
                 self.timeout = True
+                self.connectsignal.emit(False)
                 break
         if not self.timeout:
+            self.connectsignal.emit(True)
             self.vec.stop()
             self.setconfig()
             if self.record:
                 self.vec.start_disk_recording(self.savepath+"/"+self.savename)
             self.vec.start()
             self.vecstatus = "Vectrino connected "
+            while self.vec.state != "Confirmation mode":
+                self.usleep(100000)
+            self.emit(self.collecting)
 
     def getstatus(self):
         self.status = self.vec.inquire_state()
@@ -64,6 +70,7 @@ class VectrinoThread(QtCore.QThread):
             self.vec.stop_disk_recording()
         self.vec.stop()
         self.vec.disconnect()
+        
 
 class ConnectThread(QtCore.QThread):
     def __init__(self, vecthread):

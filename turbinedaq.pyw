@@ -112,6 +112,9 @@ class MainWindow(QtGui.QMainWindow):
         else:
             return False
     
+    def is_section_done(self, section):
+        pass
+    
     def import_test_plan(self):
         """Imports test plan from Excel spreadsheet in working directory"""
         test_plan_found = False
@@ -218,14 +221,23 @@ class MainWindow(QtGui.QMainWindow):
     def connect_to_controller(self):
         self.hc = acsc.openCommEthernetTCP()    
         if self.hc == acsc.INVALID:
-            print "Cannot connect to ACS controller"
+            print "Cannot connect to ACS controller. Attempting to connect to simulator..."
             self.label_acs_connect.setText(" Not connected to ACS controller ")
+            self.hc = acsc.openCommDirect()
+            if self.hc == acsc.INVALID:
+                print "Cannot connect to simulator"
+            else:
+                self.label_acs_connect.setText(" Connected to SPiiPlus simulator ")
             
     def initialize_plots(self):
         # Torque trans plot
         self.curve_torque_trans = guiqwt.curve.CurveItem()
         self.plot_torque = self.ui.plotTorque.get_plot()
         self.plot_torque.add_item(self.curve_torque_trans)
+        # Torque arm plot
+        self.curve_torque_arm = guiqwt.curve.CurveItem()
+        self.curve_torque_arm.setPen(QtGui.QPen(QtCore.Qt.red, 1))
+        self.plot_torque.add_item(self.curve_torque_arm)
         # Drag plot
         self.curve_drag = guiqwt.curve.CurveItem()
         self.plot_drag = self.ui.plotDrag.get_plot()
@@ -325,9 +337,26 @@ class MainWindow(QtGui.QMainWindow):
         """Exectutes a single turbine tow"""
         print "Executing a turbine tow..."
         print "U =", U, "TSR =", tsr, "y/R =", y_R, "z/H =", z_H
-        self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H)
-        self.turbinetow.nidaq = False
+        self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
+                                              nidaq=False, vectrino=False)
+        self.turbinetow.towfinished.connect(self.on_tow_finished)
         self.turbinetow.start()
+        # First step is to 
+        
+    def on_tow_finished(self):
+        """Current tow complete."""
+        # Reset time of last run
+        self.time_last_run = time.time()
+        self.test_plan_into_table()
+        # If executing a test plan start a single shot timer for next run
+        if self.ui.tabTestPlan.isVisible() and self.ui.actionStart.isChecked():
+            idlesec = 5
+            QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
+        else: 
+            self.ui.actionStart.trigger()
+        
+    def on_idletimer(self):
+        self.do_test_plan()
         
     def do_test_plan(self):
         """Continue test plan"""
@@ -371,9 +400,8 @@ class MainWindow(QtGui.QMainWindow):
             self.monitorvec = True
         else:
             self.vecthread.stop()
-            print self.vecthread.vec.get_vel_range()
             self.monitorvec = False
-        
+    
     def on_timer(self):
         self.update_acs()
         self.time_since_last_run = time.time() - self.time_last_run
@@ -387,11 +415,18 @@ class MainWindow(QtGui.QMainWindow):
             self.update_plots_ni()
     
     def update_plots_ni(self):
-        self.curve_drag.set_data(self.nidata["t"], self.nidata["drag_left"])
-        self.plot_drag.replot()
-        self.curve_torque_trans.set_data(self.nidata["t"],
-                                         self.nidata["torque_trans"])
+        t = self.nidata["t"]
+        self.curve_drag_left.set_data(t, self.nidata["drag_left"])
+        self.plot_drag_left.replot()
+        self.curve_torque_trans.set_data(t, self.nidata["torque_trans"])
+        self.curve_torque_arm.set_data(t, self.nidata["torque_arm"])        
         self.plot_torque.replot()
+        self.curve_drag_right.set_data(t, self.nidata["drag_right"])
+        self.plot_drag_right.replot()
+        self.curve_drag.set_data(t, self.nidata["drag_left"]+self.nidata["drag_right"])
+        self.plot_drag.replot()
+        self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
+        self.plot_rpm_ni.replot()
         
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
@@ -413,6 +448,8 @@ class MainWindow(QtGui.QMainWindow):
         with open("settings/settings.json", "w") as fn:
             json.dump(self.settings, fn)
         acsc.closeComm(self.hc)
+        if self.monitorni:
+            self.daqthread.clear()
 
 
 def main():

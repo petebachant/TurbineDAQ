@@ -13,8 +13,10 @@ import daqtasks
 import vectasks
 import time
 from PyQt4 import QtCore
+from pdcommpy.pdcommpy import PdControl
 
 class TurbineTow(QtCore.QThread):
+    towfinished = QtCore.pyqtSignal()
     def __init__(self, acs_hcomm, U, tsr, y_R, z_H, 
                  R=0.5, H=1.0, nidaq=True, vectrino=True):
         """Turbine tow run object."""
@@ -30,6 +32,17 @@ class TurbineTow(QtCore.QThread):
         self.nidaq = nidaq 
         self.build_acsprg()
         
+        if self.vectrino:
+            print "Attempting to connect to Vectrino..."
+            self.vecthread = vectasks.VectrinoThread()
+            self.vecthread.collecting.connect(self.on_vec_collecting)
+            self.vecdata = self.vecthread.vec.data
+            
+        if self.nidaq:
+            self.daqthread = daqtasks.TurbineTowDAQ()
+            self.daqthread.collecting.connect(self.on_nidaq_collecting)
+            self.nidata = self.daqthread.data
+        
     def build_acsprg(self):
         """Create the ACSPL+ program for running the run.
         This run should send a trigger pulse."""
@@ -38,21 +51,30 @@ class TurbineTow(QtCore.QThread):
     def run(self):
         """Start the run. Comms should be open already with the controller"""
         if self.vectrino:
-            print "Attempting to connect to Vectrino..."
-            self.vecthread = vectasks.VectrinoThread()
-            print "Turbine tow thread created vecthread"
             self.vecthread.start()
-            time.sleep(10)
-            
-        if self.nidaq:
-            self.daqthread = daqtasks.TurbineTowDAQ()
-        
+        elif self.nidaq:
+            self.daqthread.start()
+        else:
+            self.start_motion()
+
+    def start_motion(self):
+        time.sleep(2)
+        self.towfinished.emit()
         if self.acs_hcomm != acsc.INVALID:
             acs_buffno = 17
             acsc.loadBuffer(self.acs_hcomm, acs_buffno, self.acs_prg, 512)
             acsc.enable(self.acs_hcomm, 0)
             acsc.runBuffer(self.acs_hcomm, acs_buffno)
     
+    def on_vec_collecting(self):
+        if self.nidaq:
+            self.daqthread.start()
+        else:
+            self.start_motion()
+        
+    def on_nidaq_collecting(self):
+        self.start_motion()
+            
     def abort(self):
         """This should stop everything."""
         acsc.halt(self.acs_hcomm, 0)
@@ -66,8 +88,12 @@ class TurbineTow(QtCore.QThread):
         pass
         self.cp = 0
     
-    def plot(self):
+    def save_data(self, fullpath):
         pass
+    
+    def compile_metadata(self):
+        pass
+        self.daqthread.metadata
 
 
 class TareTorqueRun(object):

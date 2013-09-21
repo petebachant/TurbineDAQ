@@ -17,17 +17,17 @@ from scipy.io import savemat
 
 
 class TurbineTowDAQ(QtCore.QThread):
-    def __init__(self, name=None):
+    collecting = QtCore.pyqtSignal()
+    finished = QtCore.pyqtSignal()
+    def __init__(self, usetrigger=True):
         QtCore.QThread.__init__(self)
         
         # Some parameters for the thread
-        self.usetrigger = True
+        self.usetrigger = usetrigger
         
         # Crete some meta data for the run
-        self.name = name
         self.timecreated = time.asctime()
-        self.metadata = {"Name" : self.name,
-                         "Time created" : self.timecreated}
+        self.metadata = {"Time created" : self.timecreated}
         
         # Initialize sample rate
         self.sr = 2000.0
@@ -35,8 +35,9 @@ class TurbineTowDAQ(QtCore.QThread):
         
         # Create a dict of arrays for storing data
         # Probably should be based on global channel names...
-        self.data = {"carriage_pos": np.array([]),
-                     "turbine_angle": np.array([]),
+        self.data = {"carriage_pos" : np.array([]),
+                     "turbine_angle" : np.array([]),
+                     "turbine_rpm" : np.array([]),
                      "torque_trans": np.array([]),
                      "torque_arm" : np.array([]),
                      "drag_left" : np.array([]),
@@ -129,45 +130,48 @@ class TurbineTowDAQ(QtCore.QThread):
         """Start DAQmx tasks."""
         # Acquire and throwaway samples for alignment
         # Need to set these up on a different task?
-        
         # Callback code from PyDAQmx
         class MyList(list):
             pass
-        
         # List where the data are stored
         data = MyList()
         id_data = daqmx.create_callbackdata_id(data)
         
-        # Function that is called every N callback
         def EveryNCallback_py(taskHandle, everyNsamplesEventType, nSamples, 
                               callbackData_ptr):
-                                  
+            """Function called every N samples"""
             callbackdata = daqmx.get_callbackdata_from_id(callbackData_ptr)
-            
             data, npoints = daqmx.ReadAnalogF64(taskHandle, int(self.sr/10), 
                     10.0, daqmx.Val_GroupByChannel, int(self.sr/10), 
                     len(self.analogchans))
-
             callbackdata.extend(data.tolist())
             self.data["torque_trans"] = np.append(self.data["torque_trans"], 
                                                   data[:,0], axis=0)
-#            self.data["torque_arm"] = np.append(self.data["torque_arm"], 
-#                                                data[:,1], axis=0)
-                                                
-#            carpos, cpoints = daqmx.ReadCounterF64(self.carpostask,
-#                                                   int(self.sr/10), 10.0,
-#                                                   int(self.sr/10))
-#            turbang, cpoints = daqmx.ReadCounterF64(self.turbangtask,
-#                                                    int(self.sr/10), 10.0,
-#                                                    int(self.sr/10))
-
-
-#            self.data["carriage_pos"] = np.append(self.data["carriage_pos"],
-#                                                  carpos)
+            self.data["torque_arm"] = np.append(self.data["torque_arm"], 
+                                                data[:,1], axis=0)
+            self.data["drag_left"] = np.append(self.data["drag_left"], 
+                                                data[:,2], axis=0)
+            self.data["drag_right"] = np.append(self.data["drag_right"], 
+                                                data[:,3], axis=0)
             self.data["t"] = np.arange(len(self.data["torque_trans"]), 
-                                       dtype=float)/self.sr
-#            self.data["turbine_angle"] = np.append(self.data["turbine_angle"],
-#                                                   turbang)                                                  
+                                       dtype=float)/self.sr                                                
+            carpos, cpoints = daqmx.ReadCounterF64(self.carpostask,
+                                                   int(self.sr/10), 10.0,
+                                                   int(self.sr/10))
+            self.data["carriage_pos"] = np.append(self.data["carriage_pos"],
+                                                  carpos)  
+            turbang, cpoints = daqmx.ReadCounterF64(self.turbangtask,
+                                                    int(self.sr/10), 10.0,
+                                                    int(self.sr/10))
+            self.data["turbine_angle"] = np.append(self.data["turbine_angle"],
+                                                   turbang)
+            if len(self.data["t"]) > 1:
+                rpm = (turbang - self.data["turbine_angle"][-2])*self.sr/6
+            else: 
+                rpm = 0.0
+                print "Zero rpm"
+            self.data["turbine_rpm"] = np.append(self.data["turbine_rpm"],
+                                                 rpm)                                                 
             return 0 # The function should return an integer
             
         # Convert the python callback function to a CFunction
@@ -185,18 +189,18 @@ class TurbineTowDAQ(QtCore.QThread):
         daqmx.StartTask(self.analogtask)
 #        daqmx.StartTask(self.carpostask)
 #        daqmx.StartTask(self.turbangtask)
+        self.collecting.emit()
 
         # Keep the acquisition going until task it cleared
         while True:
             pass
     
-    
     def savedata(self):
         savedir = "test/"
-        fmdata = open(savedir+self.name+".json", "w")
+#        fmdata = open(savedir+self.name+".json", "w")
         json.dump(self.metadata, fmdata)
         fmdata.close()
-        savemat(savedir+self.name, self.data)
+#        savemat(savedir+self.name, self.data)
         
     def stopdaq(self):
         daqmx.StopTask(self.analogtask)
@@ -208,6 +212,7 @@ class TurbineTowDAQ(QtCore.QThread):
         daqmx.ClearTask(self.analogtask)
         daqmx.ClearTask(self.carpostask)
         daqmx.ClearTask(self.turbangtask)
+        self.finished.emit()
 
 class TareTorqueDAQ(QtCore.QThread):
     pass
