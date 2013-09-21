@@ -25,6 +25,9 @@ import json
 import guiqwt
 import time
 from scipy.io import savemat
+import xlrd
+import os
+import re
 
 # Some global constants
 simulator = True
@@ -51,6 +54,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorvec = False
         self.exp_running = False
         self.enabled_axes = {}
+        self.test_plan_data = {}
         
         # Add file path combobox to toolbar
         self.line_edit_wdir = QtGui.QLineEdit()
@@ -76,31 +80,92 @@ class MainWindow(QtGui.QMainWindow):
         if "Last window location" in self.settings:
             self.move(QtCore.QPoint(self.settings["Last window location"][0],
                                     self.settings["Last window location"][1]))
-            
-        # See what files exist in what folders using last path
-        self.read_done()
-
+        
+        # Import test plan
+        self.import_test_plan()
         # Create a timer
         self.timer = QtCore.QTimer()
-        
         # Connect signals to slots
         self.connect_sigs_slots()
-        
         # Start timer
         self.timer.start(200)
-        
         # Connect to controller
         self.connect_to_controller()
-        
         # Initialize plots
         self.initialize_plots()
-        
         # Set single run visible in tab widget
         self.ui.tabWidgetMode.setCurrentWidget(self.ui.tabSingleRun)
         
-    def read_done(self):
+    def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
-        pass
+        if "Perf" in section:
+            subdir = self.wdir + "/Performance/" + section[-5:]
+            runpath = subdir + "/" + str(number)
+        elif "Wake" in section:
+            subdir = self.wdir + "/Wake/" + section[-5:]
+            runpath = subdir + "/" + str(number)
+        elif section == "Tare Drag":
+            runpath = self.wdir + "/Tare Drag/" + str(number)
+        else: runpath = ""
+        if os.path.isdir(runpath):
+            return True
+        else:
+            return False
+    
+    def import_test_plan(self):
+        """Imports test plan from Excel spreadsheet in working directory"""
+        test_plan_found = False
+        for item in os.listdir(self.wdir):
+            if "Test plan" in item or "Test Plan" in item:
+                wb = xlrd.open_workbook(self.wdir + "/" + item)
+                test_plan_found = True
+        if test_plan_found:
+            # Set combobox items to reflect sheet names
+            self.ui.comboBox_testPlanSection.clear()
+            self.test_plan_sections = wb.sheet_names()
+            self.ui.comboBox_testPlanSection.addItems(QtCore.QStringList(self.test_plan_sections))
+            # Pull data from each sheet
+            for sheetname in self.test_plan_sections:
+                self.test_plan_data[sheetname] = {}
+                self.test_plan_data[sheetname]["Parameter list"] = []
+                ws = wb.sheet_by_name(sheetname)
+                for column in range(ws.ncols):
+                    colname = ws.cell(0,column).value
+                    if colname != "Notes":
+                        self.test_plan_data[sheetname]["Parameter list"].append(colname) 
+                        self.test_plan_data[sheetname][colname] = ws.col_values(column)[1:]
+                    if colname == "Run":
+                        for run in self.test_plan_data[sheetname][colname]:
+                            if run != "":
+                                run = int(run)
+            self.test_plan_into_table()
+        else:
+            print "No test plan found in working directory"
+            
+    def test_plan_into_table(self):
+        """Takes test plan values and puts them in table widget"""
+        section = str(self.ui.comboBox_testPlanSection.currentText())
+        paramlist = self.test_plan_data[section]["Parameter list"]
+        self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist)+1)
+        self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(
+                QtCore.QStringList(paramlist+["Done?"]))
+        self.ui.tableWidgetTestPlan.setRowCount(
+                len(self.test_plan_data[section][paramlist[0]]))
+        for i in range(len(paramlist)):
+            itemlist = self.test_plan_data[section][paramlist[i]]
+            for n in range(len(itemlist)):
+                self.ui.tableWidgetTestPlan.setItem(n, i, 
+                            QtGui.QTableWidgetItem(str(itemlist[n])))
+                # Check if run is done
+                isdone = self.is_run_done(section, n)
+                if isdone:
+                    self.ui.tableWidgetTestPlan.setItem(n, i+1,
+                            QtGui.QTableWidgetItem("Yes"))
+                    self.ui.tableWidgetTestPlan.item(n, i+1).setBackgroundColor(QtCore.Qt.green)
+                else:
+                    self.ui.tableWidgetTestPlan.setItem(n, i+1,
+                            QtGui.QTableWidgetItem("No"))
+                    self.ui.tableWidgetTestPlan.item(n, i+1).setBackgroundColor(QtCore.Qt.red)
         
     def connect_sigs_slots(self):
         """Connect signals to appropriate slots."""
@@ -111,6 +176,10 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.actionMonitor_NI.triggered.connect(self.on_monitor_ni)
         self.ui.actionStart.triggered.connect(self.on_start)
         self.ui.actionAbort.triggered.connect(self.on_abort)
+        self.ui.actionImportTestPlan.triggered.connect(self.import_test_plan)
+        self.ui.comboBox_testPlanSection.currentIndexChanged.connect(self.test_plan_into_table)
+        self.ui.tabWidgetMode.currentChanged.connect(self.on_tab_change)
+        self.ui.comboBox_testPlanSection.currentIndexChanged.connect(self.on_section_change)
         
     def on_tbutton_wdir(self):
         self.wdir = QFileDialog.getExistingDirectory()
@@ -118,6 +187,23 @@ class MainWindow(QtGui.QMainWindow):
             self.line_edit_wdir.setText(self.wdir)
         self.wdir = str(self.line_edit_wdir.text())
         self.settings["Last working directory"] = self.wdir
+    
+    def on_tab_change(self):
+        tabindex = self.ui.tabWidgetMode.currentIndex()
+        tabitem = self.ui.tabWidgetMode.tabText(tabindex)
+        section = self.ui.comboBox_testPlanSection.currentText()
+        if tabitem == "Test Plan" and section == "Top Level":
+            self.ui.actionStart.setDisabled(True)
+        else:
+            self.ui.actionStart.setEnabled(True)
+            
+    def on_section_change(self):
+        section = self.ui.comboBox_testPlanSection.currentText()
+        if section == "Top Level":
+            self.ui.actionStart.setDisabled(True)
+        else:
+            self.ui.actionStart.setEnabled(True)
+        self.test_plan_into_table()
         
     def add_labels_to_statusbar(self):
         self.label_acs_connect = QLabel()
@@ -196,7 +282,8 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.tabWidgetMode.setDisabled(True)
             if self.ui.tabTestPlan.isVisible():
                 """Continue working on test plan"""
-                print "Test plan"
+                print "Continuing test plan..."
+                self.do_test_plan()
             elif self.ui.tabSingleRun.isVisible():
                 """Do a single run"""
                 U = self.ui.doubleSpinBox_singleRun_U.value()
@@ -219,10 +306,16 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.tabWidgetMode.setEnabled(True)
             
     def on_abort(self):
+        """Abort current run and delete all data"""
         if self.ui.actionStart.isChecked():
-            self.ui.actionStart.trigger()
+            self.ui.actionStart.setChecked(False)
+            print "Aborting current run..."
         self.ui.actionMonitor_NI.setChecked(False)
         self.ui.actionMonitor_Vectrino.setChecked(False)
+        self.ui.actionStart.setIcon(QIcon(":icons/play.png"))
+        self.ui.toolBar_DAQ.setEnabled(True)
+        self.ui.toolBar_directory.setEnabled(True)
+        self.ui.tabWidgetMode.setEnabled(True)
         acsc.halt(self.hc, 0)
         acsc.halt(self.hc, 1)
         acsc.halt(self.hc, 4)
@@ -230,8 +323,31 @@ class MainWindow(QtGui.QMainWindow):
         
     def do_turbine_tow(self, U, tsr, y_R, z_H):
         """Exectutes a single turbine tow"""
-        print "Towing a turbine..."
-        print U
+        print "Executing a turbine tow..."
+        print "U =", U, "TSR =", tsr, "y/R =", y_R, "z/H =", z_H
+        self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H)
+        self.turbinetow.nidaq = False
+        self.turbinetow.start()
+        
+    def do_test_plan(self):
+        """Continue test plan"""
+        section = self.ui.comboBox_testPlanSection.currentText()
+        print "Continuing", section+"..."
+        # Find next run to do by looking in the Done? column
+        nruns = self.ui.tableWidgetTestPlan.rowCount()
+        donecol = self.ui.tableWidgetTestPlan.columnCount()-1
+        for n in range(nruns):
+            doneval = self.ui.tableWidgetTestPlan.item(n, donecol).text()
+            if doneval == "No":
+                nextrun = int(float(self.ui.tableWidgetTestPlan.item(n, 0).text()))
+                break
+        print "Starting run", str(nextrun) + "..."
+        if "Perf" in section or "Wake" in section:
+            U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
+            tsr = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
+            y_R = float(self.ui.tableWidgetTestPlan.item(nextrun, 3).text())
+            z_H = float(self.ui.tableWidgetTestPlan.item(nextrun, 4).text())
+            self.do_turbine_tow(U, tsr, y_R, z_H)
         
     def on_monitor_ni(self):
         if self.ui.actionMonitor_NI.isChecked():

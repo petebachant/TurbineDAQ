@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="icons/resources.qrc">
-    <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
+    <normaloff>:/icons/turbine.png</normaloff>:/icons/turbine.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidgetMode">
@@ -28,7 +28,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tabTareDrag">
      <attribute name="title">
@@ -314,7 +314,7 @@
      <attribute name="title">
       <string>Test Plan</string>
      </attribute>
-     <widget class="QTableWidget" name="tableWidget">
+     <widget class="QTableWidget" name="tableWidgetTestPlan">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -323,17 +323,35 @@
         <height>251</height>
        </rect>
       </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
       <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOff</enum>
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::NoSelection</enum>
+      </property>
+      <property name="textElideMode">
+       <enum>Qt::ElideMiddle</enum>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>60</number>
+       <number>57</number>
       </attribute>
       <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>25</number>
+       <number>20</number>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
       </attribute>
       <attribute name="verticalHeaderDefaultSectionSize">
        <number>15</number>
+      </attribute>
+      <attribute name="verticalHeaderHighlightSections">
+       <bool>false</bool>
       </attribute>
       <attribute name="verticalHeaderMinimumSectionSize">
        <number>15</number>
@@ -977,11 +995,17 @@
     </property>
     <addaction name="actionImportTestPlan"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuSetings"/>
    <addaction name="menuHoming"/>
    <addaction name="menuTest_Plan"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">

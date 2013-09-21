@@ -13,7 +13,7 @@ import time
 class VectrinoThread(QtCore.QThread):
     def __init__(self, usetrigger=True):
         QtCore.QThread.__init__(self)
-        
+        print "Vectrino thread initiated..."
         self.vec = PdControl()
         self.usetrigger = usetrigger
         self.comport = "COM2"
@@ -22,6 +22,7 @@ class VectrinoThread(QtCore.QThread):
         self.savepath = ""
         self.savename = "vectrino"
         self.vecstatus = "Vectrino disconnected "
+        print "Vectrino thread init done"
         
     def setconfig(self):
         self.vec.set_start_on_synch(self.usetrigger)
@@ -33,19 +34,20 @@ class VectrinoThread(QtCore.QThread):
         print "Vectrino configuration set"
 
     def run(self):
+        print "Vectrino thread started..."
         self.vec.set_serial_port(self.comport)
         self.vec.connect()
         tstart = time.time()
-        timeout = False
+        self.timeout = False
         self.vecstatus = "Connecting to Vectrino..."
         while not self.vec.connected:
             time.sleep(0.5)
             self.vec.is_connected()
             if time.time() - tstart > 10:
                 print "Vectrino timed out"
-                timeout = True
+                self.timeout = True
                 break
-        if not timeout:
+        if not self.timeout:
             self.vec.stop()
             self.setconfig()
             if self.record:

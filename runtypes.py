@@ -12,58 +12,54 @@ from acspy import acsc
 import daqtasks
 import vectasks
 import time
+from PyQt4 import QtCore
 
-class TurbineTow(object):
-    def __init__(self, acs_hcomm, towspeed, tsr, y_R=None, z_H=None, 
+class TurbineTow(QtCore.QThread):
+    def __init__(self, acs_hcomm, U, tsr, y_R, z_H, 
                  R=0.5, H=1.0, nidaq=True, vectrino=True):
         """Turbine tow run object."""
+        QtCore.QThread.__init__(self)
+        
         self.acs_hcomm = acs_hcomm
-        self.towspeed = towspeed
+        self.U = U
         self.tsr = tsr
         self.y_R = y_R
         self.z_H = z_H
         self.name = "Something" # Come up with a naming scheme
-        self.vectrino = True
-        self.nidaq = True        
+        self.vectrino = vectrino
+        self.nidaq = nidaq 
         self.build_acsprg()
         
     def build_acsprg(self):
         """Create the ACSPL+ program for running the run.
         This run should send a trigger pulse."""
-        self.acs_prg = acsprgs.build_turbine_tow(self.towspeed, self.tsr)
+        self.acs_prg = acsprgs.build_turbine_tow(self.U, self.tsr)
 
-    def go(self):
+    def run(self):
         """Start the run. Comms should be open already with the controller"""
         if self.vectrino:
-            self.start_vec()
-            vecstatus = self.vectask.getstatus()
-            while vecstatus != "Confimation mode":
-                time.sleep(0.3)
-        # Wait for Vectrino to start
+            print "Attempting to connect to Vectrino..."
+            self.vecthread = vectasks.VectrinoThread()
+            print "Turbine tow thread created vecthread"
+            self.vecthread.start()
+            time.sleep(10)
             
         if self.nidaq:
-            self.start_nidaq()
+            self.daqthread = daqtasks.TurbineTowDAQ()
         
-        acs_buffno = 15
-        acsc.loadBuffer(self.acs_hcomm, acs_buffno, self.acs_prg, 512)
-        acsc.enable(self.acs_hcomm, 0)
-        acsc.runBuffer(self.acs_hcomm, acs_buffno)
+        if self.acs_hcomm != acsc.INVALID:
+            acs_buffno = 17
+            acsc.loadBuffer(self.acs_hcomm, acs_buffno, self.acs_prg, 512)
+            acsc.enable(self.acs_hcomm, 0)
+            acsc.runBuffer(self.acs_hcomm, acs_buffno)
     
-    def halt(self):
+    def abort(self):
         """This should stop everything."""
         acsc.halt(self.acs_hcomm, 0)
         acsc.halt(self.acs_hcomm, 1)
         acsc.halt(self.acs_hcomm, 4)
         acsc.halt(self.acs_hcomm, 5)
-        self.daqtask.clear()
-    
-    def start_nidaq(self):
-        self.daqtask = daqtasks.TurbineTowDAQ()
-        self.daqtask.start()
-    
-    def start_vec(self):
-        self.vectask = vectasks.VectrinoRun()
-        self.vectask.start()
+        self.daqtask.clear()    
     
     def process(self, t1, t2):
         """This shit should load in the data and spit out mean values"""
