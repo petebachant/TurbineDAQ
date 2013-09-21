@@ -50,6 +50,7 @@ class MainWindow(QtGui.QMainWindow):
         self.time_last_run = time.time()
         
         # Some operating parameters
+        self.monitoracs = False
         self.monitorni = False
         self.monitorvec = False
         self.exp_running = False
@@ -183,6 +184,7 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.comboBox_testPlanSection.currentIndexChanged.connect(self.test_plan_into_table)
         self.ui.tabWidgetMode.currentChanged.connect(self.on_tab_change)
         self.ui.comboBox_testPlanSection.currentIndexChanged.connect(self.on_section_change)
+        self.ui.actionMonitor_ACS.triggered.connect(self.on_monitor_acs)
         
     def on_tbutton_wdir(self):
         self.wdir = QFileDialog.getExistingDirectory()
@@ -227,6 +229,7 @@ class MainWindow(QtGui.QMainWindow):
             if self.hc == acsc.INVALID:
                 print "Cannot connect to simulator"
             else:
+                print "Connected to simulator"
                 self.label_acs_connect.setText(" Connected to SPiiPlus simulator ")
             
     def initialize_plots(self):
@@ -276,11 +279,18 @@ class MainWindow(QtGui.QMainWindow):
         self.curve_vec_snr = guiqwt.curve.CurveItem()
         self.plot_vec_snr = self.ui.plotVecSNR.get_plot()
         self.plot_vec_snr.add_item(self.curve_vec_snr)
-        # ACS plot
-        # ACS plot
-        # ACS plot
-        # Add a panel
-        
+        # ACS carriage speed plot
+        self.curve_acs_carvel = guiqwt.curve.CurveItem()
+        self.plot_acs_carvel = self.ui.plotTowSpeed.get_plot()
+        self.plot_acs_carvel.add_item(self.curve_acs_carvel)
+        # ACS turbine RPM plot
+        self.curve_acs_rpm = guiqwt.curve.CurveItem()
+        self.plot_acs_rpm = self.ui.plotRPM_acs.get_plot()
+        self.plot_acs_rpm.add_item(self.curve_acs_rpm)
+        # ACS TSR plot
+        self.curve_acs_tsr = guiqwt.curve.CurveItem()
+        self.plot_acs_tsr = self.ui.plotTurbineTSR.get_plot()
+        self.plot_acs_tsr.add_item(self.curve_acs_tsr)        
         
     def on_start(self):
         """Start whatever is visibile in the tab widget"""
@@ -378,6 +388,16 @@ class MainWindow(QtGui.QMainWindow):
             z_H = float(self.ui.tableWidgetTestPlan.item(nextrun, 4).text())
             self.do_turbine_tow(U, tsr, y_R, z_H)
         
+    def on_monitor_acs(self):
+        if self.ui.actionMonitor_ACS.isChecked():
+            self.acsthread = daqtasks.AcsDaqThread(self.hc)
+            self.acsdata = self.acsthread.data            
+            self.acsthread.start()
+            self.monitoracs = True
+        else:
+            self.acsthread.stop()
+            self.monitoracs = False
+        
     def on_monitor_ni(self):
         if self.ui.actionMonitor_NI.isChecked():
             self.daqthread = daqtasks.TurbineTowDAQ()
@@ -408,12 +428,30 @@ class MainWindow(QtGui.QMainWindow):
         self.label_timer.setText("Time since last run: " + \
         str(int(self.time_since_last_run)) + " s ")
         
+        if self.monitoracs:
+            self.update_plots_acs()
         if self.monitorvec or self.exp_running:
             self.update_plots_vec()
             self.label_vecstatus.setText(self.vecthread.vecstatus)
         if self.monitorni or self.exp_running:
             self.update_plots_ni()
     
+    def update_plots_acs(self):
+        """Update the acs plots for carriage speed, rpm, and tsr"""
+        t = self.acsdata["t"]
+        if len(t) > 0:
+            t = (t - t[0])/1000.0
+        self.curve_acs_carvel.set_data(t, self.acsdata["carriage_vel"])
+        self.plot_acs_carvel.replot()
+        self.curve_acs_rpm.set_data(t, self.acsdata["turbine_rpm"])
+        self.plot_acs_rpm.replot()
+        r = 0.5
+        tsr = self.acsdata["turbine_rpm"]*2*np.pi/60.0*r/ \
+                self.acsdata["carriage_vel"]
+        self.curve_acs_tsr.set_data(t, tsr)
+        self.plot_acs_tsr.replot()
+        
+        
     def update_plots_ni(self):
         t = self.nidata["t"]
         self.curve_drag_left.set_data(t, self.nidata["drag_left"])
@@ -438,7 +476,8 @@ class MainWindow(QtGui.QMainWindow):
         self.plot_vecw.replot()
     
     def update_acs(self):
-        """This function updates all the ACS controller data"""
+        """This function updates all the non-time-critical 
+        ACS controller data"""
         if acsc.getMotorState(self.hc, 0) == "disabled":
             self.enabled_axes["y"] = False 
     

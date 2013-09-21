@@ -1147,6 +1147,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionMonitor_ACS"/>
    <addaction name="actionMonitor_NI"/>
    <addaction name="actionMonitor_Vectrino"/>
   </widget>
@@ -1329,6 +1330,21 @@
    </property>
    <property name="toolTip">
     <string>Enable all axes</string>
+   </property>
+  </action>
+  <action name="actionMonitor_ACS">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/resources.qrc">
+     <normaloff>:/icons/acs.png</normaloff>:/icons/acs.png</iconset>
+   </property>
+   <property name="text">
+    <string>Monitor ACS</string>
+   </property>
+   <property name="toolTip">
+    <string>Monitor values in ACS controller</string>
    </property>
   </action>
  </widget>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Sat Sep 21 00:23:58 2013
+# Created: Sat Sep 21 17:49:47 2013
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -580,6 +580,12 @@ class Ui_MainWindow(object):
         icon8.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/button_ok.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionEnable_All.setIcon(icon8)
         self.actionEnable_All.setObjectName(_fromUtf8("actionEnable_All"))
+        self.actionMonitor_ACS = QtGui.QAction(MainWindow)
+        self.actionMonitor_ACS.setCheckable(True)
+        icon9 = QtGui.QIcon()
+        icon9.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/acs.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionMonitor_ACS.setIcon(icon9)
+        self.actionMonitor_ACS.setObjectName(_fromUtf8("actionMonitor_ACS"))
         self.menuFile.addAction(self.actionQuit)
         self.menuHoming.addAction(self.actionHome_Tow)
         self.menuHoming.addAction(self.actionHome_Turbine)
@@ -596,6 +602,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuHelp.menuAction())
         self.toolBar.addAction(self.actionStart)
         self.toolBar.addAction(self.actionAbort)
+        self.toolBar_DAQ.addAction(self.actionMonitor_ACS)
         self.toolBar_DAQ.addAction(self.actionMonitor_NI)
         self.toolBar_DAQ.addAction(self.actionMonitor_Vectrino)
 
@@ -724,6 +731,8 @@ class Ui_MainWindow(object):
         self.actionEnable_z.setText(_translate("MainWindow", "Enable z", None))
         self.actionEnable_All.setText(_translate("MainWindow", "Enable All", None))
         self.actionEnable_All.setToolTip(_translate("MainWindow", "Enable all axes", None))
+        self.actionMonitor_ACS.setText(_translate("MainWindow", "Monitor ACS", None))
+        self.actionMonitor_ACS.setToolTip(_translate("MainWindow", "Monitor values in ACS controller", None))
 
 from guiqwt.plot import CurveWidget
 import resources_rc

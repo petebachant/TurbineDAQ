@@ -7,13 +7,13 @@ Created on Mon Aug 19 10:51:28 2013
 This module contains the DAQ stuff for TurbineDAQ
 
 """
-
 from PyQt4 import QtCore
 import numpy as np
 from daqmx import daqmx
 import time
 import json
 from scipy.io import savemat
+from acspy import acsc, prgs
 
 
 class TurbineTowDAQ(QtCore.QThread):
@@ -219,6 +219,45 @@ class TareTorqueDAQ(QtCore.QThread):
 
 class TareDragDAQ(QtCore.QThread):
     pass
+
+class AcsDaqThread(QtCore.QThread):
+    def __init__(self, acs_hc):
+        QtCore.QThread.__init__(self)
+        self.hc = acs_hc
+        self.collectdata = True
+        self.data = {"carriage_vel" : np.array([]),
+                     "turbine_rpm" : np.array([]),
+                     "turbine_tsr" : np.array([]),
+                     "t" : np.array([])}
+        self.dblen = 100
+        self.sr = 200.0
+        self.sleeptime = self.dblen/self.sr/2*1.05
+        # Create an ACSPL+ program to load into the controller
+        self.prg = prgs.ACSPLplusPrg()
+        self.prg.declare_2darray("global", "real", "data", 3, self.dblen)
+        self.prg.addline("GLOBAL INT collect_data")
+        self.prg.addline("collect_data = 1")
+        self.prg.add_dc("data", self.dblen, self.sr, "TIME, FVEL(5), FVEL(4)", "/c")
+        self.prg.addline("TILL collect_data = 0")
+        self.prg.addline("STOPDC")
+        self.prg.addstopline()
+    def run(self):
+        acsc.loadBuffer(self.hc, 20, self.prg, 1024)
+        acsc.runBuffer(self.hc, 20)
+        while self.collectdata:
+            time.sleep(self.sleeptime)
+            newdata = acsc.readReal(self.hc, acsc.NONE, "data", 0, 2, 0, self.dblen/2-1)
+            self.data["t"] = np.append(self.data["t"], newdata[0])
+            self.data["carriage_vel"] = np.append(self.data["carriage_vel"], newdata[1])
+            self.data["turbine_rpm"] = np.append(self.data["turbine_rpm"], newdata[2])
+            time.sleep(self.sleeptime)
+            newdata = acsc.readReal(self.hc, acsc.NONE, "data", 0, 2, self.dblen/2, self.dblen-1)
+            self.data["t"] = np.append(self.data["t"], newdata[0])
+            self.data["carriage_vel"] = np.append(self.data["carriage_vel"], newdata[1])
+            self.data["turbine_rpm"] = np.append(self.data["turbine_rpm"], newdata[2])
+    def stop(self):
+        self.collectdata = False
+        acsc.writeInteger(self.hc, "collect_data", 0)
 
 def main():
     turbdaq = TurbineTowDAQ("run2_yz32")
