@@ -241,6 +241,7 @@ class AcsDaqThread(QtCore.QThread):
         self.prg.addline("TILL collect_data = 0")
         self.prg.addline("STOPDC")
         self.prg.addstopline()
+        print self.prg
     def run(self):
         acsc.loadBuffer(self.hc, 20, self.prg, 1024)
         acsc.runBuffer(self.hc, 20)
@@ -268,4 +269,5 @@ def main():
     return turbdaq.data
 
 if __name__ == "__main__":
-    data = main()
+    something = AcsDaqThread(0)
+    print something.prg
