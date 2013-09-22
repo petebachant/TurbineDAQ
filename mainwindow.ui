@@ -413,6 +413,19 @@
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
      </widget>
+     <widget class="QToolButton" name="toolButtonOpenSection">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>11</y>
+        <width>25</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>...</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tabProcessing">
      <attribute name="title">

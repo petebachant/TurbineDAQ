@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Sat Sep 21 21:18:30 2013
+# Created: Sun Sep 22 01:34:03 2013
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -205,6 +205,9 @@ class Ui_MainWindow(object):
         self.label_32.setGeometry(QtCore.QRect(10, 10, 41, 21))
         self.label_32.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_32.setObjectName(_fromUtf8("label_32"))
+        self.toolButtonOpenSection = QtGui.QToolButton(self.tabTestPlan)
+        self.toolButtonOpenSection.setGeometry(QtCore.QRect(200, 11, 25, 20))
+        self.toolButtonOpenSection.setObjectName(_fromUtf8("toolButtonOpenSection"))
         self.tabWidgetMode.addTab(self.tabTestPlan, _fromUtf8(""))
         self.tabProcessing = QtGui.QWidget()
         self.tabProcessing.setObjectName(_fromUtf8("tabProcessing"))
@@ -644,6 +647,7 @@ class Ui_MainWindow(object):
         item = self.tableWidgetTestPlan.horizontalHeaderItem(5)
         item.setText(_translate("MainWindow", "Done?", None))
         self.label_32.setText(_translate("MainWindow", "Section", None))
+        self.toolButtonOpenSection.setText(_translate("MainWindow", "...", None))
         self.tabWidgetMode.setTabText(self.tabWidgetMode.indexOf(self.tabTestPlan), _translate("MainWindow", "Test Plan", None))
         self.groupBox.setTitle(_translate("MainWindow", "Results", None))
         self.label_20.setText(_translate("MainWindow", "C_P", None))

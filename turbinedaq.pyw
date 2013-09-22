@@ -27,7 +27,7 @@ import time
 from scipy.io import savemat
 import xlrd
 import os
-import re
+import subprocess
 
 # Some global constants
 simulator = True
@@ -92,9 +92,12 @@ class MainWindow(QtGui.QMainWindow):
         self.import_test_plan()
         # Set single run visible in tab widget
         self.ui.tabWidgetMode.setCurrentWidget(self.ui.tabTestPlan)
-        self.ui.actionStart.setDisabled(True)
+        if "Last section" in self.settings:
+            self.ui.comboBox_testPlanSection.setCurrentIndex(self.settings["Last section"])
+        self.test_plan_into_table()
         # Connect signals to slots
         self.connect_sigs_slots()
+        self.ui.comboBox_testPlanSection.currentIndexChanged.emit(0)
         # Start timer
         self.timer.start(200)        
         
@@ -115,7 +118,14 @@ class MainWindow(QtGui.QMainWindow):
             return False
     
     def is_section_done(self, section):
-        pass
+        if "Perf" in section:
+            subdir = self.wdir + "/Performance/" + section[-5:]
+            runlist = self.test_plan_data[section]["Run"]
+            runlist = [str(run) for run in runlist]
+            if runlist == os.listdir(subdir):
+                return True
+            else:
+                return False
     
     def import_test_plan(self):
         """Imports test plan from Excel spreadsheet in working directory"""
@@ -152,10 +162,17 @@ class MainWindow(QtGui.QMainWindow):
     def test_plan_into_table(self):
         """Takes test plan values and puts them in table widget"""
         section = str(self.ui.comboBox_testPlanSection.currentText())
+        if section == "":
+            section = "Top Level"
         paramlist = self.test_plan_data[section]["Parameter list"]
-        self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist)+1)
-        self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(
-                QtCore.QStringList(paramlist+["Done?"]))
+        if section != "Top Level":
+            self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist)+1)
+            self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(
+                    QtCore.QStringList(paramlist+["Done?"]))
+        else:
+            self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist))
+            self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(
+                    QtCore.QStringList(paramlist))        
         self.ui.tableWidgetTestPlan.setRowCount(
                 len(self.test_plan_data[section][paramlist[0]]))
         for i in range(len(paramlist)):
@@ -164,15 +181,18 @@ class MainWindow(QtGui.QMainWindow):
                 self.ui.tableWidgetTestPlan.setItem(n, i, 
                             QtGui.QTableWidgetItem(str(itemlist[n])))
                 # Check if run is done
-                isdone = self.is_run_done(section, n)
-                if isdone:
-                    self.ui.tableWidgetTestPlan.setItem(n, i+1,
-                            QtGui.QTableWidgetItem("Yes"))
-                    self.ui.tableWidgetTestPlan.item(n, i+1).setBackgroundColor(QtCore.Qt.green)
-                else:
-                    self.ui.tableWidgetTestPlan.setItem(n, i+1,
-                            QtGui.QTableWidgetItem("No"))
-                    self.ui.tableWidgetTestPlan.item(n, i+1).setBackgroundColor(QtCore.Qt.red)
+                if section != "Top Level":
+                    isdone = self.is_run_done(section, n)
+                    if isdone:
+                        self.ui.tableWidgetTestPlan.setItem(n, i+1,
+                                QtGui.QTableWidgetItem("Yes"))
+                        self.ui.tableWidgetTestPlan.item(n, i+1).\
+                                setBackgroundColor(QtCore.Qt.green)
+                    else:
+                        self.ui.tableWidgetTestPlan.setItem(n, i+1,
+                                QtGui.QTableWidgetItem("No"))
+                        self.ui.tableWidgetTestPlan.item(n, i+1).\
+                                setBackgroundColor(QtCore.Qt.red)
         
     def connect_sigs_slots(self):
         """Connect signals to appropriate slots."""
@@ -188,6 +208,7 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.tabWidgetMode.currentChanged.connect(self.on_tab_change)
         self.ui.comboBox_testPlanSection.currentIndexChanged.connect(self.on_section_change)
         self.ui.actionMonitor_ACS.triggered.connect(self.on_monitor_acs)
+        self.ui.toolButtonOpenSection.clicked.connect(self.on_open_section_folder)
         
     def on_tbutton_wdir(self):
         self.wdir = QFileDialog.getExistingDirectory()
@@ -204,6 +225,17 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.actionStart.setDisabled(True)
         else:
             self.ui.actionStart.setEnabled(True)
+    
+    def on_open_section_folder(self):
+        section = str(self.ui.comboBox_testPlanSection.currentText())
+        if "Perf" in section:
+            subdir = self.wdir + "\\Performance\\" + section[-5:]
+        elif "Wake" in section:
+            subdir = self.wdir + "\\Wake\\" + section[-5:]
+        elif section == "Tare Drag":
+            subdir = self.wdir + "\\Tare Drag"
+        else: subdir = self.wdir
+        os.startfile(subdir)
             
     def on_section_change(self):
         section = self.ui.comboBox_testPlanSection.currentText()
@@ -370,7 +402,8 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.actionStart.trigger()
         
     def on_idletimer(self):
-        self.do_test_plan()
+        if self.ui.actionStart.isChecked():
+            self.do_test_plan()
         
     def do_test_plan(self):
         """Continue test plan"""
@@ -397,9 +430,12 @@ class MainWindow(QtGui.QMainWindow):
             self.acsthread = daqtasks.AcsDaqThread(self.hc, makeprg=True)
             self.acsdata = self.acsthread.data            
             self.acsthread.start()
+            acsc.enable(self.hc, 5)
+            acsc.jog(self.hc, acsc.AMF_VELOCITY, 5, 1)
             self.monitoracs = True
         else:
             self.acsthread.stop()
+            acsc.halt(self.hc, 5)
             self.monitoracs = False
         
     def on_monitor_ni(self):
@@ -519,6 +555,8 @@ class MainWindow(QtGui.QMainWindow):
     def closeEvent(self, event):
         self.settings["Last window location"] = [self.pos().x(), 
                                                  self.pos().y()]
+        self.settings["Last section"] = \
+                self.ui.comboBox_testPlanSection.currentIndex()
         with open("settings/settings.json", "w") as fn:
             json.dump(self.settings, fn)
         acsc.closeComm(self.hc)

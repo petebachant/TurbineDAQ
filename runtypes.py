@@ -46,7 +46,8 @@ class TurbineTow(QtCore.QThread):
     def build_acsprg(self):
         """Create the ACSPL+ program for running the run.
         This run should send a trigger pulse."""
-        self.acs_prg = acsprgs.build_turbine_tow(self.U, self.tsr)
+        self.acs_prg = acsprgs.build_turbine_tow(self.U, self.tsr, self.y_R,
+                                                 self.z_H)
 
     def run(self):
         """Start the run. Comms should be open already with the controller"""
