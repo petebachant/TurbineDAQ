@@ -82,20 +82,21 @@ class MainWindow(QtGui.QMainWindow):
             self.move(QtCore.QPoint(self.settings["Last window location"][0],
                                     self.settings["Last window location"][1]))
         
-        # Import test plan
-        self.import_test_plan()
         # Create a timer
         self.timer = QtCore.QTimer()
-        # Connect signals to slots
-        self.connect_sigs_slots()
-        # Start timer
-        self.timer.start(200)
         # Connect to controller
         self.connect_to_controller()
         # Initialize plots
         self.initialize_plots()
+        # Import test plan
+        self.import_test_plan()
         # Set single run visible in tab widget
-        self.ui.tabWidgetMode.setCurrentWidget(self.ui.tabSingleRun)
+        self.ui.tabWidgetMode.setCurrentWidget(self.ui.tabTestPlan)
+        self.ui.actionStart.setDisabled(True)
+        # Connect signals to slots
+        self.connect_sigs_slots()
+        # Start timer
+        self.timer.start(200)        
         
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
@@ -119,6 +120,7 @@ class MainWindow(QtGui.QMainWindow):
     def import_test_plan(self):
         """Imports test plan from Excel spreadsheet in working directory"""
         test_plan_found = False
+        self.test_plan_loaded = False
         for item in os.listdir(self.wdir):
             if "Test plan" in item or "Test Plan" in item:
                 wb = xlrd.open_workbook(self.wdir + "/" + item)
@@ -142,6 +144,7 @@ class MainWindow(QtGui.QMainWindow):
                         for run in self.test_plan_data[sheetname][colname]:
                             if run != "":
                                 run = int(run)
+            self.test_plan_loaded = True
             self.test_plan_into_table()
         else:
             print "No test plan found in working directory"
@@ -304,8 +307,9 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.tabWidgetMode.setDisabled(True)
             if self.ui.tabTestPlan.isVisible():
                 """Continue working on test plan"""
-                print "Continuing test plan..."
-                self.do_test_plan()
+                if self.ui.comboBox_testPlanSection.currentText() != "Top Level":
+                    print "Continuing test plan..."
+                    self.do_test_plan()
             elif self.ui.tabSingleRun.isVisible():
                 """Do a single run"""
                 U = self.ui.doubleSpinBox_singleRun_U.value()
@@ -390,7 +394,7 @@ class MainWindow(QtGui.QMainWindow):
         
     def on_monitor_acs(self):
         if self.ui.actionMonitor_ACS.isChecked():
-            self.acsthread = daqtasks.AcsDaqThread(self.hc)
+            self.acsthread = daqtasks.AcsDaqThread(self.hc, makeprg=True)
             self.acsdata = self.acsthread.data            
             self.acsthread.start()
             self.monitoracs = True
@@ -400,7 +404,7 @@ class MainWindow(QtGui.QMainWindow):
         
     def on_monitor_ni(self):
         if self.ui.actionMonitor_NI.isChecked():
-            self.daqthread = daqtasks.TurbineTowDAQ()
+            self.daqthread = daqtasks.NiDaqThread()
             self.daqthread.usetrigger = False
             self.nidata = self.daqthread.data
             self.daqthread.start()
@@ -478,8 +482,39 @@ class MainWindow(QtGui.QMainWindow):
     def update_acs(self):
         """This function updates all the non-time-critical 
         ACS controller data"""
-        if acsc.getMotorState(self.hc, 0) == "disabled":
-            self.enabled_axes["y"] = False 
+        if acsc.getMotorState(self.hc, 0) != "disabled":
+            self.enabled_axes["y"] = "Yes"
+        else:
+            self.enabled_axes["y"] = "No"
+        if acsc.getMotorState(self.hc, 1) != "disabled":
+            self.enabled_axes["z"] = "Yes"
+        else:
+            self.enabled_axes["z"] = "No"            
+        if acsc.getMotorState(self.hc, 4) != "disabled":
+            self.enabled_axes["turbine"] = "Yes"
+        else:
+            self.enabled_axes["turbine"] = "No"
+        if acsc.getMotorState(self.hc, 5) != "disabled":
+            self.enabled_axes["tow"] = "Yes"
+        else:
+            self.enabled_axes["tow"] = "No"            
+        # Put this data into table widget
+        self.ui.tableWidget_acs.setItem(0, 1, 
+                QtGui.QTableWidgetItem(str(self.enabled_axes["tow"])))
+        self.ui.tableWidget_acs.setItem(1, 1, 
+                QtGui.QTableWidgetItem(str(self.enabled_axes["turbine"])))
+        self.ui.tableWidget_acs.setItem(2, 1, 
+                QtGui.QTableWidgetItem(str(self.enabled_axes["y"])))
+        self.ui.tableWidget_acs.setItem(3, 1, 
+                QtGui.QTableWidgetItem(str(self.enabled_axes["z"])))
+        hc_tow = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_tow")
+        hc_turbine = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_turbine")
+        hc_y = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_y")
+        hc_z = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_z")
+        self.ui.tableWidget_acs.setItem(0, 2, QtGui.QTableWidgetItem(str(hc_tow)))
+        self.ui.tableWidget_acs.setItem(1, 2, QtGui.QTableWidgetItem(str(hc_turbine)))
+        self.ui.tableWidget_acs.setItem(2, 2, QtGui.QTableWidgetItem(str(hc_y)))
+        self.ui.tableWidget_acs.setItem(3, 2, QtGui.QTableWidgetItem(str(hc_z)))
     
     def closeEvent(self, event):
         self.settings["Last window location"] = [self.pos().x(), 

@@ -906,7 +906,12 @@
       </column>
       <column>
        <property name="text">
-        <string>Home Ct.</string>
+        <string>Enabled?</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Home #</string>
        </property>
       </column>
       <column>
@@ -917,11 +922,6 @@
       <column>
        <property name="text">
         <string>FPOS</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>RVEL</string>
        </property>
       </column>
       <column>

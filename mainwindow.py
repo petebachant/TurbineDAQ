@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Sat Sep 21 17:49:47 2013
+# Created: Sat Sep 21 21:18:30 2013
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -672,13 +672,13 @@ class Ui_MainWindow(object):
         item = self.tableWidget_acs.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Axis", None))
         item = self.tableWidget_acs.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Home Ct.", None))
+        item.setText(_translate("MainWindow", "Enabled?", None))
         item = self.tableWidget_acs.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "RPOS", None))
+        item.setText(_translate("MainWindow", "Home #", None))
         item = self.tableWidget_acs.horizontalHeaderItem(3)
-        item.setText(_translate("MainWindow", "FPOS", None))
+        item.setText(_translate("MainWindow", "RPOS", None))
         item = self.tableWidget_acs.horizontalHeaderItem(4)
-        item.setText(_translate("MainWindow", "RVEL", None))
+        item.setText(_translate("MainWindow", "FPOS", None))
         item = self.tableWidget_acs.horizontalHeaderItem(5)
         item.setText(_translate("MainWindow", "FVEL", None))
         __sortingEnabled = self.tableWidget_acs.isSortingEnabled()
