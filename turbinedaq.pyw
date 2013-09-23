@@ -390,7 +390,6 @@ class MainWindow(QtGui.QMainWindow):
                                               nidaq=True, vectrino=False)
         self.turbinetow.towfinished.connect(self.on_tow_finished)
         self.turbinetow.vecsavepath = str(self.savedir + "/" + str(self.currentrun) + "/vecdata_vno")
-        print self.turbinetow.vecsavepath
         self.acsdata = self.turbinetow.acsdata
         self.nidata = self.turbinetow.nidata
         self.towinprogress = True
@@ -409,6 +408,8 @@ class MainWindow(QtGui.QMainWindow):
             print "Saving " + savedir + "/acsdata.mat" + "..."
             savemat(savedir+"/acsdata.mat", self.acsdata, oned_as="column")
             savemat(savedir+"/nidata.mat", self.nidata, oned_as="column")
+            with open(savedir+"/metadata.json", "w") as fn:
+                json.dump(self.turbinetow.metadata, fn, indent=4)
         # Update test plan table
         self.test_plan_into_table()
         # If executing a test plan start a single shot timer for next run
@@ -503,6 +504,10 @@ class MainWindow(QtGui.QMainWindow):
     def update_plots_acs(self):
         """Update the acs plots for carriage speed, rpm, and tsr"""
         t = self.acsdata["t"]
+        try:
+            print t[0]
+        except IndexError:
+            pass
         self.curve_acs_carvel.set_data(t, self.acsdata["carriage_vel"])
         self.plot_acs_carvel.replot()
         self.curve_acs_rpm.set_data(t, self.acsdata["turbine_rpm"])

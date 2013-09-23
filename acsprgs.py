@@ -13,6 +13,8 @@ def build_turbine_tow(towspeed, tsr, y_R, z_H):
     initvars = "local real target, tsr, U, rpm, tacc, endpos, tzero \n"
     initvars += "global real data(3)(100) \n"
     initvars += "global real start_time \n"
+    initvars += "global int collect_data \n"
+    initvars += "collect_data = 0 \n \n"
     prgbody = \
 """
 rpm = tsr*U/0.5*60/6.28318530718
@@ -39,11 +41,15 @@ VEL(4) = rpm
 DEC(4) = ACC(4)
 JERK(4)= ACC(4)*10
 
+! Wait a little after moving Vectrino
+WAIT 3000
+
 ! Move turbine to zero
 ptp/e(4), 0
 
 ! Start controller data acquisition and send trigger pulse in same cycle
 BLOCK
+    collect_data = 1
     DC/c data, 100, 5.0, TIME, FVEL(5), FVEL(4)
     ! Send trigger pulse for data acquisition (may need work)
     ! OUT4.0 = 1
@@ -64,6 +70,7 @@ ptp/e 5, 0
 
 ! OUT4.0 = 0
 STOPDC
+collect_data = 0
 STOP
 """
     

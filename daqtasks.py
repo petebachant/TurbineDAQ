@@ -217,7 +217,6 @@ class AcsDaqThread(QtCore.QThread):
         self.collectdata = True
         self.data = {"carriage_vel" : np.array([]),
                      "turbine_rpm" : np.array([]),
-                     "turbine_tsr" : np.array([]),
                      "t" : np.array([])}
         self.dblen = bufflen
         self.sr = sample_rate
@@ -228,8 +227,10 @@ class AcsDaqThread(QtCore.QThread):
             self.makedaqprg()
             acsc.loadBuffer(self.hc, 19, self.prg, 1024)
             acsc.runBuffer(self.hc, 19)
-#        while acsc.getProgramState(self.hc, 19) != 3:
-            time.sleep(0.1)
+        collect = acsc.readInteger(self.hc, acsc.NONE, "collect_data")
+        while collect == 0:
+            time.sleep(0.01)
+            collect = acsc.readInteger(self.hc, acsc.NONE, "collect_data")
         while self.collectdata:
             time.sleep(self.sleeptime)
             t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
