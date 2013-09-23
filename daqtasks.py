@@ -23,9 +23,8 @@ class NiDaqThread(QtCore.QThread):
         # Some parameters for the thread
         self.usetrigger = usetrigger
         
-        # Crete some meta data for the run
-        self.timecreated = time.asctime()
-        self.metadata = {"Time created" : self.timecreated}
+        # Create some meta data for the run
+        self.metadata = {}
         
         # Initialize sample rate
         self.sr = 2000.0
@@ -60,9 +59,9 @@ class NiDaqThread(QtCore.QThread):
         daqmx.AddGlobalChansToTask(self.analogtask, self.analogchans)
         daqmx.AddGlobalChansToTask(self.carpostask, self.carposchan)
         daqmx.AddGlobalChansToTask(self.turbangtask, self.turbangchan)
-        self.metadata["Global analog channels"] = self.analogchans
-        self.metadata["Global counter channels"] = [self.carposchan,
-                                                    self.turbangchan]
+#        self.metadata["Global analog channels"] = self.analogchans
+#        self.metadata["Global counter channels"] = [self.carposchan,
+#                                                    self.turbangchan]
 
         # Get channel information to add to metadata
         self.chaninfo = {}

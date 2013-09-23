@@ -24,11 +24,11 @@
       <x>10</x>
       <y>10</y>
       <width>381</width>
-      <height>331</height>
+      <height>371</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tabTareDrag">
      <attribute name="title">
@@ -202,8 +202,8 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>201</width>
-        <height>151</height>
+        <width>211</width>
+        <height>131</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
@@ -266,13 +266,6 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="2">
-        <widget class="QLabel" name="label_Re_D">
-         <property name="text">
-          <string>Re_D =</string>
-         </property>
-        </widget>
-       </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_33">
          <property name="text">
@@ -290,20 +283,10 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="QCheckBox" name="checkBox_singleRun_save">
+       <item row="0" column="2">
+        <widget class="QToolButton" name="toolButtonOpenShakedown">
          <property name="text">
-          <string>Save</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="2">
-        <widget class="QLabel" name="label_singleRun_name">
-         <property name="text">
-          <string>Name: </string>
+          <string>...</string>
          </property>
         </widget>
        </item>
@@ -320,7 +303,7 @@
         <x>10</x>
         <y>40</y>
         <width>361</width>
-        <height>251</height>
+        <height>301</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -435,7 +418,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>140</y>
+        <y>180</y>
         <width>181</width>
         <height>111</height>
        </rect>
@@ -513,7 +496,7 @@
         <x>10</x>
         <y>10</y>
         <width>181</width>
-        <height>121</height>
+        <height>141</height>
        </rect>
       </property>
       <property name="title">
@@ -525,11 +508,11 @@
          <x>10</x>
          <y>20</y>
          <width>161</width>
-         <height>91</height>
+         <height>111</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
+        <item row="1" column="0">
          <widget class="QLabel" name="label_23">
           <property name="text">
            <string>Run</string>
@@ -539,10 +522,10 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
+        <item row="1" column="1">
          <widget class="QComboBox" name="comboBox"/>
         </item>
-        <item row="1" column="0">
+        <item row="2" column="0">
          <widget class="QLabel" name="label_21">
           <property name="text">
            <string>Start Time (s)</string>
@@ -552,7 +535,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="label_22">
           <property name="text">
            <string>End Time (s)</string>
@@ -562,11 +545,24 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
+        <item row="2" column="1">
          <widget class="QDoubleSpinBox" name="doubleSpinBox_t1"/>
         </item>
-        <item row="2" column="1">
+        <item row="3" column="1">
          <widget class="QDoubleSpinBox" name="doubleSpinBox_t2"/>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_28">
+          <property name="text">
+           <string>Section</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="comboBoxProcessSection"/>
         </item>
        </layout>
       </widget>
@@ -727,9 +723,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>340</y>
+      <y>390</y>
       <width>381</width>
-      <height>521</height>
+      <height>471</height>
      </rect>
     </property>
     <property name="floating">
@@ -743,7 +739,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>170</y>
+        <y>120</y>
         <width>371</width>
         <height>321</height>
        </rect>
@@ -989,6 +985,7 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -1256,7 +1253,7 @@
   </action>
   <action name="actionImportTestPlan">
    <property name="text">
-    <string>Import...</string>
+    <string>Reload</string>
    </property>
   </action>
   <action name="actionAbort">
@@ -1335,6 +1332,11 @@
    </property>
    <property name="toolTip">
     <string>Monitor values in ACS controller</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>

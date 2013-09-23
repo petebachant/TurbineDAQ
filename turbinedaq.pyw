@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Aug 15 20:43:44 2013
-
-@author: Pete
+@author: Pete Bachant
 
 This is the turbineDAQ main code.
 
 To-do:
-  * Do some data acquisition in the ACS controller as well...
-  
+  * After "pausing" need some way to know a run is done to enable controls
+    rather than enabling them right away
 """
 
 from __future__ import division
@@ -27,18 +26,8 @@ import time
 from scipy.io import savemat
 import xlrd
 import os
-import subprocess
 
-# Some global constants
-simulator = True
 
-# Log run metadata as JSON
-# Move Vectrino first?
-# Start Vectrino and wait for it to enter data collection mode
-# Start NI waiting for a trigger pulse
-# Start ACS program
-
-    
 class MainWindow(QtGui.QMainWindow):
     def __init__(self, parent=None):
         QtGui.QMainWindow.__init__(self)
@@ -100,7 +89,7 @@ class MainWindow(QtGui.QMainWindow):
         self.connect_sigs_slots()
         self.ui.comboBox_testPlanSection.currentIndexChanged.emit(0)
         # Start timer
-        self.timer.start(200)        
+        self.timer.start(100)        
         
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
@@ -211,6 +200,8 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.comboBox_testPlanSection.currentIndexChanged.connect(self.on_section_change)
         self.ui.actionMonitor_ACS.triggered.connect(self.on_monitor_acs)
         self.ui.toolButtonOpenSection.clicked.connect(self.on_open_section_folder)
+        self.ui.actionHome_Tow.triggered.connect(self.on_home_tow)
+        self.ui.toolButtonOpenShakedown.clicked.connect(self.on_open_shakedown)
         
     def on_tbutton_wdir(self):
         self.wdir = QFileDialog.getExistingDirectory()
@@ -228,6 +219,9 @@ class MainWindow(QtGui.QMainWindow):
         else:
             self.ui.actionStart.setEnabled(True)
     
+    def on_home_tow(self):
+        acsc.runBuffer(self.hc, 2)
+    
     def on_open_section_folder(self):
         section = str(self.ui.comboBox_testPlanSection.currentText())
         if "Perf" in section:
@@ -237,6 +231,10 @@ class MainWindow(QtGui.QMainWindow):
         elif section == "Tare Drag":
             subdir = self.wdir + "\\Tare Drag"
         else: subdir = self.wdir
+        os.startfile(subdir)
+        
+    def on_open_shakedown(self):
+        subdir = self.wdir + "\\Shakedown"
         os.startfile(subdir)
             
     def on_section_change(self):
@@ -256,6 +254,9 @@ class MainWindow(QtGui.QMainWindow):
         self.label_vecstatus = QLabel()
         self.label_vecstatus.setText("Vectrino disconnected ")
         self.ui.statusbar.addWidget(self.label_vecstatus)
+        self.label_runstatus = QLabel()
+        self.label_runstatus.setText("Not running ")
+        self.ui.statusbar.addWidget(self.label_runstatus)
     
     def connect_to_controller(self):
         self.hc = acsc.openCommEthernetTCP()    
@@ -326,7 +327,7 @@ class MainWindow(QtGui.QMainWindow):
         self.plot_acs_rpm.add_item(self.curve_acs_rpm)     
         
     def on_start(self):
-        """Start whatever is visibile in the tab widget"""
+        """Start whatever is visibile in the tab widget."""
         self.abort = False
         if self.ui.actionStart.isChecked():
             self.ui.actionStart.setIcon(QIcon(":icons/pause.png"))
@@ -339,7 +340,6 @@ class MainWindow(QtGui.QMainWindow):
             if self.ui.tabTestPlan.isVisible():
                 """Continue working on test plan"""
                 if self.ui.comboBox_testPlanSection.currentText() != "Top Level":
-                    print "Continuing test plan..."
                     self.do_test_plan()
             elif self.ui.tabSingleRun.isVisible():
                 """Do a single run"""
@@ -353,7 +353,10 @@ class MainWindow(QtGui.QMainWindow):
                     self.currentrun = 0
                 else:
                     self.currentrun = np.max([int(run) for run in runsdone])+1
+                self.currentname = "Shakedown run " + str(self.currentrun)
+                self.label_runstatus.setText(self.currentname + " in progress ")
                 self.do_turbine_tow(U, tsr, y_R, z_H)
+                
             elif self.ui.tabTareDrag.isVisible():
                 """Do tare drag runs"""
             elif self.ui.tabTareTorque.isVisible():
@@ -362,25 +365,39 @@ class MainWindow(QtGui.QMainWindow):
                 """Process a run"""
         else:
             """Stop after current run completes"""
-            print "Stopping after current run..."
             self.ui.actionStart.setIcon(QIcon(":icons/play.png"))
             self.ui.toolBar_DAQ.setEnabled(True)
             self.ui.toolBar_directory.setEnabled(True)
             self.ui.tabWidgetMode.setEnabled(True)
             
     def on_abort(self):
-        """Abort current run and delete all data"""
+        """Abort current run and do not save data"""
         if self.ui.actionStart.isChecked():
             self.ui.actionStart.setChecked(False)
             print "Aborting current run..."
-        self.ui.actionMonitor_NI.setChecked(False)
-        self.ui.actionMonitor_Vectrino.setChecked(False)
+            text = str(self.label_runstatus.text())
+            self.label_runstatus.setText(text[:-13] + " aborted ")
+        if self.ui.actionMonitor_ACS.isChecked():
+            self.ui.actionMonitor_ACS.setChecked(False)
+            self.acsthread.stop()
+            self.monitoracs = False
+        if self.ui.actionMonitor_NI.isChecked():
+            self.ui.actionMonitor_NI.setChecked(False)
+            self.daqthread.stopdaq()
+            self.monitorni = False
+        if self.ui.actionMonitor_Vectrino.isChecked():
+            self.ui.actionMonitor_Vectrino.setChecked(False)
+            self.vecthread.stop()
+            self.monitorvec = False
         self.ui.actionStart.setIcon(QIcon(":icons/play.png"))
         self.ui.toolBar_DAQ.setEnabled(True)
         self.ui.toolBar_directory.setEnabled(True)
         self.ui.tabWidgetMode.setEnabled(True)
-        if self.turbinetow.isRunning():
-            self.turbinetow.abort()
+        try:
+            if self.turbinetow.isRunning():
+                self.turbinetow.abort()
+        except AttributeError:
+            pass
         self.abort = True
         self.towinprogress = False
         
@@ -389,16 +406,33 @@ class MainWindow(QtGui.QMainWindow):
         self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
                                               nidaq=True, vectrino=False)
         self.turbinetow.towfinished.connect(self.on_tow_finished)
+        self.turbinetow.metadata["Name"] = self.currentname
         self.turbinetow.vecsavepath = str(self.savedir + "/" + str(self.currentrun) + "/vecdata_vno")
         self.acsdata = self.turbinetow.acsdata
         self.nidata = self.turbinetow.nidata
         self.towinprogress = True
         self.turbinetow.start()
         
+    def do_tare_drag_tow(self, U):
+        """Executes a single tare drag run"""
+        self.tow = runtypes.TareDragRun(U)
+        self.tow.runfinished.connect(self.on_tow_finished)
+        self.tow.metadata["Name"] = self.currentname
+        self.acsdata = self.tow.acsdata
+        self.nidata = self.tow.nidata
+        self.monitorni = True
+        self.monitoracs = True
+        
+    def do_tare_torque_run(self, U, tsr):
+        """Executes a single tare torque run"""
+        
     def on_tow_finished(self):
         """Current tow complete."""
         # Reset time of last run
         self.towinprogress = False
+        self.monitoracs = False
+        self.monitorni = False
+        self.monitorvec = False
         self.time_last_run = time.time()
         # Save data from the run that just finished
         savedir = os.path.normpath(str(self.savedir + "/" + str(self.currentrun)))
@@ -410,6 +444,9 @@ class MainWindow(QtGui.QMainWindow):
             savemat(savedir+"/nidata.mat", self.nidata, oned_as="column")
             with open(savedir+"/metadata.json", "w") as fn:
                 json.dump(self.turbinetow.metadata, fn, indent=4)
+            text = str(self.label_runstatus.text())
+            if "in progress" in text:
+                self.label_runstatus.setText(text[:-13] + " saved ")
         # Update test plan table
         self.test_plan_into_table()
         # If executing a test plan start a single shot timer for next run
@@ -446,12 +483,18 @@ class MainWindow(QtGui.QMainWindow):
         elif section == "Tare Drag" or section == "Tare Torque":
             self.savedir = self.wdir + "/" + section
         self.currentrun = nextrun
+        self.currentname = section + " run " + str(nextrun)
+        self.label_runstatus.setText(self.currentname + " in progress ")
+        U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
+        tsr = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
         if "Perf" in section or "Wake" in section:
-            U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
-            tsr = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
             y_R = float(self.ui.tableWidgetTestPlan.item(nextrun, 3).text())
             z_H = float(self.ui.tableWidgetTestPlan.item(nextrun, 4).text())
             self.do_turbine_tow(U, tsr, y_R, z_H)
+        elif section == "Tare Drag":
+            self.do_tare_drag_tow(U)
+        elif section == "Tare Torque":
+            self.do_tare_torque_run(U, tsr)
         
     def on_monitor_acs(self):
         if self.ui.actionMonitor_ACS.isChecked():
@@ -504,10 +547,6 @@ class MainWindow(QtGui.QMainWindow):
     def update_plots_acs(self):
         """Update the acs plots for carriage speed, rpm, and tsr"""
         t = self.acsdata["t"]
-        try:
-            print t[0]
-        except IndexError:
-            pass
         self.curve_acs_carvel.set_data(t, self.acsdata["carriage_vel"])
         self.plot_acs_carvel.replot()
         self.curve_acs_rpm.set_data(t, self.acsdata["turbine_rpm"])

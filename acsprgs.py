@@ -6,7 +6,7 @@ Created on Sun Sep 08 12:20:14 2013
 """
 from acspy.prgs import ACSPLplusPrg
 
-def build_turbine_tow(towspeed, tsr, y_R, z_H):
+def turbine_tow_prg(towspeed, tsr, y_R, z_H):
     """This function builds an ACSPL+ program for turbine towing. Turbine
     radius is assumed to be 0.5 m"""
     
@@ -29,7 +29,7 @@ DEC(5) = 0.5
 VEL(5) = U
 JERK(5)= ACC(5)*10
 
-! Reset modulo on turbine axis
+! Set modulo on turbine axis
 DISABLE 4
 SLPMAX(4) = 60
 SLPMIN(4) = 0
@@ -86,7 +86,12 @@ STOP
     return prg
     
 
+def tare_trq_prg(U, tsr):
+    """Builds a tare torque ACSPL+ program"""
+    pass
     
+def tare_drag_prg(U):
+    pass
 
 class TurbineTow(ACSPLplusPrg):
     """A class for creating turbine tows."""
