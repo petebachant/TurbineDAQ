@@ -54,6 +54,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorni = False
         self.monitorvec = False
         self.exp_running = False
+        self.towinprogress = False
         self.enabled_axes = {}
         self.test_plan_data = {}
         
@@ -186,13 +187,14 @@ class MainWindow(QtGui.QMainWindow):
                     if isdone:
                         self.ui.tableWidgetTestPlan.setItem(n, i+1,
                                 QtGui.QTableWidgetItem("Yes"))
-                        self.ui.tableWidgetTestPlan.item(n, i+1).\
-                                setBackgroundColor(QtCore.Qt.green)
+                        for j in range(i+2):
+                            self.ui.tableWidgetTestPlan.item(n, j).\
+                                    setTextColor(QtCore.Qt.darkGreen)
+                            self.ui.tableWidgetTestPlan.item(n, j).\
+                                    setBackgroundColor(QtCore.Qt.lightGray)                                    
                     else:
                         self.ui.tableWidgetTestPlan.setItem(n, i+1,
                                 QtGui.QTableWidgetItem("No"))
-                        self.ui.tableWidgetTestPlan.item(n, i+1).\
-                                setBackgroundColor(QtCore.Qt.red)
         
     def connect_sigs_slots(self):
         """Connect signals to appropriate slots."""
@@ -282,7 +284,7 @@ class MainWindow(QtGui.QMainWindow):
         self.plot_drag.add_item(self.curve_drag)
         # Drag left plot
         self.curve_drag_left = guiqwt.curve.CurveItem()
-        self.curve_drag_left.setPen(QtGui.QPen(QtCore.Qt.green, 1))
+        self.curve_drag_left.setPen(QtGui.QPen(QtCore.Qt.darkGreen, 1))
         self.plot_drag_left = self.ui.plotDragL.get_plot()
         self.plot_drag_left.add_item(self.curve_drag_left)
         # Drag right plot
@@ -321,14 +323,11 @@ class MainWindow(QtGui.QMainWindow):
         # ACS turbine RPM plot
         self.curve_acs_rpm = guiqwt.curve.CurveItem()
         self.plot_acs_rpm = self.ui.plotRPM_acs.get_plot()
-        self.plot_acs_rpm.add_item(self.curve_acs_rpm)
-        # ACS TSR plot
-        self.curve_acs_tsr = guiqwt.curve.CurveItem()
-        self.plot_acs_tsr = self.ui.plotTurbineTSR.get_plot()
-        self.plot_acs_tsr.add_item(self.curve_acs_tsr)        
+        self.plot_acs_rpm.add_item(self.curve_acs_rpm)     
         
     def on_start(self):
         """Start whatever is visibile in the tab widget"""
+        self.abort = False
         if self.ui.actionStart.isChecked():
             self.ui.actionStart.setIcon(QIcon(":icons/pause.png"))
             self.ui.actionStart.setToolTip("Stop after current run")
@@ -348,6 +347,12 @@ class MainWindow(QtGui.QMainWindow):
                 tsr = self.ui.doubleSpinBox_singleRun_tsr.value()
                 y_R = self.ui.doubleSpinBox_singleRun_y_R.value()
                 z_H = self.ui.doubleSpinBox_singleRun_z_H.value()
+                self.savedir = self.wdir + "/Shakedown"
+                runsdone = os.listdir(self.savedir)
+                if len(runsdone) == 0:
+                    self.currentrun = 0
+                else:
+                    self.currentrun = np.max([int(run) for run in runsdone])+1
                 self.do_turbine_tow(U, tsr, y_R, z_H)
             elif self.ui.tabTareDrag.isVisible():
                 """Do tare drag runs"""
@@ -374,32 +379,47 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.toolBar_DAQ.setEnabled(True)
         self.ui.toolBar_directory.setEnabled(True)
         self.ui.tabWidgetMode.setEnabled(True)
-        acsc.halt(self.hc, 0)
-        acsc.halt(self.hc, 1)
-        acsc.halt(self.hc, 4)
-        acsc.halt(self.hc, 5)
+        if self.turbinetow.isRunning():
+            self.turbinetow.abort()
+        self.abort = True
+        self.towinprogress = False
         
     def do_turbine_tow(self, U, tsr, y_R, z_H):
         """Exectutes a single turbine tow"""
-        print "Executing a turbine tow..."
-        print "U =", U, "TSR =", tsr, "y/R =", y_R, "z/H =", z_H
         self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
-                                              nidaq=False, vectrino=False)
+                                              nidaq=True, vectrino=False)
         self.turbinetow.towfinished.connect(self.on_tow_finished)
+        self.turbinetow.vecsavepath = str(self.savedir + "/" + str(self.currentrun) + "/vecdata_vno")
+        print self.turbinetow.vecsavepath
+        self.acsdata = self.turbinetow.acsdata
+        self.nidata = self.turbinetow.nidata
+        self.towinprogress = True
         self.turbinetow.start()
-        # First step is to 
         
     def on_tow_finished(self):
         """Current tow complete."""
         # Reset time of last run
+        self.towinprogress = False
         self.time_last_run = time.time()
+        # Save data from the run that just finished
+        savedir = os.path.normpath(str(self.savedir + "/" + str(self.currentrun)))
+        if not self.abort:
+            # Create directory and save the data inside
+            os.mkdir(savedir)
+            print "Saving " + savedir + "/acsdata.mat" + "..."
+            savemat(savedir+"/acsdata.mat", self.acsdata, oned_as="column")
+            savemat(savedir+"/nidata.mat", self.nidata, oned_as="column")
+        # Update test plan table
         self.test_plan_into_table()
         # If executing a test plan start a single shot timer for next run
-        if self.ui.tabTestPlan.isVisible() and self.ui.actionStart.isChecked():
-            idlesec = 5
-            QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
+        if self.ui.tabTestPlan.isVisible():
+            if self.ui.actionStart.isChecked():
+                idlesec = 5
+                print "Waiting " + str(idlesec) + " seconds until next run..."
+                QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
         else: 
-            self.ui.actionStart.trigger()
+            self.ui.actionStart.setChecked(False)
+            self.on_start()
         
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():
@@ -407,7 +427,7 @@ class MainWindow(QtGui.QMainWindow):
         
     def do_test_plan(self):
         """Continue test plan"""
-        section = self.ui.comboBox_testPlanSection.currentText()
+        section = str(self.ui.comboBox_testPlanSection.currentText())
         print "Continuing", section+"..."
         # Find next run to do by looking in the Done? column
         nruns = self.ui.tableWidgetTestPlan.rowCount()
@@ -418,6 +438,13 @@ class MainWindow(QtGui.QMainWindow):
                 nextrun = int(float(self.ui.tableWidgetTestPlan.item(n, 0).text()))
                 break
         print "Starting run", str(nextrun) + "..."
+        if "Perf" in section:
+            self.savedir = self.wdir + "/Performance/" + section[-5:]
+        elif "Wake" in section:
+            self.savedir = self.wdir + "/Wake/" + section[-5:]
+        elif section == "Tare Drag" or section == "Tare Torque":
+            self.savedir = self.wdir + "/" + section
+        self.currentrun = nextrun
         if "Perf" in section or "Wake" in section:
             U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
             tsr = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
@@ -430,12 +457,9 @@ class MainWindow(QtGui.QMainWindow):
             self.acsthread = daqtasks.AcsDaqThread(self.hc, makeprg=True)
             self.acsdata = self.acsthread.data            
             self.acsthread.start()
-            acsc.enable(self.hc, 5)
-            acsc.jog(self.hc, acsc.AMF_VELOCITY, 5, 1)
             self.monitoracs = True
         else:
             self.acsthread.stop()
-            acsc.halt(self.hc, 5)
             self.monitoracs = False
         
     def on_monitor_ni(self):
@@ -468,28 +492,21 @@ class MainWindow(QtGui.QMainWindow):
         self.label_timer.setText("Time since last run: " + \
         str(int(self.time_since_last_run)) + " s ")
         
-        if self.monitoracs:
+        if self.monitoracs or self.towinprogress:
             self.update_plots_acs()
         if self.monitorvec or self.exp_running:
             self.update_plots_vec()
             self.label_vecstatus.setText(self.vecthread.vecstatus)
-        if self.monitorni or self.exp_running:
+        if self.monitorni or self.towinprogress:
             self.update_plots_ni()
     
     def update_plots_acs(self):
         """Update the acs plots for carriage speed, rpm, and tsr"""
         t = self.acsdata["t"]
-        if len(t) > 0:
-            t = (t - t[0])/1000.0
         self.curve_acs_carvel.set_data(t, self.acsdata["carriage_vel"])
         self.plot_acs_carvel.replot()
         self.curve_acs_rpm.set_data(t, self.acsdata["turbine_rpm"])
         self.plot_acs_rpm.replot()
-        r = 0.5
-        tsr = self.acsdata["turbine_rpm"]*2*np.pi/60.0*r/ \
-                self.acsdata["carriage_vel"]
-        self.curve_acs_tsr.set_data(t, tsr)
-        self.plot_acs_tsr.replot()
         
         
     def update_plots_ni(self):
@@ -501,8 +518,10 @@ class MainWindow(QtGui.QMainWindow):
         self.plot_torque.replot()
         self.curve_drag_right.set_data(t, self.nidata["drag_right"])
         self.plot_drag_right.replot()
-        self.curve_drag.set_data(t, self.nidata["drag_left"]+self.nidata["drag_right"])
-        self.plot_drag.replot()
+        if len(self.nidata["drag_left"]) == len(self.nidata["drag_right"]):
+            self.curve_drag.set_data(t, self.nidata["drag_left"]\
+                    +self.nidata["drag_right"])
+            self.plot_drag.replot()
         self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
         self.plot_rpm_ni.replot()
         

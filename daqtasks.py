@@ -11,13 +11,12 @@ from PyQt4 import QtCore
 import numpy as np
 from daqmx import daqmx
 import time
-import json
 from acspy import acsc, prgs
 
 
 class NiDaqThread(QtCore.QThread):
     collecting = QtCore.pyqtSignal()
-    finished = QtCore.pyqtSignal()
+    cleared = QtCore.pyqtSignal()
     def __init__(self, usetrigger=True):
         QtCore.QThread.__init__(self)
         
@@ -118,7 +117,6 @@ class NiDaqThread(QtCore.QThread):
         daqmx.SetStartTrigType(self.turbangtask, daqmx.Val_DigEdge)
         trigsrc = \
         daqmx.GetTrigSrcWithDevPrefix(self.analogtask, "ai/StartTrigger")
-        print trigsrc
         daqmx.SetDigEdgeStartTrigSrc(self.carpostask, trigsrc)
         daqmx.SetDigEdgeStartTrigSrc(self.turbangtask, trigsrc)
         daqmx.SetDigEdgeStartTrigEdge(self.carpostask, daqmx.Val_Rising)
@@ -204,7 +202,7 @@ class NiDaqThread(QtCore.QThread):
         daqmx.ClearTask(self.analogtask)
         daqmx.ClearTask(self.carpostask)
         daqmx.ClearTask(self.turbangtask)
-        self.finished.emit()
+        self.cleared.emit()
 
 class TareTorqueDAQ(QtCore.QThread):
     pass
@@ -228,40 +226,41 @@ class AcsDaqThread(QtCore.QThread):
     def run(self):
         if self.makeprg:
             self.makedaqprg()
-            acsc.loadBuffer(self.hc, 20, self.prg, 1024)
-            acsc.runBuffer(self.hc, 20)
+            acsc.loadBuffer(self.hc, 19, self.prg, 1024)
+            acsc.runBuffer(self.hc, 19)
+#        while acsc.getProgramState(self.hc, 19) != 3:
+            time.sleep(0.1)
         while self.collectdata:
             time.sleep(self.sleeptime)
+            t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
             newdata = acsc.readReal(self.hc, acsc.NONE, "data", 0, 2, 0, self.dblen/2-1)
-            self.data["t"] = np.append(self.data["t"], newdata[0])
+            t = (newdata[0] - t0)/1000.0
+            self.data["t"] = np.append(self.data["t"], t)
             self.data["carriage_vel"] = np.append(self.data["carriage_vel"], newdata[1])
             self.data["turbine_rpm"] = np.append(self.data["turbine_rpm"], newdata[2])
             time.sleep(self.sleeptime)
             newdata = acsc.readReal(self.hc, acsc.NONE, "data", 0, 2, self.dblen/2, self.dblen-1)
-            self.data["t"] = np.append(self.data["t"], newdata[0])
+            t = (newdata[0] - t0)/1000.0
+            self.data["t"] = np.append(self.data["t"], t)
             self.data["carriage_vel"] = np.append(self.data["carriage_vel"], newdata[1])
             self.data["turbine_rpm"] = np.append(self.data["turbine_rpm"], newdata[2])
     def makedaqprg(self):
         """Create an ACSPL+ program to load into the controller"""
         self.prg = prgs.ACSPLplusPrg()
-        self.prg.declare_2darray("global", "real", "data", 3, self.dblen)
+        self.prg.declare_2darray("GLOBAL", "real", "data", 3, self.dblen)
+        self.prg.addline("GLOBAL REAL start_time")
         self.prg.addline("GLOBAL INT collect_data")
         self.prg.addline("collect_data = 1")
         self.prg.add_dc("data", self.dblen, self.sr, "TIME, FVEL(5), FVEL(4)", "/c")
+        self.prg.addline("start_time = TIME")        
         self.prg.addline("TILL collect_data = 0")
         self.prg.addline("STOPDC")
         self.prg.addstopline()
     def stop(self):
         self.collectdata = False
-        acsc.writeInteger(self.hc, "collect_data", 0)
+        if self.makeprg:
+            acsc.writeInteger(self.hc, "collect_data", 0)
 
-def main():
-    turbdaq = TurbineTowDAQ("run2_yz32")
-    turbdaq.start()
-    time.sleep(1.1)
-    turbdaq.savedata()
-    turbdaq.cleartasks()
-    return turbdaq.data
 
 if __name__ == "__main__":
     spam = NiDaqThread(False)

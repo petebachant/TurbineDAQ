@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Sun Sep 22 01:34:03 2013
+# Created: Sun Sep 22 13:00:11 2013
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -340,7 +340,7 @@ class Ui_MainWindow(object):
         self.dockWidgetContents_3 = QtGui.QWidget()
         self.dockWidgetContents_3.setObjectName(_fromUtf8("dockWidgetContents_3"))
         self.verticalLayoutWidget = QtGui.QWidget(self.dockWidgetContents_3)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 120, 371, 371))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 170, 371, 321))
         self.verticalLayoutWidget.setObjectName(_fromUtf8("verticalLayoutWidget"))
         self.verticalLayout = QtGui.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setMargin(0)
@@ -354,15 +354,6 @@ class Ui_MainWindow(object):
         self.plotTowSpeed.setOrientation(QtCore.Qt.Horizontal)
         self.plotTowSpeed.setObjectName(_fromUtf8("plotTowSpeed"))
         self.verticalLayout.addWidget(self.plotTowSpeed)
-        self.label_28 = QtGui.QLabel(self.verticalLayoutWidget)
-        self.label_28.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_28.setObjectName(_fromUtf8("label_28"))
-        self.verticalLayout.addWidget(self.label_28)
-        self.plotTurbineTSR = CurveWidget(self.verticalLayoutWidget)
-        self.plotTurbineTSR.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        self.plotTurbineTSR.setOrientation(QtCore.Qt.Horizontal)
-        self.plotTurbineTSR.setObjectName(_fromUtf8("plotTurbineTSR"))
-        self.verticalLayout.addWidget(self.plotTurbineTSR)
         self.label_27 = QtGui.QLabel(self.verticalLayoutWidget)
         self.label_27.setAlignment(QtCore.Qt.AlignCenter)
         self.label_27.setObjectName(_fromUtf8("label_27"))
@@ -671,7 +662,6 @@ class Ui_MainWindow(object):
         self.label_16.setText(_translate("MainWindow", "           Turbine RPM", None))
         self.dockWidget_acscontrol.setWindowTitle(_translate("MainWindow", "ACS Controller", None))
         self.label_26.setText(_translate("MainWindow", "             Tow Speed (m/s)", None))
-        self.label_28.setText(_translate("MainWindow", "            Turbine TSR", None))
         self.label_27.setText(_translate("MainWindow", "           Turbine RPM", None))
         item = self.tableWidget_acs.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Axis", None))

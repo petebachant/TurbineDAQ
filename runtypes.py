@@ -13,35 +13,43 @@ import daqtasks
 import vectasks
 import time
 from PyQt4 import QtCore
-from pdcommpy.pdcommpy import PdControl
 
 class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
     def __init__(self, acs_hcomm, U, tsr, y_R, z_H, 
                  R=0.5, H=1.0, nidaq=True, vectrino=True):
         """Turbine tow run object."""
-        QtCore.QThread.__init__(self)
-        
-        self.acs_hcomm = acs_hcomm
+        QtCore.QThread.__init__(self)        
+        self.hc = acs_hcomm
         self.U = U
         self.tsr = tsr
         self.y_R = y_R
         self.z_H = z_H
-        self.name = "Something" # Come up with a naming scheme
         self.vectrino = vectrino
         self.nidaq = nidaq 
         self.build_acsprg()
+        self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
+        self.acsdata = self.acsdaqthread.data
+        self.vecsavepath = ""
+        
+        self.metadata = {"Tow speed" : U,
+                         "Tip speed ratio" : tsr,
+                         "Vectrino y/R" : y_R,
+                         "Vectrino z/H" : z_H, 
+                         "Time created" : time.asctime()}
         
         if self.vectrino:
             print "Attempting to connect to Vectrino..."
             self.vecthread = vectasks.VectrinoThread()
             self.vecthread.collecting.connect(self.on_vec_collecting)
             self.vecdata = self.vecthread.vec.data
+            self.vecthread.savepath = self.vecsavepath
             
         if self.nidaq:
-            self.daqthread = daqtasks.TurbineTowDAQ()
-            self.daqthread.collecting.connect(self.on_nidaq_collecting)
+            self.daqthread = daqtasks.NiDaqThread(usetrigger=False)
+#            self.daqthread.started.connect(self.on_nidaq_collecting)
             self.nidata = self.daqthread.data
+            self.metadata["NI metadata"] = self.daqthread.metadata
         
     def build_acsprg(self):
         """Create the ACSPL+ program for running the run.
@@ -55,17 +63,28 @@ class TurbineTow(QtCore.QThread):
             self.vecthread.start()
         elif self.nidaq:
             self.daqthread.start()
+            self.start_motion()
         else:
+            # Start motion
             self.start_motion()
 
     def start_motion(self):
-        time.sleep(2)
+        print "Starting motion..."
+        self.acsdaqthread.start()
+        nbuf = 19
+        acsc.loadBuffer(self.hc, nbuf, self.acs_prg, 2048)
+        acsc.enable(self.hc, 0)
+        acsc.enable(self.hc, 1)
+        acsc.enable(self.hc, 4)
+        acsc.enable(self.hc, 5)
+        acsc.runBuffer(self.hc, nbuf)
+        prgstate = acsc.getProgramState(self.hc, nbuf)
+        while prgstate == 3:
+            time.sleep(0.5)
+            prgstate = acsc.getProgramState(self.hc, nbuf)
         self.towfinished.emit()
-        if self.acs_hcomm != acsc.INVALID:
-            acs_buffno = 17
-            acsc.loadBuffer(self.acs_hcomm, acs_buffno, self.acs_prg, 512)
-            acsc.enable(self.acs_hcomm, 0)
-            acsc.runBuffer(self.acs_hcomm, acs_buffno)
+        if self.nidaq:
+            self.daqthread.clear()
     
     def on_vec_collecting(self):
         if self.nidaq:
@@ -78,11 +97,15 @@ class TurbineTow(QtCore.QThread):
             
     def abort(self):
         """This should stop everything."""
-        acsc.halt(self.acs_hcomm, 0)
-        acsc.halt(self.acs_hcomm, 1)
-        acsc.halt(self.acs_hcomm, 4)
-        acsc.halt(self.acs_hcomm, 5)
-        self.daqtask.clear()    
+        acsc.stopBuffer(self.hc, 19)
+        acsc.halt(self.hc, 0)
+        acsc.halt(self.hc, 1)
+        acsc.halt(self.hc, 4)
+        acsc.halt(self.hc, 5)
+        self.acsdaqthread.stop()
+        self.daqthread.clear()
+        if self.vectrino:
+            self.vecthread.stop()
     
     def process(self, t1, t2):
         """This shit should load in the data and spit out mean values"""
@@ -132,8 +155,10 @@ class PowerCurve(object):
 
 
 def main():
-    run = TurbineTow(None, 1.0, 1.5)
-    print run.acs_prg
+    hc = acsc.openCommDirect()
+    run = TurbineTow(hc, 1.0, 1.5, 0.0, 0.25, vectrino=False, nidaq=False)
+    run.start_motion()
+    acsc.closeComm(hc)
     
 if __name__ == "__main__":
     main()

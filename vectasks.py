@@ -22,7 +22,6 @@ class VectrinoThread(QtCore.QThread):
         self.record = True
         self.isconnected = self.vec.is_connected()
         self.savepath = ""
-        self.savename = "vectrino"
         self.vecstatus = "Vectrino disconnected "
         print "Vectrino thread init done"
         
@@ -54,7 +53,7 @@ class VectrinoThread(QtCore.QThread):
             self.vec.stop()
             self.setconfig()
             if self.record:
-                self.vec.start_disk_recording(self.savepath+"/"+self.savename)
+                self.vec.start_disk_recording(self.savepath)
             self.vec.start()
             self.vecstatus = "Vectrino connected "
             while self.vec.state != "Confirmation mode":
