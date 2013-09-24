@@ -73,7 +73,6 @@ STOPDC
 collect_data = 0
 STOP
 """
-    
     prg = initvars 
     prg += "tsr = " + str(tsr) + "\n" + "U = " + str(towspeed) + "\n"
     if y_R != None:
@@ -84,19 +83,72 @@ STOP
     # Set this up as a linear 2 ax-s move?
     prg += prgbody
     return prg
-    
+
 
 def tare_trq_prg(U, tsr):
     """Builds a tare torque ACSPL+ program"""
-    pass
-    
-def tare_drag_prg(U):
-    pass
+    prg = """GLOBAL INT homeCounter_AKD
+REAL tsr, U, rpm, tacc
 
+tsr = 2.3
+U = 1
+rpm = tsr*U/0.5*60/6.28318530718
+tacc = 2
+
+ACC(turbine) = rpm/tacc
+DEC(turbine) = ACC(turbine)
+VEL(turbine) = rpm
+JERK(turbine) = ACC(turbine)*10
+
+IF homeCounter_AKD > 0
+	jog/v turbine, rpm
+END
+
+WAIT 32*1000
+! HALT turbine
+ptp/e turbine, 60
+
+STOP
+"""
+    return prg
+
+
+def tare_drag_prg(U):
+    prg = """global real data(3)(100)
+global real start_time
+global int collect_data
+collect_data = 0
+
+"""
+    prg += "VEL(5) = " + str(U)
+    prg += \
+"""
+ACC(5) = 1
+DEC(5) = 1
+
+! Start controller data acquisition and send trigger pulse in same cycle
+BLOCK
+    collect_data = 1
+    DC/c data, 100, 5.0, TIME, FVEL(5), FVEL(4)
+    ! Send trigger pulse for data acquisition (may need work)
+    ! OUT4.0 = 1
+END
+
+! Define start time from now
+start_time = TIME
+
+PTP/e 5, 24.9
+PTP/e 5, 0
+STOP
+"""
+    return prg
+
+
+## Possible make this object oriented... ##
 class TurbineTow(ACSPLplusPrg):
     """A class for creating turbine tows."""
     def __init__(self, towspeed, tsr, y_R=None, z_H=None):
         ACSPLplusPrg.__init__(self)
         
 if __name__ == "__main__":
-    print build_turbine_tow(1.0, 1.9, 0.0, 0.25)
+    print tare_drag_prg(0.5)

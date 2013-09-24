@@ -202,6 +202,9 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.toolButtonOpenSection.clicked.connect(self.on_open_section_folder)
         self.ui.actionHome_Tow.triggered.connect(self.on_home_tow)
         self.ui.toolButtonOpenShakedown.clicked.connect(self.on_open_shakedown)
+        self.ui.actionHome_Turbine.triggered.connect(self.on_home_turbine)
+        self.ui.actionEnable_y.triggered.connect(self.on_home_y)
+        self.ui.actionEnable_z.triggered.connect(self.on_home_z)
         
     def on_tbutton_wdir(self):
         self.wdir = QFileDialog.getExistingDirectory()
@@ -221,6 +224,15 @@ class MainWindow(QtGui.QMainWindow):
     
     def on_home_tow(self):
         acsc.runBuffer(self.hc, 2)
+    
+    def on_home_tow(self):
+        acsc.runBuffer(self.hc, 8)
+        
+    def on_home_y(self):
+        acsc.runBuffer(self.hc, 12)
+        
+    def on_home_z(self):
+        acsc.runBuffer(self.hc, 11)
     
     def on_open_section_folder(self):
         section = str(self.ui.comboBox_testPlanSection.currentText())
@@ -452,6 +464,7 @@ class MainWindow(QtGui.QMainWindow):
         # If executing a test plan start a single shot timer for next run
         if self.ui.tabTestPlan.isVisible():
             if self.ui.actionStart.isChecked():
+                # Move y and z axes to next location if applicable
                 idlesec = 5
                 print "Waiting " + str(idlesec) + " seconds until next run..."
                 QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
