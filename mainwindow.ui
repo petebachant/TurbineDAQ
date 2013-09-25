@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1126</width>
-    <height>941</height>
+    <height>961</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -601,7 +601,7 @@
       <x>400</x>
       <y>0</y>
       <width>360</width>
-      <height>861</height>
+      <height>891</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -626,7 +626,7 @@
         <x>10</x>
         <y>5</y>
         <width>341</width>
-        <height>831</height>
+        <height>851</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -725,7 +725,7 @@
       <x>10</x>
       <y>390</y>
       <width>381</width>
-      <height>471</height>
+      <height>501</height>
      </rect>
     </property>
     <property name="floating">
@@ -741,7 +741,7 @@
         <x>0</x>
         <y>120</y>
         <width>371</width>
-        <height>321</height>
+        <height>351</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -1031,7 +1031,7 @@
        <x>10</x>
        <y>1</y>
        <width>341</width>
-       <height>841</height>
+       <height>861</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">

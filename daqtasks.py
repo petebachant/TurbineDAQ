@@ -59,9 +59,6 @@ class NiDaqThread(QtCore.QThread):
         daqmx.AddGlobalChansToTask(self.analogtask, self.analogchans)
         daqmx.AddGlobalChansToTask(self.carpostask, self.carposchan)
         daqmx.AddGlobalChansToTask(self.turbangtask, self.turbangchan)
-#        self.metadata["Global analog channels"] = self.analogchans
-#        self.metadata["Global counter channels"] = [self.carposchan,
-#                                                    self.turbangchan]
 
         # Get channel information to add to metadata
         self.chaninfo = {}
@@ -182,8 +179,8 @@ class NiDaqThread(QtCore.QThread):
         daqmx.RegisterDoneEvent(self.analogtask, 0, DoneCallback, None) 
 
         # Start the tasks
-        daqmx.StartTask(self.carpostask)
-        daqmx.StartTask(self.turbangtask)
+#        daqmx.StartTask(self.carpostask)
+#        daqmx.StartTask(self.turbangtask)
         daqmx.StartTask(self.analogtask)
         self.collecting.emit()
 

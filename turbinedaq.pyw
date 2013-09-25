@@ -44,13 +44,14 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorvec = False
         self.exp_running = False
         self.towinprogress = False
+        self.test_plan_loaded = False
         self.enabled_axes = {}
         self.test_plan_data = {}
         
         # Add file path combobox to toolbar
         self.line_edit_wdir = QtGui.QLineEdit()
         self.ui.toolBar_directory.addWidget(self.line_edit_wdir)
-        self.wdir = "C:\temp"
+        self.wdir = "C:\\temp"
         self.line_edit_wdir.setText("C:\\temp")
         self.toolbutton_wdir = QtGui.QToolButton()
         self.ui.toolBar_directory.addWidget(self.toolbutton_wdir)
@@ -66,8 +67,9 @@ class MainWindow(QtGui.QMainWindow):
             except ValueError:
                 self.settings = {}
         if "Last working directory" in self.settings:
-            self.wdir = self.settings["Last working directory"]
-            self.line_edit_wdir.setText(self.wdir)
+            if os.path.isdir(self.settings["Last working directory"]):
+                self.wdir = self.settings["Last working directory"]
+                self.line_edit_wdir.setText(self.wdir)
         if "Last window location" in self.settings:
             self.move(QtCore.QPoint(self.settings["Last window location"][0],
                                     self.settings["Last window location"][1]))
@@ -78,18 +80,16 @@ class MainWindow(QtGui.QMainWindow):
         self.connect_to_controller()
         # Initialize plots
         self.initialize_plots()
-        # Import test plan
-        self.import_test_plan()
-        # Set single run visible in tab widget
+        if self.wdir != "C:\\temp":
+            # Import test plan
+            self.import_test_plan()
+        self.connect_sigs_slots()
+        # Set test plan visible in tab widget
         self.ui.tabWidgetMode.setCurrentWidget(self.ui.tabTestPlan)
         if "Last section" in self.settings:
             self.ui.comboBox_testPlanSection.setCurrentIndex(self.settings["Last section"])
-        self.test_plan_into_table()
-        # Connect signals to slots
-        self.connect_sigs_slots()
-        self.ui.comboBox_testPlanSection.currentIndexChanged.emit(0)
         # Start timer
-        self.timer.start(100)        
+        self.timer.start(100)
         
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
@@ -152,38 +152,37 @@ class MainWindow(QtGui.QMainWindow):
     def test_plan_into_table(self):
         """Takes test plan values and puts them in table widget"""
         section = str(self.ui.comboBox_testPlanSection.currentText())
-        if section == "":
-            section = "Top Level"
-        paramlist = self.test_plan_data[section]["Parameter list"]
-        if section != "Top Level":
-            self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist)+1)
-            self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(
-                    QtCore.QStringList(paramlist+["Done?"]))
-        else:
-            self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist))
-            self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(
-                    QtCore.QStringList(paramlist))        
-        self.ui.tableWidgetTestPlan.setRowCount(
-                len(self.test_plan_data[section][paramlist[0]]))
-        for i in range(len(paramlist)):
-            itemlist = self.test_plan_data[section][paramlist[i]]
-            for n in range(len(itemlist)):
-                self.ui.tableWidgetTestPlan.setItem(n, i, 
-                            QtGui.QTableWidgetItem(str(itemlist[n])))
-                # Check if run is done
-                if section != "Top Level":
-                    isdone = self.is_run_done(section, n)
-                    if isdone:
-                        self.ui.tableWidgetTestPlan.setItem(n, i+1,
-                                QtGui.QTableWidgetItem("Yes"))
-                        for j in range(i+2):
-                            self.ui.tableWidgetTestPlan.item(n, j).\
-                                    setTextColor(QtCore.Qt.darkGreen)
-                            self.ui.tableWidgetTestPlan.item(n, j).\
-                                    setBackgroundColor(QtCore.Qt.lightGray)                                    
-                    else:
-                        self.ui.tableWidgetTestPlan.setItem(n, i+1,
-                                QtGui.QTableWidgetItem("No"))
+        if section != "":
+            paramlist = self.test_plan_data[section]["Parameter list"]
+            if section != "Top Level":
+                self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist)+1)
+                self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(
+                        QtCore.QStringList(paramlist+["Done?"]))
+            else:
+                self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist))
+                self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(
+                        QtCore.QStringList(paramlist))        
+            self.ui.tableWidgetTestPlan.setRowCount(
+                    len(self.test_plan_data[section][paramlist[0]]))
+            for i in range(len(paramlist)):
+                itemlist = self.test_plan_data[section][paramlist[i]]
+                for n in range(len(itemlist)):
+                    self.ui.tableWidgetTestPlan.setItem(n, i, 
+                                QtGui.QTableWidgetItem(str(itemlist[n])))
+                    # Check if run is done
+                    if section != "Top Level":
+                        isdone = self.is_run_done(section, n)
+                        if isdone:
+                            self.ui.tableWidgetTestPlan.setItem(n, i+1,
+                                    QtGui.QTableWidgetItem("Yes"))
+                            for j in range(i+2):
+                                self.ui.tableWidgetTestPlan.item(n, j).\
+                                        setTextColor(QtCore.Qt.darkGreen)
+                                self.ui.tableWidgetTestPlan.item(n, j).\
+                                        setBackgroundColor(QtCore.Qt.lightGray)                                    
+                        else:
+                            self.ui.tableWidgetTestPlan.setItem(n, i+1,
+                                    QtGui.QTableWidgetItem("No"))
         
     def connect_sigs_slots(self):
         """Connect signals to appropriate slots."""
@@ -212,6 +211,7 @@ class MainWindow(QtGui.QMainWindow):
             self.line_edit_wdir.setText(self.wdir)
         self.wdir = str(self.line_edit_wdir.text())
         self.settings["Last working directory"] = self.wdir
+        self.import_test_plan()
     
     def on_tab_change(self):
         tabindex = self.ui.tabWidgetMode.currentIndex()
@@ -225,7 +225,7 @@ class MainWindow(QtGui.QMainWindow):
     def on_home_tow(self):
         acsc.runBuffer(self.hc, 2)
     
-    def on_home_tow(self):
+    def on_home_turbine(self):
         acsc.runBuffer(self.hc, 8)
         
     def on_home_y(self):
@@ -255,7 +255,8 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.actionStart.setDisabled(True)
         else:
             self.ui.actionStart.setEnabled(True)
-        self.test_plan_into_table()
+        if section in self.test_plan_data:
+            self.test_plan_into_table()
         
     def add_labels_to_statusbar(self):
         self.label_acs_connect = QLabel()
@@ -281,6 +282,8 @@ class MainWindow(QtGui.QMainWindow):
             else:
                 print "Connected to simulator"
                 self.label_acs_connect.setText(" Connected to SPiiPlus simulator ")
+        else:
+            self.label_acs_connect.setText(" Connected to ACS controller ")
             
     def initialize_plots(self):
         # Torque trans plot
