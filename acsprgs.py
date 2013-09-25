@@ -24,6 +24,9 @@ endpos = 0      ! Where to move carriage at end of tow
 tacc = 5        ! Time (in seconds) for turbine angular acceleration
 tzero = 2       ! Time (in seconds) to wait before starting
 
+VEL(5) = 0.5
+ptp/e 5, 0
+
 ACC(5) = 1
 DEC(5) = 0.5
 VEL(5) = U

@@ -8,6 +8,8 @@ This is the turbineDAQ main code.
 To-do:
   * After "pausing" need some way to know a run is done to enable controls
     rather than enabling them right away
+  * Add last couple of working directories to a dropdown list in directory
+    selection box
 """
 
 from __future__ import division
@@ -89,7 +91,7 @@ class MainWindow(QtGui.QMainWindow):
         if "Last section" in self.settings:
             self.ui.comboBox_testPlanSection.setCurrentIndex(self.settings["Last section"])
         # Start timer
-        self.timer.start(100)
+        self.timer.start(150)
         
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
@@ -147,12 +149,14 @@ class MainWindow(QtGui.QMainWindow):
             self.test_plan_loaded = True
             self.test_plan_into_table()
         else:
+            """Clear everything from table widget. Doesn't work right now."""
+            self.ui.tableWidgetTestPlan.clearContents()
             print "No test plan found in working directory"
             
     def test_plan_into_table(self):
         """Takes test plan values and puts them in table widget"""
         section = str(self.ui.comboBox_testPlanSection.currentText())
-        if section != "":
+        if section in self.test_plan_data:
             paramlist = self.test_plan_data[section]["Parameter list"]
             if section != "Top Level":
                 self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist)+1)
@@ -630,6 +634,14 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.tableWidget_acs.setItem(1, 2, QtGui.QTableWidgetItem(str(hc_turbine)))
         self.ui.tableWidget_acs.setItem(2, 2, QtGui.QTableWidgetItem(str(hc_y)))
         self.ui.tableWidget_acs.setItem(3, 2, QtGui.QTableWidgetItem(str(hc_z)))
+        self.ui.tableWidget_acs.setItem(0, 3, 
+                QtGui.QTableWidgetItem(str(acsc.getRPosition(self.hc, 5))))
+        self.ui.tableWidget_acs.setItem(1, 3, 
+                QtGui.QTableWidgetItem(str(acsc.getRPosition(self.hc, 4))))
+        self.ui.tableWidget_acs.setItem(2, 3, 
+                QtGui.QTableWidgetItem(str(acsc.getRPosition(self.hc, 0))))
+        self.ui.tableWidget_acs.setItem(3, 3, 
+                QtGui.QTableWidgetItem(str(acsc.getRPosition(self.hc, 1))))
     
     def closeEvent(self, event):
         self.settings["Last window location"] = [self.pos().x(), 
@@ -637,7 +649,7 @@ class MainWindow(QtGui.QMainWindow):
         self.settings["Last section"] = \
                 self.ui.comboBox_testPlanSection.currentIndex()
         with open("settings/settings.json", "w") as fn:
-            json.dump(self.settings, fn)
+            json.dump(self.settings, fn, indent=4)
         acsc.closeComm(self.hc)
         if self.monitorni:
             self.daqthread.clear()
