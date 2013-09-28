@@ -53,7 +53,7 @@ ptp/e(4), 0
 ! Start controller data acquisition and send trigger pulse in same cycle
 BLOCK
     collect_data = 1
-    DC/c data, 100, 5.0, TIME, FVEL(5), FVEL(4)
+    DC/c data, 100, 1.0, TIME, FVEL(5), FVEL(4)
     ! Send trigger pulse for data acquisition (may need work)
     ! OUT4.0 = 1
 END

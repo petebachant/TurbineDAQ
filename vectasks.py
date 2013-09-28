@@ -13,11 +13,12 @@ import time
 class VectrinoThread(QtCore.QThread):
     collecting = QtCore.pyqtSignal()
     connectsignal = QtCore.pyqtSignal(bool)
-    def __init__(self, usetrigger=True):
+    def __init__(self, maxvel=2.5, usetrigger=True):
         QtCore.QThread.__init__(self)
         print "Vectrino thread initialized"
         self.vec = PdControl()
         self.usetrigger = usetrigger
+        self.maxvel = maxvel
         self.comport = "COM2"
         self.record = True
         self.isconnected = self.vec.is_connected()
@@ -30,7 +31,12 @@ class VectrinoThread(QtCore.QThread):
         self.vec.set_synch_master(not self.usetrigger)
         self.vec.set_sample_on_synch(False)
         self.vec.set_sample_rate(200)
-        self.vec.set_vel_range(2)
+        if self.maxvel <= 4.0 and self.maxvel > 2.5:
+            self.vec.set_vel_range(0)
+        elif self.maxvel <= 2.5 and self.maxvel > 1.0:
+            self.vec.set_vel_range(1)
+        elif self.maxvel <= 1.0 and self.maxvel > 0.3:
+            self.vec.set_vel_range(2)
         self.vec.set_config()
         print "Vectrino configuration set"
 

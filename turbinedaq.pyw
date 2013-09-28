@@ -28,6 +28,7 @@ import time
 from scipy.io import savemat
 import xlrd
 import os
+import platform
 
 
 class MainWindow(QtGui.QMainWindow):
@@ -61,21 +62,8 @@ class MainWindow(QtGui.QMainWindow):
         
         # Add labels to status bar
         self.add_labels_to_statusbar()
-        
-        # Read in metadata from previous session, i.e. last working directory
-        with open("settings/settings.json", "r") as fn:
-            try:
-                self.settings = json.load(fn)
-            except ValueError:
-                self.settings = {}
-        if "Last working directory" in self.settings:
-            if os.path.isdir(self.settings["Last working directory"]):
-                self.wdir = self.settings["Last working directory"]
-                self.line_edit_wdir.setText(self.wdir)
-        if "Last window location" in self.settings:
-            self.move(QtCore.QPoint(self.settings["Last window location"][0],
-                                    self.settings["Last window location"][1]))
-        
+        # Read in and apply settings from last session
+        self.load_settings()
         # Create a timer
         self.timer = QtCore.QTimer()
         # Connect to controller
@@ -91,7 +79,25 @@ class MainWindow(QtGui.QMainWindow):
         if "Last section" in self.settings:
             self.ui.comboBox_testPlanSection.setCurrentIndex(self.settings["Last section"])
         # Start timer
-        self.timer.start(150)
+        self.timer.start(100)
+        
+    def load_settings(self):
+        """Loads settings"""
+        self.pcid = platform.node()
+        with open("settings/settings.json", "r") as fn:
+            try:
+                self.settings = json.load(fn)
+            except ValueError:
+                self.settings = {}
+        if "Last PC name" in self.settings:
+            if self.settings["Last PC name"] == self.pcid:
+                if "Last working directory" in self.settings:
+                    if os.path.isdir(self.settings["Last working directory"]):
+                        self.wdir = self.settings["Last working directory"]
+                        self.line_edit_wdir.setText(self.wdir)
+                if "Last window location" in self.settings:
+                    self.move(QtCore.QPoint(self.settings["Last window location"][0],
+                                            self.settings["Last window location"][1]))
         
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
@@ -518,7 +524,8 @@ class MainWindow(QtGui.QMainWindow):
         
     def on_monitor_acs(self):
         if self.ui.actionMonitor_ACS.isChecked():
-            self.acsthread = daqtasks.AcsDaqThread(self.hc, makeprg=True)
+            self.acsthread = daqtasks.AcsDaqThread(self.hc, makeprg=True,
+                                     sample_rate=1000, bufflen=100)
             self.acsdata = self.acsthread.data            
             self.acsthread.start()
             self.monitoracs = True
@@ -528,8 +535,7 @@ class MainWindow(QtGui.QMainWindow):
         
     def on_monitor_ni(self):
         if self.ui.actionMonitor_NI.isChecked():
-            self.daqthread = daqtasks.NiDaqThread()
-            self.daqthread.usetrigger = False
+            self.daqthread = daqtasks.NiDaqThread(usetrigger=False)
             self.nidata = self.daqthread.data
             self.daqthread.start()
             self.monitorni = True
@@ -648,6 +654,7 @@ class MainWindow(QtGui.QMainWindow):
                                                  self.pos().y()]
         self.settings["Last section"] = \
                 self.ui.comboBox_testPlanSection.currentIndex()
+        self.settings["Last PC name"] = self.pcid
         with open("settings/settings.json", "w") as fn:
             json.dump(self.settings, fn, indent=4)
         acsc.closeComm(self.hc)

@@ -29,10 +29,10 @@ class NiDaqThread(QtCore.QThread):
         # Initialize sample rate
         self.sr = 2000.0
         self.metadata["Sample rate (Hz)"] = self.sr
+        self.nsamps = int(self.sr/10)
         
         # Create a dict of arrays for storing data
-        self.data = {"carriage_pos" : np.array([]),
-                     "turbine_angle" : np.array([]),
+        self.data = {"turbine_angle" : np.array([]),
                      "turbine_rpm" : np.array([]),
                      "torque_trans": np.array([]),
                      "torque_arm" : np.array([]),
@@ -43,21 +43,21 @@ class NiDaqThread(QtCore.QThread):
         # Create one analog and one digital task
         # Probably should be a bridge task in there too!
         self.analogtask = daqmx.TaskHandle()
-        self.carpostask = daqmx.TaskHandle()
+#        self.carpostask = daqmx.TaskHandle()
         self.turbangtask = daqmx.TaskHandle()
         
         # Create tasks
         daqmx.CreateTask("", self.analogtask)
-        daqmx.CreateTask("", self.carpostask)
+#        daqmx.CreateTask("", self.carpostask)
         daqmx.CreateTask("", self.turbangtask)
         
         # Add channels to tasks
         self.analogchans = ["torque_trans", "torque_arm", 
                             "drag_left", "drag_right"]
-        self.carposchan = "carriage_pos"
+#        self.carposchan = "carriage_pos"
         self.turbangchan = "turbine_angle"
         daqmx.AddGlobalChansToTask(self.analogtask, self.analogchans)
-        daqmx.AddGlobalChansToTask(self.carpostask, self.carposchan)
+#        daqmx.AddGlobalChansToTask(self.carpostask, self.carposchan)
         daqmx.AddGlobalChansToTask(self.turbangtask, self.turbangchan)
 
         # Get channel information to add to metadata
@@ -81,41 +81,41 @@ class NiDaqThread(QtCore.QThread):
         self.chaninfo[self.turbangchan]["Units"] = \
         daqmx.GetCIAngEncoderUnits(self.turbangtask, self.turbangchan)
 
-        self.chaninfo[self.carposchan] = {}
-        self.chaninfo[self.carposchan]["Distance per pulse"] = \
-        daqmx.GetCILinEncoderDisPerPulse(self.carpostask, self.carposchan)
-        self.chaninfo[self.carposchan]["Units"] = \
-        daqmx.GetCILinEncoderUnits(self.carpostask, self.carposchan)
-        self.metadata["Channel info"] = self.chaninfo
+#        self.chaninfo[self.carposchan] = {}
+#        self.chaninfo[self.carposchan]["Distance per pulse"] = \
+#        daqmx.GetCILinEncoderDisPerPulse(self.carpostask, self.carposchan)
+#        self.chaninfo[self.carposchan]["Units"] = \
+#        daqmx.GetCILinEncoderUnits(self.carpostask, self.carposchan)
+#        self.metadata["Channel info"] = self.chaninfo
         
 
         # Configure sample clock timing
         daqmx.CfgSampClkTiming(self.analogtask, "", self.sr, 
                                daqmx.Val_Rising, daqmx.Val_ContSamps, 
-                               int(self.sr/10))   
+                               self.nsamps)   
         # Get source for analog sample clock
         trigname = daqmx.GetTerminalNameWithDevPrefix(self.analogtask,
                                                       "ai/SampleClock")
-        daqmx.CfgSampClkTiming(self.carpostask, trigname, self.sr,
-                               daqmx.Val_Rising, daqmx.Val_ContSamps,
-                               int(self.sr/10))
+#        daqmx.CfgSampClkTiming(self.carpostask, trigname, self.sr,
+#                               daqmx.Val_Rising, daqmx.Val_ContSamps,
+#                               self.nsamps)
         daqmx.CfgSampClkTiming(self.turbangtask, trigname, self.sr,
                                daqmx.Val_Rising, daqmx.Val_ContSamps,
-                               int(self.sr/10))
+                               self.nsamps)
                                
         # If using trigger for analog signals set source to chassis PFI0
         if self.usetrigger:
-            daqmx.CfgDigEdgeStartTrig(self.analogtask, "/cDAQ1/PFI0",
+            daqmx.CfgDigEdgeStartTrig(self.analogtask, "/cDAQ9188-16D66BB/PFI0",
                                       daqmx.Val_Rising)
                                
         # Set trigger functions for counter channels
-        daqmx.SetStartTrigType(self.carpostask, daqmx.Val_DigEdge)
+#        daqmx.SetStartTrigType(self.carpostask, daqmx.Val_DigEdge)
         daqmx.SetStartTrigType(self.turbangtask, daqmx.Val_DigEdge)
         trigsrc = \
         daqmx.GetTrigSrcWithDevPrefix(self.analogtask, "ai/StartTrigger")
-        daqmx.SetDigEdgeStartTrigSrc(self.carpostask, trigsrc)
+#        daqmx.SetDigEdgeStartTrigSrc(self.carpostask, trigsrc)
         daqmx.SetDigEdgeStartTrigSrc(self.turbangtask, trigsrc)
-        daqmx.SetDigEdgeStartTrigEdge(self.carpostask, daqmx.Val_Rising)
+#        daqmx.SetDigEdgeStartTrigEdge(self.carpostask, daqmx.Val_Rising)
         daqmx.SetDigEdgeStartTrigEdge(self.turbangtask, daqmx.Val_Rising)
         
 
@@ -134,8 +134,8 @@ class NiDaqThread(QtCore.QThread):
                               callbackData_ptr):
             """Function called every N samples"""
             callbackdata = daqmx.get_callbackdata_from_id(callbackData_ptr)
-            data, npoints = daqmx.ReadAnalogF64(taskHandle, int(self.sr/10), 
-                    10.0, daqmx.Val_GroupByChannel, int(self.sr/10), 
+            data, npoints = daqmx.ReadAnalogF64(taskHandle, self.nsamps, 
+                    10.0, daqmx.Val_GroupByChannel, self.nsamps, 
                     len(self.analogchans))
             callbackdata.extend(data.tolist())
             self.data["torque_trans"] = np.append(self.data["torque_trans"], 
@@ -148,29 +148,24 @@ class NiDaqThread(QtCore.QThread):
                                                 data[:,3], axis=0)
             self.data["t"] = np.arange(len(self.data["torque_trans"]), 
                                        dtype=float)/self.sr                                                
-            carpos, cpoints = daqmx.ReadCounterF64(self.carpostask,
-                                                   int(self.sr/10), 10.0,
-                                                   int(self.sr/10))
-            self.data["carriage_pos"] = np.append(self.data["carriage_pos"],
-                                                  carpos)  
+#            carpos, cpoints = daqmx.ReadCounterF64(self.carpostask,
+#                                                   self.nsamps, 10.0,
+#                                                   self.nsamps)
+#            self.data["carriage_pos"] = np.append(self.data["carriage_pos"],
+#                                                  carpos)  
             turbang, cpoints = daqmx.ReadCounterF64(self.turbangtask,
-                                                    int(self.sr/10), 10.0,
-                                                    int(self.sr/10))
+                                                    self.nsamps, 10.0,
+                                                    self.nsamps)
             self.data["turbine_angle"] = np.append(self.data["turbine_angle"],
                                                    turbang)
-            if len(self.data["t"]) > 1:
-                rpm = (turbang - self.data["turbine_angle"][-2])*self.sr/6
-            else: 
-                rpm = 0.0
-                print "Zero rpm"
-            self.data["turbine_rpm"] = np.append(self.data["turbine_rpm"],
-                                                 rpm)                                                 
+            self.data["turbine_rpm"] = np.zeros(len(self.data["t"]))
+            self.data["turbine_rpm"][:-1] = np.diff(self.data["turbine_angle"])*self.sr/6.0                                             
             return 0 # The function should return an integer
             
         # Convert the python callback function to a CFunction
         EveryNCallback = daqmx.EveryNSamplesEventCallbackPtr(EveryNCallback_py)
         daqmx.RegisterEveryNSamplesEvent(self.analogtask, 
-                daqmx.Val_Acquired_Into_Buffer, int(self.sr/10), 0, 
+                daqmx.Val_Acquired_Into_Buffer, self.nsamps, 0, 
                 EveryNCallback, id_data)    
         def DoneCallback_py(taskHandle, status, callbackData_ptr):
             print "Status", status.value
@@ -180,7 +175,7 @@ class NiDaqThread(QtCore.QThread):
 
         # Start the tasks
 #        daqmx.StartTask(self.carpostask)
-#        daqmx.StartTask(self.turbangtask)
+        daqmx.StartTask(self.turbangtask)
         daqmx.StartTask(self.analogtask)
         self.collecting.emit()
 
@@ -190,13 +185,13 @@ class NiDaqThread(QtCore.QThread):
         
     def stopdaq(self):
         daqmx.StopTask(self.analogtask)
-        daqmx.StopTask(self.carpostask)
+#        daqmx.StopTask(self.carpostask)
         daqmx.StopTask(self.turbangtask)
     
     def clear(self):
         self.stopdaq()
         daqmx.ClearTask(self.analogtask)
-        daqmx.ClearTask(self.carpostask)
+#        daqmx.ClearTask(self.carpostask)
         daqmx.ClearTask(self.turbangtask)
         self.cleared.emit()
 
@@ -207,7 +202,7 @@ class TareDragDAQ(QtCore.QThread):
     pass
 
 class AcsDaqThread(QtCore.QThread):
-    def __init__(self, acs_hc, sample_rate=200.0, bufflen=100, makeprg=False):
+    def __init__(self, acs_hc, sample_rate=1000.0, bufflen=100, makeprg=False):
         QtCore.QThread.__init__(self)
         self.hc = acs_hc
         self.collectdata = True

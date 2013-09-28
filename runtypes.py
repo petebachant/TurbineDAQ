@@ -40,7 +40,7 @@ class TurbineTow(QtCore.QThread):
         
         if self.vectrino:
             print "Attempting to connect to Vectrino..."
-            self.vecthread = vectasks.VectrinoThread()
+            self.vecthread = vectasks.VectrinoThread(maxvel=self.U*1.2)
             self.vecthread.collecting.connect(self.on_vec_collecting)
             self.vecdata = self.vecthread.vec.data
             self.vecthread.savepath = self.vecsavepath
