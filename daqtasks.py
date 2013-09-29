@@ -86,7 +86,7 @@ class NiDaqThread(QtCore.QThread):
 #        daqmx.GetCILinEncoderDisPerPulse(self.carpostask, self.carposchan)
 #        self.chaninfo[self.carposchan]["Units"] = \
 #        daqmx.GetCILinEncoderUnits(self.carpostask, self.carposchan)
-#        self.metadata["Channel info"] = self.chaninfo
+        self.metadata["Channel info"] = self.chaninfo
         
 
         # Configure sample clock timing

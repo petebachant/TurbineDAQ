@@ -11,19 +11,22 @@ import time
 
 
 class VectrinoThread(QtCore.QThread):
+    """Thread for running Vectrino"""
     collecting = QtCore.pyqtSignal()
     connectsignal = QtCore.pyqtSignal(bool)
-    def __init__(self, maxvel=2.5, usetrigger=True):
+    def __init__(self, maxvel=2.5, usetrigger=True, record=False):
         QtCore.QThread.__init__(self)
         print "Vectrino thread initialized"
         self.vec = PdControl()
+        self.vecdata = self.vec.data
         self.usetrigger = usetrigger
         self.maxvel = maxvel
         self.comport = "COM2"
-        self.record = True
+        self.record = record
         self.isconnected = self.vec.is_connected()
         self.savepath = ""
         self.vecstatus = "Vectrino disconnected "
+        self.enable = True
         print "Vectrino thread init done"
         
     def setconfig(self):
@@ -63,26 +66,30 @@ class VectrinoThread(QtCore.QThread):
             self.vec.start()
             self.vecstatus = "Vectrino connected "
             while self.vec.state != "Confirmation mode":
-                self.usleep(100000)
-            self.emit(self.collecting)
+                self.vec.inquire_state()
+                time.sleep(0.1)
+            self.collecting.emit()
+            print "Vectrino collecting"
 
     def getstatus(self):
         self.status = self.vec.inquire_state()
         return self.status
         
     def stop(self):
+        self.enable = False
         if self.record:
             self.vec.stop_disk_recording()
         self.vec.stop()
         self.vec.disconnect()
+        self.vecstatus = "Vectrino disconnected "
         
 
 class ConnectThread(QtCore.QThread):
+    connected = QtCore.pyqtSignal()
     def __init__(self, vecthread):
         QtCore.QThread.__init__(self)
         self.vecthread = vecthread
         print "Connect thread initiated..."
-        connected = QtCore.pyqtSignal()
         
     def run(self):
         self.vecthread.vec.connect()
@@ -91,6 +98,18 @@ class ConnectThread(QtCore.QThread):
             time.sleep(0.3)
             self.isconnected = self.vecthread.vec.is_connected()
         self.emit(self.connected)
+        
+
+class MonitorThread(QtCore.QThread):
+    def __init__(self, vec):
+        QtCore.QThread.__init__(self)
+        self.vec = vec
+    
+    def run(self):
+        while self.vec.state == "Confirmation mode":
+            self.vec.inquire_state()
+            time.sleep(0.3)
+            print len(self.vec.data["t"])
             
             
 if __name__ == "__main__":

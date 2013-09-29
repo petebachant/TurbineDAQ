@@ -380,6 +380,8 @@ class MainWindow(QtGui.QMainWindow):
                     self.currentrun = np.max([int(run) for run in runsdone])+1
                 self.currentname = "Shakedown run " + str(self.currentrun)
                 self.label_runstatus.setText(self.currentname + " in progress ")
+                self.savesubdir = self.savedir + "/" + str(self.currentrun)
+                os.mkdir(self.savesubdir)
                 self.do_turbine_tow(U, tsr, y_R, z_H)
                 
             elif self.ui.tabTareDrag.isVisible():
@@ -405,15 +407,12 @@ class MainWindow(QtGui.QMainWindow):
         if self.ui.actionMonitor_ACS.isChecked():
             self.ui.actionMonitor_ACS.setChecked(False)
             self.acsthread.stop()
-            self.monitoracs = False
         if self.ui.actionMonitor_NI.isChecked():
             self.ui.actionMonitor_NI.setChecked(False)
             self.daqthread.stopdaq()
-            self.monitorni = False
         if self.ui.actionMonitor_Vectrino.isChecked():
             self.ui.actionMonitor_Vectrino.setChecked(False)
             self.vecthread.stop()
-            self.monitorvec = False
         self.ui.actionStart.setIcon(QIcon(":icons/play.png"))
         self.ui.toolBar_DAQ.setEnabled(True)
         self.ui.toolBar_directory.setEnabled(True)
@@ -425,17 +424,27 @@ class MainWindow(QtGui.QMainWindow):
             pass
         self.abort = True
         self.towinprogress = False
+        self.monitorni = False
+        self.monitoracs = False
+        self.monitorvec = False
         
     def do_turbine_tow(self, U, tsr, y_R, z_H):
         """Exectutes a single turbine tow"""
+        vecsavepath = self.savesubdir+"/vecdata"
+        vectrino = True
         self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
-                                              nidaq=True, vectrino=False)
+                                              nidaq=True, vectrino=vectrino,
+                                              vecsavepath=vecsavepath)
         self.turbinetow.towfinished.connect(self.on_tow_finished)
         self.turbinetow.metadata["Name"] = self.currentname
-        self.turbinetow.vecsavepath = str(self.savedir + "/" + str(self.currentrun) + "/vecdata_vno")
         self.acsdata = self.turbinetow.acsdata
         self.nidata = self.turbinetow.nidata
+        if vectrino:
+            self.vecdata = self.turbinetow.vecdata
         self.towinprogress = True
+        self.monitoracs = True
+        self.monitorni = True
+        self.monitorvec = vectrino
         self.turbinetow.start()
         
     def do_tare_drag_tow(self, U):
@@ -460,13 +469,13 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorvec = False
         self.time_last_run = time.time()
         # Save data from the run that just finished
-        savedir = os.path.normpath(str(self.savedir + "/" + str(self.currentrun)))
+        savedir = self.savesubdir
         if not self.abort:
             # Create directory and save the data inside
-            os.mkdir(savedir)
             print "Saving " + savedir + "/acsdata.mat" + "..."
             savemat(savedir+"/acsdata.mat", self.acsdata, oned_as="column")
             savemat(savedir+"/nidata.mat", self.nidata, oned_as="column")
+            savemat(savedir+"/vecdata.mat", self.vecdata, oned_as="column")
             with open(savedir+"/metadata.json", "w") as fn:
                 json.dump(self.turbinetow.metadata, fn, indent=4)
             text = str(self.label_runstatus.text())
@@ -511,6 +520,8 @@ class MainWindow(QtGui.QMainWindow):
         self.currentrun = nextrun
         self.currentname = section + " run " + str(nextrun)
         self.label_runstatus.setText(self.currentname + " in progress ")
+        self.savesubdir = self.savedir + "/" + srt(nextrun)
+        os.mkdir(self.savesubdir)
         U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
         tsr = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
         if "Perf" in section or "Wake" in section:
@@ -545,16 +556,16 @@ class MainWindow(QtGui.QMainWindow):
 
     def on_monitor_vec(self):
         if self.ui.actionMonitor_Vectrino.isChecked():
-            self.vecthread = vectasks.VectrinoThread()
-            self.vecdata = self.vecthread.vec.data
-            self.vecthread.record = False
-            self.vecthread.savepath = self.wdir
-            self.vecthread.usetrigger = False
+            self.vecthread = vectasks.VectrinoThread(usetrigger=False, 
+                                                     maxvel=0.3,
+                                                     record=False)
+            self.vecdata = self.vecthread.vecdata
             self.vecthread.start()
             self.monitorvec = True
         else:
             self.vecthread.stop()
             self.monitorvec = False
+            self.label_vecstatus.setText(self.vecthread.vecstatus)
     
     def on_timer(self):
         self.update_acs()
@@ -562,12 +573,15 @@ class MainWindow(QtGui.QMainWindow):
         self.label_timer.setText("Time since last run: " + \
         str(int(self.time_since_last_run)) + " s ")
         
-        if self.monitoracs or self.towinprogress:
+        if self.monitoracs:
             self.update_plots_acs()
-        if self.monitorvec or self.exp_running:
+        if self.monitorvec:
             self.update_plots_vec()
-            self.label_vecstatus.setText(self.vecthread.vecstatus)
-        if self.monitorni or self.towinprogress:
+            if not self.towinprogress:
+                self.label_vecstatus.setText(self.vecthread.vecstatus)
+            else:
+                self.label_vecstatus.setText(self.turbinetow.vecstatus)
+        if self.monitorni:
             self.update_plots_ni()
     
     def update_plots_acs(self):
@@ -577,7 +591,6 @@ class MainWindow(QtGui.QMainWindow):
         self.plot_acs_carvel.replot()
         self.curve_acs_rpm.set_data(t, self.acsdata["turbine_rpm"])
         self.plot_acs_rpm.replot()
-        
         
     def update_plots_ni(self):
         t = self.nidata["t"]
@@ -658,9 +671,10 @@ class MainWindow(QtGui.QMainWindow):
         with open("settings/settings.json", "w") as fn:
             json.dump(self.settings, fn, indent=4)
         acsc.closeComm(self.hc)
-        if self.monitorni:
+        if self.monitorni and not self.towinprogress:
             self.daqthread.clear()
-
+        if self.monitorvec and not self.towinprogress:
+            self.vecthread.stop()
 
 def main():
     import sys
