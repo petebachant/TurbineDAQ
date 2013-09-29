@@ -55,7 +55,7 @@ BLOCK
     collect_data = 1
     DC/c data, 100, 1.0, TIME, FVEL(5), FVEL(4)
     ! Send trigger pulse for data acquisition (may need work)
-    ! OUT4.0 = 1
+    ! AKD_OUT.0 = 1
 END
 
 ! Define start time from now
@@ -66,12 +66,12 @@ jog/v 4, rpm
 wait tacc*1000
 ptp/e 5, target
 HALT(4)
-VEL(5) = 0.5
+VEL(5) = 0.7
 VEL(4) = 10
 ptp/e 4, 0
 ptp/e 5, 0
 
-! OUT4.0 = 0
+! AKD_OUT.0 = 0
 STOPDC
 collect_data = 0
 STOP

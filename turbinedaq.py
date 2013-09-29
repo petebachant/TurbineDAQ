@@ -138,6 +138,9 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.comboBox_testPlanSection.clear()
             self.test_plan_sections = wb.sheet_names()
             self.ui.comboBox_testPlanSection.addItems(QtCore.QStringList(self.test_plan_sections))
+            self.ui.comboBoxProcessSection.addItem("Shakedown")
+            self.ui.comboBoxProcessSection.addItems(\
+                    QtCore.QStringList([s for s in self.test_plan_sections if "U" in s]))
             # Pull data from each sheet
             for sheetname in self.test_plan_sections:
                 self.test_plan_data[sheetname] = {}
@@ -610,12 +613,21 @@ class MainWindow(QtGui.QMainWindow):
         
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
-        self.curve_vecu.set_data(self.vecdata["t"], self.vecdata["u"])
+        t = self.vecdata["t"]
+        meancorr = (self.vecdata["corr_u"] + self.vecdata["corr_v"] \
+                + self.vecdata["corr_w"])/3.0
+        meansnr = (self.vecdata["snr_u"] + self.vecdata["snr_v"] \
+                + self.vecdata["snr_w"])/3.0
+        self.curve_vecu.set_data(t, self.vecdata["u"])
         self.plot_vecu.replot()
-        self.curve_vecv.set_data(self.vecdata["t"], self.vecdata["v"])
+        self.curve_vecv.set_data(t, self.vecdata["v"])
         self.plot_vecv.replot()
-        self.curve_vecw.set_data(self.vecdata["t"], self.vecdata["w"])
+        self.curve_vecw.set_data(t, self.vecdata["w"])
         self.plot_vecw.replot()
+        self.curve_vec_corr.set_data(t, meancorr)
+        self.plot_vec_corr.replot()
+        self.curve_vec_snr.set_data(t, meansnr)
+        self.plot_vec_snr.replot()
     
     def update_acs(self):
         """This function updates all the non-time-critical 

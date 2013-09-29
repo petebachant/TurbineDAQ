@@ -74,6 +74,8 @@ class TurbineTow(QtCore.QThread):
                 self.vec.get_vel_range()
         self.metadata["Vectrino metadata"]["Sample rate (Hz)"] = \
                 self.vec.sample_rate
+        self.metadata["Vectrino metadata"]["Coordinate system"] = \
+                self.vec.get_coordinate_system()
         print "Vectrino configuration set"
 
     def run(self):
