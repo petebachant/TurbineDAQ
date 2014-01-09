@@ -490,7 +490,7 @@ class MainWindow(QtGui.QMainWindow):
         if self.ui.tabTestPlan.isVisible():
             if self.ui.actionStart.isChecked():
                 # Move y and z axes to next location if applicable
-                idlesec = 5
+                idlesec = 240
                 print "Waiting " + str(idlesec) + " seconds until next run..."
                 QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
         else: 
@@ -523,7 +523,7 @@ class MainWindow(QtGui.QMainWindow):
         self.currentrun = nextrun
         self.currentname = section + " run " + str(nextrun)
         self.label_runstatus.setText(self.currentname + " in progress ")
-        self.savesubdir = self.savedir + "/" + srt(nextrun)
+        self.savesubdir = self.savedir + "/" + str(nextrun)
         os.mkdir(self.savesubdir)
         U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
         tsr = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
@@ -614,10 +614,12 @@ class MainWindow(QtGui.QMainWindow):
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
         t = self.vecdata["t"]
-        meancorr = (self.vecdata["corr_u"] + self.vecdata["corr_v"] \
-                + self.vecdata["corr_w"])/3.0
-        meansnr = (self.vecdata["snr_u"] + self.vecdata["snr_v"] \
-                + self.vecdata["snr_w"])/3.0
+#        meancorr = (self.vecdata["corr_u"] + self.vecdata["corr_v"] \
+#                + self.vecdata["corr_w"])/3.0
+#        meansnr = (self.vecdata["snr_u"] + self.vecdata["snr_v"] \
+#                + self.vecdata["snr_w"])/3.0
+        meancorr = self.vecdata["corr_u"]
+        meansnr = self.vecdata["snr_u"]
         self.curve_vecu.set_data(t, self.vecdata["u"])
         self.plot_vecu.replot()
         self.curve_vecv.set_data(t, self.vecdata["v"])
@@ -658,7 +660,7 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.tableWidget_acs.setItem(3, 1, 
                 QtGui.QTableWidgetItem(str(self.enabled_axes["z"])))
         hc_tow = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_tow")
-        hc_turbine = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_turbine")
+        hc_turbine = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_AKD")
         hc_y = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_y")
         hc_z = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_z")
         self.ui.tableWidget_acs.setItem(0, 2, QtGui.QTableWidgetItem(str(hc_tow)))

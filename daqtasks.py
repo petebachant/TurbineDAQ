@@ -64,7 +64,7 @@ class NiDaqThread(QtCore.QThread):
         self.chaninfo = {}
         for channame in self.analogchans:
             self.chaninfo[channame] = {}
-            scale = daqmx.GetAICustomScaleName(self.analogtask, channame)
+            scale = channame + "_scale"
             self.chaninfo[channame]["Scale name"] = scale
             self.chaninfo[channame]["Scale slope"] = \
             daqmx.GetScaleLinSlope(scale)
@@ -106,7 +106,7 @@ class NiDaqThread(QtCore.QThread):
         # If using trigger for analog signals set source to chassis PFI0
         if self.usetrigger:
             daqmx.CfgDigEdgeStartTrig(self.analogtask, "/cDAQ9188-16D66BB/PFI0",
-                                      daqmx.Val_Rising)
+                                      daqmx.Val_Falling)
                                
         # Set trigger functions for counter channels
 #        daqmx.SetStartTrigType(self.carpostask, daqmx.Val_DigEdge)
@@ -202,7 +202,7 @@ class TareDragDAQ(QtCore.QThread):
     pass
 
 class AcsDaqThread(QtCore.QThread):
-    def __init__(self, acs_hc, sample_rate=1000.0, bufflen=100, makeprg=False):
+    def __init__(self, acs_hc, sample_rate=1000, bufflen=100, makeprg=False):
         QtCore.QThread.__init__(self)
         self.hc = acs_hc
         self.collectdata = True
@@ -211,7 +211,7 @@ class AcsDaqThread(QtCore.QThread):
                      "t" : np.array([])}
         self.dblen = bufflen
         self.sr = sample_rate
-        self.sleeptime = self.dblen/self.sr/2*1.05
+        self.sleeptime = float(self.dblen)/float(self.sr)/2*1.05
         self.makeprg = makeprg
     def run(self):
         if self.makeprg:

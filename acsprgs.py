@@ -19,7 +19,7 @@ def turbine_tow_prg(towspeed, tsr, y_R, z_H):
 """
 rpm = tsr*U/0.5*60/6.28318530718
 
-target = 24.9   ! Do not exceed 24.9 for traverse at x/D = 1
+target = 22.0   ! Do not exceed 24.9 for traverse at x/D = 1
 endpos = 0      ! Where to move carriage at end of tow
 tacc = 5        ! Time (in seconds) for turbine angular acceleration
 tzero = 2       ! Time (in seconds) to wait before starting
@@ -33,10 +33,10 @@ VEL(5) = U
 JERK(5)= ACC(5)*10
 
 ! Set modulo on turbine axis
-DISABLE 4
-SLPMAX(4) = 60
-SLPMIN(4) = 0
-MFLAGS(4).#MODULO = 1
+! DISABLE 4
+! SLPMAX(4) = 60
+! SLPMIN(4) = 0
+! MFLAGS(4).#MODULO = 1
 ENABLE 4
 
 ACC(4) = rpm/tacc
@@ -44,36 +44,38 @@ VEL(4) = rpm
 DEC(4) = ACC(4)
 JERK(4)= ACC(4)*10
 
-! Wait a little after moving Vectrino
-WAIT 3000
-
 ! Move turbine to zero
 ptp/e(4), 0
+wait 1000
 
 ! Start controller data acquisition and send trigger pulse in same cycle
 BLOCK
+    ! Define start time from now
+    start_time = TIME
     collect_data = 1
     DC/c data, 100, 1.0, TIME, FVEL(5), FVEL(4)
     ! Send trigger pulse for data acquisition (may need work)
     ! AKD_OUT.0 = 1
+    disable 4 ! Trigger for now...
 END
 
-! Define start time from now
-start_time = TIME
+wait 200
+enable 4
+
 
 wait tzero*1000
 jog/v 4, rpm
 wait tacc*1000
 ptp/e 5, target
 HALT(4)
-VEL(5) = 0.7
+VEL(5) = 0.5
 VEL(4) = 10
-ptp/e 4, 0
+ptp 4, 0
 ptp/e 5, 0
-
-! AKD_OUT.0 = 0
 STOPDC
 collect_data = 0
+! AKD_OUT.0 = 0
+
 STOP
 """
     prg = initvars 

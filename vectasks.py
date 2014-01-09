@@ -34,6 +34,10 @@ class VectrinoThread(QtCore.QThread):
         self.vec.set_synch_master(not self.usetrigger)
         self.vec.set_sample_on_synch(False)
         self.vec.set_sample_rate(200)
+        self.vec.set_transmit_length(1.8)
+        self.vec.set_sampling_volume(7.0)
+        self.vec.set_salinity(0.0)
+        self.vec.set_power_level()
         if self.maxvel <= 4.0 and self.maxvel > 2.5:
             self.vec.set_vel_range(0)
         elif self.maxvel <= 2.5 and self.maxvel > 1.0:

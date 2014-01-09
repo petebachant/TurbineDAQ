@@ -31,9 +31,9 @@ class TurbineTow(QtCore.QThread):
         self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
         self.acsdata = self.acsdaqthread.data
         self.maxvel = U*1.2
-        self.usetrigger = False
+        self.usetrigger = True
         self.vecsavepath = vecsavepath
-        self.record = False
+        self.recordvno = True
         self.vecstatus = "Vectrino disconnected "
         
         self.metadata = {"Tow speed (m/s)" : U,
@@ -48,7 +48,7 @@ class TurbineTow(QtCore.QThread):
             self.metadata["Vectrino metadata"] = {}
             
         if self.nidaq:
-            self.daqthread = daqtasks.NiDaqThread(usetrigger=False)
+            self.daqthread = daqtasks.NiDaqThread(usetrigger=self.usetrigger)
             self.nidata = self.daqthread.data
             self.metadata["NI metadata"] = self.daqthread.metadata
         
@@ -63,6 +63,12 @@ class TurbineTow(QtCore.QThread):
         self.vec.set_synch_master(not self.usetrigger)
         self.vec.set_sample_on_synch(False)
         self.vec.set_sample_rate(200)
+        self.vec.set_coordinate_system("XYZ")
+        self.vec.set_power_level()
+        self.vec.set_transmit_length(1.8)
+        self.vec.set_sampling_volume(7.0)
+        self.vec.set_salinity()
+        
         if self.maxvel <= 4.0 and self.maxvel > 2.5:
             self.vec.set_vel_range(0)
         elif self.maxvel <= 2.5 and self.maxvel > 1.0:
@@ -97,7 +103,7 @@ class TurbineTow(QtCore.QThread):
             if not self.timeout:
                 self.vec.stop()
                 self.setvecconfig()
-                if self.record:
+                if self.recordvno:
                     self.vec.start_disk_recording(self.vecsavepath)
                 self.vec.start()
                 self.vecstatus = "Vectrino connected "
@@ -105,7 +111,7 @@ class TurbineTow(QtCore.QThread):
                     self.vec.inquire_state()
                     time.sleep(0.1)
                 print "Vectrino collecting"
-                time.sleep(5)
+                time.sleep(6)
                 self.daqthread.start()
                 self.start_motion()
         elif self.nidaq:
@@ -134,13 +140,6 @@ class TurbineTow(QtCore.QThread):
             self.vec.stop()
             self.vec.disconnect()
         self.towfinished.emit()
-    
-    def on_vec_collecting(self):
-        self.metadata["Vectrino velocity range (m/s)"] = self.vecthread.vec.get_vel_range()
-        print "Starting NI DAQ"
-        if self.nidaq:
-            self.daqthread.start()
-        self.start_motion()
             
     def abort(self):
         """This should stop everything."""
