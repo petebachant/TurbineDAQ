@@ -23,27 +23,27 @@ class VectrinoThread(QtCore.QThread):
         self.maxvel = maxvel
         self.comport = "COM2"
         self.record = record
-        self.isconnected = self.vec.is_connected()
+        self.isconnected = self.vec.connected
         self.savepath = ""
         self.vecstatus = "Vectrino disconnected "
         self.enable = True
         print "Vectrino thread init done"
         
     def setconfig(self):
-        self.vec.set_start_on_synch(self.usetrigger)
-        self.vec.set_synch_master(not self.usetrigger)
-        self.vec.set_sample_on_synch(False)
-        self.vec.set_sample_rate(200)
-        self.vec.set_transmit_length(1.8)
-        self.vec.set_sampling_volume(7.0)
-        self.vec.set_salinity(0.0)
-        self.vec.set_power_level()
+        self.vec.start_on_sync = self.usetrigger
+        self.vec.sync_master = not self.usetrigger
+        self.vec.sample_on_sync = False
+        self.vec.sample_rate = 200 
+        self.vec.transmit_length = 3
+        self.vec.sampling_volume = 3
+        self.vec.salinity = 0.0
+        self.vec.power_level = "High"
         if self.maxvel <= 4.0 and self.maxvel > 2.5:
-            self.vec.set_vel_range(0)
+            self.vec.vel_range = 0
         elif self.maxvel <= 2.5 and self.maxvel > 1.0:
-            self.vec.set_vel_range(1)
+            self.vec.vel_range = 1
         elif self.maxvel <= 1.0 and self.maxvel > 0.3:
-            self.vec.set_vel_range(2)
+            self.vec.vel_range = 2
         self.vec.set_config()
         print "Vectrino configuration set"
 
@@ -55,7 +55,6 @@ class VectrinoThread(QtCore.QThread):
         self.vecstatus = "Connecting to Vectrino..."
         while not self.vec.connected:
             time.sleep(0.5)
-            self.vec.is_connected()
             if time.time() - tstart > 10:
                 print "Vectrino timed out"
                 self.timeout = True
@@ -70,14 +69,12 @@ class VectrinoThread(QtCore.QThread):
             self.vec.start()
             self.vecstatus = "Vectrino connected "
             while self.vec.state != "Confirmation mode":
-                self.vec.inquire_state()
                 time.sleep(0.1)
             self.collecting.emit()
             print "Vectrino collecting"
 
     def getstatus(self):
-        self.status = self.vec.inquire_state()
-        return self.status
+        return self.vec.state
         
     def stop(self):
         self.enable = False
@@ -97,10 +94,8 @@ class ConnectThread(QtCore.QThread):
         
     def run(self):
         self.vecthread.vec.connect()
-        self.isconnected = self.vecthread.vec.is_connected()
-        while not self.isconnected:
+        while not self.vecthread.vec.connected:
             time.sleep(0.3)
-            self.isconnected = self.vecthread.vec.is_connected()
         self.emit(self.connected)
         
 
