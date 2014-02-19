@@ -5,7 +5,7 @@ Created on Tue Aug 20 18:58:38 2013
 @author: Pete
 """
 
-from pdcommpy.pdcommpy import PdControl
+from pdcommpy import PdControl
 from PyQt4 import QtCore
 import time
 
