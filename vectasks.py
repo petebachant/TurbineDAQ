@@ -106,7 +106,6 @@ class MonitorThread(QtCore.QThread):
     
     def run(self):
         while self.vec.state == "Confirmation mode":
-            self.vec.inquire_state()
             time.sleep(0.3)
             print len(self.vec.data["t"])
             
