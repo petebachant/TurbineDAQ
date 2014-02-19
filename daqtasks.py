@@ -9,7 +9,7 @@ This module contains the DAQ stuff for TurbineDAQ
 """
 from PyQt4 import QtCore
 import numpy as np
-from daqmx import daqmx
+import daqmx
 import time
 from acspy import acsc, prgs
 
