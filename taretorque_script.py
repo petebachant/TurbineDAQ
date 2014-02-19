@@ -10,7 +10,7 @@ This is a non-GUI tare torque running program
 from acspy import acsc
 import matplotlib.pyplot as plt
 import numpy as np
-from daqmx import daqmx
+import daqmx
 
 # Create arrays for U and tsr
 speeds = np.array([0.5, 1.0, 1.5, 2.0])
