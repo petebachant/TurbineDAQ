@@ -37,7 +37,6 @@ JERK(5)= ACC(5)*10
 ! SLPMAX(4) = 60
 ! SLPMIN(4) = 0
 ! MFLAGS(4).#MODULO = 1
-ENABLE 4
 
 ACC(4) = rpm/tacc
 VEL(4) = rpm
@@ -54,14 +53,11 @@ BLOCK
     start_time = TIME
     collect_data = 1
     DC/c data, 100, 1.0, TIME, FVEL(5), FVEL(4)
-    ! Send trigger pulse for data acquisition (may need work)
-    ! AKD_OUT.0 = 1
-    disable 4 ! Trigger for now...
+    ! Send trigger pulse for data acquisition
+    OUT1.16 = 1
 END
 
 wait 200
-enable 4
-
 
 wait tzero*1000
 jog/v 4, rpm
@@ -74,7 +70,7 @@ ptp 4, 0
 ptp/e 5, 0
 STOPDC
 collect_data = 0
-! AKD_OUT.0 = 0
+OUT1.16 = 0
 
 STOP
 """
