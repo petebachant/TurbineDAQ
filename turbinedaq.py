@@ -217,8 +217,8 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.actionHome_Tow.triggered.connect(self.on_home_tow)
         self.ui.toolButtonOpenShakedown.clicked.connect(self.on_open_shakedown)
         self.ui.actionHome_Turbine.triggered.connect(self.on_home_turbine)
-        self.ui.actionEnable_y.triggered.connect(self.on_home_y)
-        self.ui.actionEnable_z.triggered.connect(self.on_home_z)
+        self.ui.actionHome_y.triggered.connect(self.on_home_y)
+        self.ui.actionHome_z.triggered.connect(self.on_home_z)
         
     def on_tbutton_wdir(self):
         self.wdir = QFileDialog.getExistingDirectory()

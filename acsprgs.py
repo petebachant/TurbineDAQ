@@ -32,7 +32,7 @@ DEC(5) = 0.5
 VEL(5) = U
 JERK(5)= ACC(5)*10
 
-! Set modulo on turbine axis
+! Set modulo on turbine axis (only needed if using simulator)
 ! DISABLE 4
 ! SLPMAX(4) = 60
 ! SLPMIN(4) = 0
