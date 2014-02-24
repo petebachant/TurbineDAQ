@@ -70,6 +70,8 @@ class VectrinoThread(QtCore.QThread):
             self.vecstatus = "Vectrino connected "
             while self.vec.state != "Confirmation mode":
                 time.sleep(0.1)
+            print "Vectrino in data collection mode"
+            time.sleep(6)
             self.collecting.emit()
             print "Vectrino collecting"
 

@@ -25,6 +25,8 @@ class TurbineTow(QtCore.QThread):
         self.tsr = tsr
         self.y_R = y_R
         self.z_H = z_H
+        self.R = R
+        self.H = H
         self.vectrino = vectrino
         self.nidaq = nidaq 
         self.build_acsprg()
@@ -85,8 +87,14 @@ class TurbineTow(QtCore.QThread):
         print "Vectrino configuration set"
 
     def run(self):
-        """Start the run. Comms should be open already with the controller.
-        Maybe the vectrino shouldn't have its own thread here..."""
+        """Start the run. Comms should be open already with the controller."""
+        if not acsc.getOutput(self.hc, 1, 16):
+            acsc.setOutput(self.hc, 1, 16, 1)
+        acsc.toPoint(self.hc, None, 0, self.y_R*self.R)
+        acsc.toPoint(self.hc, None, 1, self.z_H*self.H)
+        while not acsc.getMotorState(self.hc, 0)["in position"] and not \
+        acsc.getMotorState(self.hc, 1)["in position"]:
+            time.sleep(0.2)
         if self.vectrino:
             self.vec.serial_port = "COM2"
             self.vec.connect()
@@ -108,7 +116,8 @@ class TurbineTow(QtCore.QThread):
                 self.vecstatus = "Vectrino connected "
                 while self.vec.state != "Confirmation mode":
                     time.sleep(0.1)
-                print "Vectrino collecting"
+                print "Vectrino in data collection mode"
+                print "Waiting 6 seconds..."
                 time.sleep(6)
                 self.daqthread.start()
                 self.start_motion()

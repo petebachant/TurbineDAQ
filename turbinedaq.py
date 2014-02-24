@@ -12,6 +12,7 @@ To-do:
     selection box
   * Calculate statistics of various quantities during the run, including
     C_P. Use a window of 3 seconds maybe.
+  * Make Vectrino stop thread
 """
 
 from __future__ import division
@@ -31,6 +32,13 @@ from scipy.io import savemat
 import xlrd
 import os
 import platform
+import subprocess
+
+# Some turbine constants
+turbine_params = {"R" : 0.5,
+                  "D" : 1.0,
+                  "A" : 1.0,
+                  "H" : 1.0}
 
 
 class MainWindow(QtGui.QMainWindow):
@@ -140,8 +148,8 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.comboBox_testPlanSection.clear()
             self.test_plan_sections = wb.sheet_names()
             self.ui.comboBox_testPlanSection.addItems(QtCore.QStringList(self.test_plan_sections))
-            self.ui.comboBoxProcessSection.addItem("Shakedown")
-            self.ui.comboBoxProcessSection.addItems(\
+            self.ui.comboBox_process_section.addItem("Shakedown")
+            self.ui.comboBox_process_section.addItems(\
                     QtCore.QStringList([s for s in self.test_plan_sections if "U" in s]))
             # Pull data from each sheet
             for sheetname in self.test_plan_sections:
@@ -219,6 +227,7 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.actionHome_Turbine.triggered.connect(self.on_home_turbine)
         self.ui.actionHome_y.triggered.connect(self.on_home_y)
         self.ui.actionHome_z.triggered.connect(self.on_home_z)
+        self.ui.commandLinkButton_process.clicked.connect(self.on_process)
         
     def on_tbutton_wdir(self):
         self.wdir = QFileDialog.getExistingDirectory()
@@ -236,6 +245,10 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.actionStart.setDisabled(True)
         else:
             self.ui.actionStart.setEnabled(True)
+        if tabitem == "Processing":
+            runsdone = sorted([int(n) for n in os.listdir(self.wdir+"/Shakedown")])
+            runsdone = [str(n) for n in runsdone]
+            self.ui.comboBox_process_nrun.addItems(runsdone)
     
     def on_home_tow(self):
         acsc.runBuffer(self.hc, 2)
@@ -357,7 +370,7 @@ class MainWindow(QtGui.QMainWindow):
         self.plot_acs_rpm.add_item(self.curve_acs_rpm)     
         
     def on_start(self):
-        """Start whatever is visibile in the tab widget."""
+        """Start whatever is visible in the tab widget."""
         self.abort = False
         if self.ui.actionStart.isChecked():
             self.ui.actionStart.setIcon(QIcon(":icons/pause.png"))
@@ -561,7 +574,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def on_monitor_vec(self):
         if self.ui.actionMonitor_Vectrino.isChecked():
-            self.vecthread = vectasks.VectrinoThread(usetrigger=False, 
+            self.vecthread = vectasks.VectrinoThread(usetrigger=True, 
                                                      maxvel=0.3,
                                                      record=False)
             self.vecdata = self.vecthread.vecdata
@@ -588,6 +601,12 @@ class MainWindow(QtGui.QMainWindow):
                 self.label_vecstatus.setText(self.turbinetow.vecstatus)
         if self.monitorni:
             self.update_plots_ni()
+            
+    def on_process(self):
+        section = str(self.ui.comboBox_process_section.currentText())
+        nrun = str(self.ui.comboBox_process_nrun.currentText())
+        subprocess.call(["cd", self.wdir, "&", "python", 
+                         self.wdir+"/processing.py", section, nrun], shell=True)
     
     def update_plots_acs(self):
         """Update the acs plots for carriage speed, rpm, and tsr"""

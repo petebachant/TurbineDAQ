@@ -19,7 +19,7 @@ def turbine_tow_prg(towspeed, tsr, y_R, z_H):
 """
 rpm = tsr*U/0.5*60/6.28318530718
 
-target = 22.0   ! Do not exceed 24.9 for traverse at x/D = 1
+target = 23.0   ! Do not exceed 24.9 for traverse at x/D = 1
 endpos = 0      ! Where to move carriage at end of tow
 tacc = 5        ! Time (in seconds) for turbine angular acceleration
 tzero = 2       ! Time (in seconds) to wait before starting
@@ -44,8 +44,8 @@ DEC(4) = ACC(4)
 JERK(4)= ACC(4)*10
 
 ! Move turbine to zero
-ptp/e(4), 0
-wait 1000
+ptp/e 4, 0
+wait 2000
 
 ! Start controller data acquisition and send trigger pulse in same cycle
 BLOCK
@@ -54,10 +54,8 @@ BLOCK
     collect_data = 1
     DC/c data, 100, 1.0, TIME, FVEL(5), FVEL(4)
     ! Send trigger pulse for data acquisition
-    OUT1.16 = 1
+    OUT1.16 = 0
 END
-
-wait 200
 
 wait tzero*1000
 jog/v 4, rpm
@@ -70,7 +68,7 @@ ptp 4, 0
 ptp/e 5, 0
 STOPDC
 collect_data = 0
-OUT1.16 = 0
+OUT1.16 = 1
 
 STOP
 """
@@ -107,7 +105,7 @@ END
 
 WAIT 32*1000
 ! HALT turbine
-ptp/e turbine, 60
+ptp/e turbine, 0
 
 STOP
 """
