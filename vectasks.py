@@ -48,7 +48,7 @@ class VectrinoThread(QtCore.QThread):
         print "Vectrino configuration set"
 
     def run(self):
-        self.vec.set_serial_port(self.comport)
+        self.vec.serial_port = self.comport
         self.vec.connect()
         tstart = time.time()
         self.timeout = False

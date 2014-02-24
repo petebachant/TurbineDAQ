@@ -12,7 +12,7 @@ from acspy import acsc
 import daqtasks
 import time
 from PyQt4 import QtCore
-from pdcommpy.pdcommpy import PdControl
+from pdcommpy import PdControl
 
 class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
@@ -59,43 +59,42 @@ class TurbineTow(QtCore.QThread):
                                                self.z_H)
                                                
     def setvecconfig(self):
-        self.vec.set_start_on_synch(self.usetrigger)
-        self.vec.set_synch_master(not self.usetrigger)
-        self.vec.set_sample_on_synch(False)
-        self.vec.set_sample_rate(200)
-        self.vec.set_coordinate_system("XYZ")
-        self.vec.set_power_level()
-        self.vec.set_transmit_length(1.8)
-        self.vec.set_sampling_volume(7.0)
-        self.vec.set_salinity()
+        self.vec.start_on_sync = self.usetrigger
+        self.vec.sync_master = not self.usetrigger
+        self.vec.sample_on_sync = False
+        self.vec.sample_rate = 200
+        self.vec.coordinate_system = "XYZ"
+        self.vec.power_level = "High"
+        self.vec.transmit_length = 3
+        self.vec.sampling_volume = 3
+        self.vec.salinity = 0.0
         
         if self.maxvel <= 4.0 and self.maxvel > 2.5:
-            self.vec.set_vel_range(0)
+            self.vec.vel_range = 0
         elif self.maxvel <= 2.5 and self.maxvel > 1.0:
-            self.vec.set_vel_range(1)
+            self.vec.vel_range = 1
         elif self.maxvel <= 1.0 and self.maxvel > 0.3:
-            self.vec.set_vel_range(2)
+            self.vec.vel_range = 2
         self.vec.set_config()
         self.metadata["Vectrino metadata"]["Velocity range (m/s)"] = \
-                self.vec.get_vel_range()
+                self.vec.vel_range
         self.metadata["Vectrino metadata"]["Sample rate (Hz)"] = \
                 self.vec.sample_rate
         self.metadata["Vectrino metadata"]["Coordinate system"] = \
-                self.vec.get_coordinate_system()
+                self.vec.coordinate_system
         print "Vectrino configuration set"
 
     def run(self):
         """Start the run. Comms should be open already with the controller.
         Maybe the vectrino shouldn't have its own thread here..."""
         if self.vectrino:
-            self.vec.set_serial_port("COM2")
+            self.vec.serial_port = "COM2"
             self.vec.connect()
             tstart = time.time()
             self.timeout = False
             self.vecstatus = "Connecting to Vectrino..."
             while not self.vec.connected:
                 time.sleep(0.5)
-                self.vec.is_connected()
                 if time.time() - tstart > 10:
                     print "Vectrino timed out"
                     self.timeout = True
@@ -108,7 +107,6 @@ class TurbineTow(QtCore.QThread):
                 self.vec.start()
                 self.vecstatus = "Vectrino connected "
                 while self.vec.state != "Confirmation mode":
-                    self.vec.inquire_state()
                     time.sleep(0.1)
                 print "Vectrino collecting"
                 time.sleep(6)

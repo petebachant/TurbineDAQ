@@ -3,13 +3,15 @@
 Created on Thu Aug 15 20:43:44 2013
 @author: Pete Bachant
 
-This is the turbineDAQ main code.
+This is the TurbineDAQ main code.
 
 To-do:
   * After "pausing" need some way to know a run is done to enable controls
     rather than enabling them right away
   * Add last couple of working directories to a dropdown list in directory
     selection box
+  * Calculate statistics of various quantities during the run, including
+    C_P. Use a window of 3 seconds maybe.
 """
 
 from __future__ import division
@@ -634,19 +636,19 @@ class MainWindow(QtGui.QMainWindow):
     def update_acs(self):
         """This function updates all the non-time-critical 
         ACS controller data"""
-        if acsc.getMotorState(self.hc, 0) != "disabled":
+        if acsc.getMotorState(self.hc, 0)["enabled"]:
             self.enabled_axes["y"] = "Yes"
         else:
             self.enabled_axes["y"] = "No"
-        if acsc.getMotorState(self.hc, 1) != "disabled":
+        if acsc.getMotorState(self.hc, 1)["enabled"]:
             self.enabled_axes["z"] = "Yes"
         else:
             self.enabled_axes["z"] = "No"            
-        if acsc.getMotorState(self.hc, 4) != "disabled":
+        if acsc.getMotorState(self.hc, 4)["enabled"]:
             self.enabled_axes["turbine"] = "Yes"
         else:
             self.enabled_axes["turbine"] = "No"
-        if acsc.getMotorState(self.hc, 5) != "disabled":
+        if acsc.getMotorState(self.hc, 5)["enabled"]:
             self.enabled_axes["tow"] = "Yes"
         else:
             self.enabled_axes["tow"] = "No"            

@@ -1,2 +1,3 @@
 settings/settings.json
 sync.ffs_db
+*.pyc

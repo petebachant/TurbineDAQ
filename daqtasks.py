@@ -159,7 +159,8 @@ class NiDaqThread(QtCore.QThread):
             self.data["turbine_angle"] = np.append(self.data["turbine_angle"],
                                                    turbang)
             self.data["turbine_rpm"] = np.zeros(len(self.data["t"]))
-            self.data["turbine_rpm"][:-1] = np.diff(self.data["turbine_angle"])*self.sr/6.0                                             
+            self.data["turbine_rpm"][:-1] = np.diff(self.data["turbine_angle"])*self.sr/6.0
+            self.data["turbine_rpm"][-1] = self.data["turbine_rpm"][-2]                                             
             return 0 # The function should return an integer
             
         # Convert the python callback function to a CFunction
