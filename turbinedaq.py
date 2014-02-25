@@ -111,6 +111,10 @@ class MainWindow(QtGui.QMainWindow):
                 if "Last window location" in self.settings:
                     self.move(QtCore.QPoint(self.settings["Last window location"][0],
                                             self.settings["Last window location"][1]))
+        if "Last size" in self.settings:
+            oldheight = self.settings["Last size"][0]
+            oldwidth = self.settings["Last size"][1]
+            self.resize(oldwidth, oldheight)
         
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
@@ -584,7 +588,7 @@ class MainWindow(QtGui.QMainWindow):
     def on_monitor_vec(self):
         if self.ui.actionMonitor_Vectrino.isChecked():
             self.vecthread = vectasks.VectrinoThread(usetrigger=False, 
-                                                     maxvel=0.3,
+                                                     maxvel=1.0,
                                                      record=False)
             self.vecdata = self.vecthread.vecdata
             self.vecthread.start()
@@ -723,6 +727,8 @@ class MainWindow(QtGui.QMainWindow):
         self.settings["Last section"] = \
                 self.ui.comboBox_testPlanSection.currentIndex()
         self.settings["Last PC name"] = self.pcid
+        self.settings["Last size"] = (self.size().height(), 
+                                      self.size().width())
         with open("settings/settings.json", "w") as fn:
             json.dump(self.settings, fn, indent=4)
         acsc.closeComm(self.hc)
