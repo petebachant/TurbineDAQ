@@ -33,12 +33,15 @@ import xlrd
 import os
 import platform
 import subprocess
+import timeseries as ts
 
 # Some turbine constants
 turbine_params = {"R" : 0.5,
                   "D" : 1.0,
                   "A" : 1.0,
                   "H" : 1.0}
+                  
+fluid_params = {"rho" : 1000.0}
 
 
 class MainWindow(QtGui.QMainWindow):
@@ -112,13 +115,13 @@ class MainWindow(QtGui.QMainWindow):
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
         if "Perf" in section:
-            subdir = self.wdir + "/Performance/" + section[-5:]
+            subdir = self.wdir + "/Performance/U_" + section.split("-")[-1]
             runpath = subdir + "/" + str(number)
         elif "Wake" in section:
-            subdir = self.wdir + "/Wake/" + section[-5:]
+            subdir = self.wdir + "/Wake/U_" + section.split("-")[-1]
             runpath = subdir + "/" + str(number)
         elif section == "Tare Drag":
-            runpath = self.wdir + "/Tare Drag/" + str(number)
+            runpath = self.wdir + "/Tare drag/" + str(number)
         else: runpath = ""
         if os.path.isdir(runpath):
             return True
@@ -127,7 +130,7 @@ class MainWindow(QtGui.QMainWindow):
     
     def is_section_done(self, section):
         if "Perf" in section:
-            subdir = self.wdir + "/Performance/" + section[-5:]
+            subdir = self.wdir + "/Performance/U_" + section.split("-")[-1]
             runlist = self.test_plan_data[section]["Run"]
             runlist = [str(run) for run in runlist]
             if runlist == os.listdir(subdir):
@@ -146,6 +149,7 @@ class MainWindow(QtGui.QMainWindow):
         if test_plan_found:
             # Set combobox items to reflect sheet names
             self.ui.comboBox_testPlanSection.clear()
+            self.ui.comboBox_process_section.clear()
             self.test_plan_sections = wb.sheet_names()
             self.ui.comboBox_testPlanSection.addItems(QtCore.QStringList(self.test_plan_sections))
             self.ui.comboBox_process_section.addItem("Shakedown")
@@ -248,6 +252,7 @@ class MainWindow(QtGui.QMainWindow):
         if tabitem == "Processing":
             runsdone = sorted([int(n) for n in os.listdir(self.wdir+"/Shakedown")])
             runsdone = [str(n) for n in runsdone]
+            self.ui.comboBox_process_nrun.clear()
             self.ui.comboBox_process_nrun.addItems(runsdone)
     
     def on_home_tow(self):
@@ -265,11 +270,11 @@ class MainWindow(QtGui.QMainWindow):
     def on_open_section_folder(self):
         section = str(self.ui.comboBox_testPlanSection.currentText())
         if "Perf" in section:
-            subdir = self.wdir + "\\Performance\\" + section[-5:]
+            subdir = self.wdir + "\\Performance\\U_" + section.split("-")[-1]
         elif "Wake" in section:
-            subdir = self.wdir + "\\Wake\\" + section[-5:]
-        elif section == "Tare Drag":
-            subdir = self.wdir + "\\Tare Drag"
+            subdir = self.wdir + "\\Wake\\U_" + section.split("-")[-1]
+        elif section == "Tare drag":
+            subdir = self.wdir + "\\Tare drag"
         else: subdir = self.wdir
         os.startfile(subdir)
         
@@ -298,6 +303,8 @@ class MainWindow(QtGui.QMainWindow):
         self.label_runstatus = QLabel()
         self.label_runstatus.setText("Not running ")
         self.ui.statusbar.addWidget(self.label_runstatus)
+        self.label_cp = QLabel()
+        self.ui.statusbar.addWidget(self.label_cp)
     
     def connect_to_controller(self):
         self.hc = acsc.openCommEthernetTCP()    
@@ -530,14 +537,16 @@ class MainWindow(QtGui.QMainWindow):
                 break
         print "Starting run", str(nextrun) + "..."
         if "Perf" in section:
-            self.savedir = self.wdir + "/Performance/" + section[-5:]
+            self.savedir = self.wdir + "/Performance/U_" + section.split("-")[-1]
         elif "Wake" in section:
-            self.savedir = self.wdir + "/Wake/" + section[-5:]
-        elif section == "Tare Drag" or section == "Tare Torque":
+            self.savedir = self.wdir + "/Wake/U_" + section.split("-")[-1]
+        elif section == "Tare drag" or section == "Tare torque":
             self.savedir = self.wdir + "/" + section
         self.currentrun = nextrun
         self.currentname = section + " run " + str(nextrun)
         self.label_runstatus.setText(self.currentname + " in progress ")
+        if not os.path.isdir(self.savedir):
+            os.mkdir(self.savedir)
         self.savesubdir = self.savedir + "/" + str(nextrun)
         os.mkdir(self.savesubdir)
         U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
@@ -574,7 +583,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def on_monitor_vec(self):
         if self.ui.actionMonitor_Vectrino.isChecked():
-            self.vecthread = vectasks.VectrinoThread(usetrigger=True, 
+            self.vecthread = vectasks.VectrinoThread(usetrigger=False, 
                                                      maxvel=0.3,
                                                      record=False)
             self.vecdata = self.vecthread.vecdata
@@ -631,6 +640,17 @@ class MainWindow(QtGui.QMainWindow):
             self.plot_drag.replot()
         self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
         self.plot_rpm_ni.replot()
+        # Calculated power coefficient
+        if self.towinprogress and len(self.nidata["torque_trans"]) > 1:
+            i = -8000
+            rho = fluid_params["rho"]
+            try:
+                cp = np.mean(self.nidata["torque_trans"][i:]*self.nidata["turbine_rpm"][i:])\
+                        /60.0*2*np.pi/(0.5*rho*turbine_params["A"]*self.turbinetow.U**3)
+                self.label_cp.setText("C_P: {:0.3f} ".format(cp))
+            except ValueError:
+                pass
+        
         
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
@@ -639,8 +659,8 @@ class MainWindow(QtGui.QMainWindow):
 #                + self.vecdata["corr_w"])/3.0
 #        meansnr = (self.vecdata["snr_u"] + self.vecdata["snr_v"] \
 #                + self.vecdata["snr_w"])/3.0
-        meancorr = self.vecdata["corr_u"]
-        meansnr = self.vecdata["snr_u"]
+        meancorr = ts.smooth(self.vecdata["corr_u"], 200)
+        meansnr = ts.smooth(self.vecdata["snr_u"], 200)
         self.curve_vecu.set_data(t, self.vecdata["u"])
         self.plot_vecu.replot()
         self.curve_vecv.set_data(t, self.vecdata["v"])
