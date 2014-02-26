@@ -22,7 +22,10 @@ rpm = tsr*U/0.5*60/6.28318530718
 target = 24.5   ! Do not exceed 24.9 for traverse at x/D = 1
 endpos = 0      ! Where to move carriage at end of tow
 tacc = 5        ! Time (in seconds) for turbine angular acceleration
-tzero = 2       ! Time (in seconds) to wait before starting
+tzero = 2.5       ! Time (in seconds) to wait before starting
+
+DISABLE 0
+DISABLE 1
 
 VEL(5) = 0.5
 ptp/e 5, 0

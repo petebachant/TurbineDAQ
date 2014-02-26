@@ -78,7 +78,7 @@ class TurbineTow(QtCore.QThread):
         elif self.maxvel <= 1.0 and self.maxvel > 0.3:
             self.vec.vel_range = 2
         self.vec.set_config()
-        self.metadata["Vectrino metadata"]["Velocity range (m/s)"] = \
+        self.metadata["Vectrino metadata"]["Velocity range (index)"] = \
                 self.vec.vel_range
         self.metadata["Vectrino metadata"]["Sample rate (Hz)"] = \
                 self.vec.sample_rate
@@ -90,6 +90,8 @@ class TurbineTow(QtCore.QThread):
         """Start the run. Comms should be open already with the controller."""
         if not acsc.getOutput(self.hc, 1, 16):
             acsc.setOutput(self.hc, 1, 16, 1)
+        acsc.enable(self.hc, 0)
+        acsc.enable(self.hc, 1)
         acsc.toPoint(self.hc, None, 0, self.y_R*self.R)
         acsc.toPoint(self.hc, None, 1, self.z_H*self.H)
         while not acsc.getMotorState(self.hc, 0)["in position"] and not \

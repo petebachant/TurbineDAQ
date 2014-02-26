@@ -588,7 +588,7 @@ class MainWindow(QtGui.QMainWindow):
     def on_monitor_vec(self):
         if self.ui.actionMonitor_Vectrino.isChecked():
             self.vecthread = vectasks.VectrinoThread(usetrigger=False, 
-                                                     maxvel=1.0,
+                                                     maxvel=0.5,
                                                      record=False)
             self.vecdata = self.vecthread.vecdata
             self.vecthread.start()
@@ -644,6 +644,7 @@ class MainWindow(QtGui.QMainWindow):
             self.plot_drag.replot()
         self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
         self.plot_rpm_ni.replot()
+        print self.nidata["carriage_pos"][-1]
         # Calculated power coefficient
         if self.towinprogress and len(self.nidata["torque_trans"]) > 1:
             i = -8000

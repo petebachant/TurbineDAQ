@@ -38,26 +38,27 @@ class NiDaqThread(QtCore.QThread):
                      "torque_arm" : np.array([]),
                      "drag_left" : np.array([]),
                      "drag_right" : np.array([]),
-                     "t" : np.array([])}
+                     "t" : np.array([]),
+                     "carriage_pos" : np.array([])}
         
         # Create one analog and one digital task
         # Probably should be a bridge task in there too!
         self.analogtask = daqmx.TaskHandle()
-#        self.carpostask = daqmx.TaskHandle()
+        self.carpostask = daqmx.TaskHandle()
         self.turbangtask = daqmx.TaskHandle()
         
         # Create tasks
         daqmx.CreateTask("", self.analogtask)
-#        daqmx.CreateTask("", self.carpostask)
+        daqmx.CreateTask("", self.carpostask)
         daqmx.CreateTask("", self.turbangtask)
         
         # Add channels to tasks
         self.analogchans = ["torque_trans", "torque_arm", 
                             "drag_left", "drag_right"]
-#        self.carposchan = "carriage_pos"
+        self.carposchan = "carriage_pos"
         self.turbangchan = "turbine_angle"
         daqmx.AddGlobalChansToTask(self.analogtask, self.analogchans)
-#        daqmx.AddGlobalChansToTask(self.carpostask, self.carposchan)
+        daqmx.AddGlobalChansToTask(self.carpostask, self.carposchan)
         daqmx.AddGlobalChansToTask(self.turbangtask, self.turbangchan)
 
         # Get channel information to add to metadata
@@ -81,11 +82,11 @@ class NiDaqThread(QtCore.QThread):
         self.chaninfo[self.turbangchan]["Units"] = \
         daqmx.GetCIAngEncoderUnits(self.turbangtask, self.turbangchan)
 
-#        self.chaninfo[self.carposchan] = {}
-#        self.chaninfo[self.carposchan]["Distance per pulse"] = \
-#        daqmx.GetCILinEncoderDisPerPulse(self.carpostask, self.carposchan)
-#        self.chaninfo[self.carposchan]["Units"] = \
-#        daqmx.GetCILinEncoderUnits(self.carpostask, self.carposchan)
+        self.chaninfo[self.carposchan] = {}
+        self.chaninfo[self.carposchan]["Distance per pulse"] = \
+        daqmx.GetCILinEncoderDisPerPulse(self.carpostask, self.carposchan)
+        self.chaninfo[self.carposchan]["Units"] = \
+        daqmx.GetCILinEncoderUnits(self.carpostask, self.carposchan)
         self.metadata["Channel info"] = self.chaninfo
         
         # Configure sample clock timing
@@ -95,9 +96,9 @@ class NiDaqThread(QtCore.QThread):
         # Get source for analog sample clock
         trigname = daqmx.GetTerminalNameWithDevPrefix(self.analogtask,
                                                       "ai/SampleClock")
-#        daqmx.CfgSampClkTiming(self.carpostask, trigname, self.sr,
-#                               daqmx.Val_Rising, daqmx.Val_ContSamps,
-#                               self.nsamps)
+        daqmx.CfgSampClkTiming(self.carpostask, trigname, self.sr,
+                               daqmx.Val_Rising, daqmx.Val_ContSamps,
+                               self.nsamps)
         daqmx.CfgSampClkTiming(self.turbangtask, trigname, self.sr,
                                daqmx.Val_Rising, daqmx.Val_ContSamps,
                                self.nsamps)
@@ -108,13 +109,13 @@ class NiDaqThread(QtCore.QThread):
                                       daqmx.Val_Falling)
                                
         # Set trigger functions for counter channels
-#        daqmx.SetStartTrigType(self.carpostask, daqmx.Val_DigEdge)
+        daqmx.SetStartTrigType(self.carpostask, daqmx.Val_DigEdge)
         daqmx.SetStartTrigType(self.turbangtask, daqmx.Val_DigEdge)
         trigsrc = \
         daqmx.GetTrigSrcWithDevPrefix(self.analogtask, "ai/StartTrigger")
-#        daqmx.SetDigEdgeStartTrigSrc(self.carpostask, trigsrc)
+        daqmx.SetDigEdgeStartTrigSrc(self.carpostask, trigsrc)
         daqmx.SetDigEdgeStartTrigSrc(self.turbangtask, trigsrc)
-#        daqmx.SetDigEdgeStartTrigEdge(self.carpostask, daqmx.Val_Rising)
+        daqmx.SetDigEdgeStartTrigEdge(self.carpostask, daqmx.Val_Rising)
         daqmx.SetDigEdgeStartTrigEdge(self.turbangtask, daqmx.Val_Rising)
         
 
@@ -147,11 +148,11 @@ class NiDaqThread(QtCore.QThread):
                                                 data[:,3], axis=0)
             self.data["t"] = np.arange(len(self.data["torque_trans"]), 
                                        dtype=float)/self.sr                                                
-#            carpos, cpoints = daqmx.ReadCounterF64(self.carpostask,
-#                                                   self.nsamps, 10.0,
-#                                                   self.nsamps)
-#            self.data["carriage_pos"] = np.append(self.data["carriage_pos"],
-#                                                  carpos)  
+            carpos, cpoints = daqmx.ReadCounterF64(self.carpostask,
+                                                   self.nsamps, 10.0,
+                                                   self.nsamps)
+            self.data["carriage_pos"] = np.append(self.data["carriage_pos"],
+                                                  carpos)  
             turbang, cpoints = daqmx.ReadCounterF64(self.turbangtask,
                                                     self.nsamps, 10.0,
                                                     self.nsamps)
@@ -174,7 +175,7 @@ class NiDaqThread(QtCore.QThread):
         daqmx.RegisterDoneEvent(self.analogtask, 0, DoneCallback, None) 
 
         # Start the tasks
-#        daqmx.StartTask(self.carpostask)
+        daqmx.StartTask(self.carpostask)
         daqmx.StartTask(self.turbangtask)
         daqmx.StartTask(self.analogtask)
         self.collecting.emit()
@@ -185,13 +186,13 @@ class NiDaqThread(QtCore.QThread):
         
     def stopdaq(self):
         daqmx.StopTask(self.analogtask)
-#        daqmx.StopTask(self.carpostask)
+        daqmx.StopTask(self.carpostask)
         daqmx.StopTask(self.turbangtask)
     
     def clear(self):
         self.stopdaq()
         daqmx.ClearTask(self.analogtask)
-#        daqmx.ClearTask(self.carpostask)
+        daqmx.ClearTask(self.carpostask)
         daqmx.ClearTask(self.turbangtask)
         self.cleared.emit()
 
