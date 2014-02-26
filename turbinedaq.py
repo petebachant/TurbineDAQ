@@ -642,7 +642,7 @@ class MainWindow(QtGui.QMainWindow):
             self.curve_drag.set_data(t, self.nidata["drag_left"]\
                     +self.nidata["drag_right"])
             self.plot_drag.replot()
-        self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
+        self.curve_rpm_ni.set_data(t, ts.smooth(self.nidata["turbine_rpm"], 50))
         self.plot_rpm_ni.replot()
         # Calculated power coefficient
         if self.towinprogress and len(self.nidata["torque_trans"]) > 1:
