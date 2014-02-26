@@ -645,18 +645,19 @@ class MainWindow(QtGui.QMainWindow):
             self.plot_drag.replot()
         try:
             rpm = fdiff.second_order_diff(self.nidata["turbine_angle"], t)/6.0
-            self.curve_rpm_ni.set_data(t, ts.smooth(rpm, 50))
-            self.plot_rpm_ni.replot()
+            rpm = ts.smooth(rpm, 50)
         except ValueError:
-            pass
+            rpm = []
         except IndexError:
-            pass
+            rpm = []
+        self.curve_rpm_ni.set_data(t, rpm)
+        self.plot_rpm_ni.replot()
         # Calculated power coefficient
         if self.towinprogress and len(self.nidata["torque_trans"]) > 1:
             i = -8000
             rho = fluid_params["rho"]
             try:
-                cp = np.mean(self.nidata["torque_trans"][i:]*self.nidata["turbine_rpm"][i:])\
+                cp = np.mean(self.nidata["torque_trans"][i:]*rpm[i:])\
                         /60.0*2*np.pi/(0.5*rho*turbine_params["A"]*self.turbinetow.U**3)
                 self.label_cp.setText("C_P: {:0.3f} ".format(cp))
             except ValueError:
