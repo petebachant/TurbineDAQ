@@ -644,7 +644,6 @@ class MainWindow(QtGui.QMainWindow):
             self.plot_drag.replot()
         self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
         self.plot_rpm_ni.replot()
-        print self.nidata["carriage_pos"][-1]
         # Calculated power coefficient
         if self.towinprogress and len(self.nidata["torque_trans"]) > 1:
             i = -8000
