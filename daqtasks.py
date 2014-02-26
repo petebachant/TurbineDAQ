@@ -159,8 +159,8 @@ class NiDaqThread(QtCore.QThread):
             self.data["turbine_angle"] = np.append(self.data["turbine_angle"],
                                                    turbang)
             self.data["turbine_rpm"] \
-                = ts.smooth(fdiff.second_order_diff(self.data["turbine_angle"], 
-                            self.data["t"])/6.0, 50)
+                = fdiff.second_order_diff(self.data["turbine_angle"], 
+                                          self.data["t"])/6.0
             return 0 # The function should return an integer
             
         # Convert the python callback function to a CFunction

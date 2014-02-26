@@ -649,7 +649,7 @@ class MainWindow(QtGui.QMainWindow):
             i = -8000
             rho = fluid_params["rho"]
             try:
-                cp = np.mean(self.nidata["torque_trans"][i:]*rpm[i:])\
+                cp = np.mean(self.nidata["torque_trans"][i:]*self.nidata["turbine_rpm"][i:])\
                         /60.0*2*np.pi/(0.5*rho*turbine_params["A"]*self.turbinetow.U**3)
                 self.label_cp.setText("C_P: {:0.3f} ".format(cp))
             except ValueError:
