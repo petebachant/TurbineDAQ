@@ -501,9 +501,12 @@ class MainWindow(QtGui.QMainWindow):
         savedir = self.savesubdir
         if not self.abort:
             # Create directory and save the data inside
-            print "Saving " + savedir + "/acsdata.mat" + "..."
+            print "Saving to " + savedir + "..."
+            nidata = dict(self.nidata)
+            if "turbine_rpm" in nidata:
+                del nidata["turbine_rpm"]
             savemat(savedir+"/acsdata.mat", self.acsdata, oned_as="column")
-            savemat(savedir+"/nidata.mat", self.nidata, oned_as="column")
+            savemat(savedir+"/nidata.mat", nidata, oned_as="column")
             savemat(savedir+"/vecdata.mat", self.vecdata, oned_as="column")
             with open(savedir+"/metadata.json", "w") as fn:
                 json.dump(self.turbinetow.metadata, fn, indent=4)
