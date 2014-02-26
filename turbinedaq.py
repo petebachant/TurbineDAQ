@@ -13,6 +13,7 @@ To-do:
   * Calculate statistics of various quantities during the run, including
     C_P. Use a window of 3 seconds maybe.
   * Make Vectrino stop thread
+  * Can't tell if a section is done
 """
 
 from __future__ import division
@@ -136,8 +137,10 @@ class MainWindow(QtGui.QMainWindow):
         if "Perf" in section:
             subdir = self.wdir + "/Performance/U_" + section.split("-")[-1]
             runlist = self.test_plan_data[section]["Run"]
-            runlist = [str(run) for run in runlist]
-            if runlist == os.listdir(subdir):
+            runlist = [int(run) for run in runlist]
+            runsdone = [int(run) for run in os.listdir(subdir).remove("Processed")]
+            runsdone.sort()         
+            if runlist == runsdone:
                 return True
             else:
                 return False
@@ -185,14 +188,9 @@ class MainWindow(QtGui.QMainWindow):
         section = str(self.ui.comboBox_testPlanSection.currentText())
         if section in self.test_plan_data:
             paramlist = self.test_plan_data[section]["Parameter list"]
-            if section != "Top Level":
-                self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist)+1)
-                self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(
-                        QtCore.QStringList(paramlist+["Done?"]))
-            else:
-                self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist))
-                self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(
-                        QtCore.QStringList(paramlist))        
+            self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist)+1)
+            self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(
+                    QtCore.QStringList(paramlist+["Done?"]))       
             self.ui.tableWidgetTestPlan.setRowCount(
                     len(self.test_plan_data[section][paramlist[0]]))
             for i in range(len(paramlist)):
@@ -201,7 +199,7 @@ class MainWindow(QtGui.QMainWindow):
                     self.ui.tableWidgetTestPlan.setItem(n, i, 
                                 QtGui.QTableWidgetItem(str(itemlist[n])))
                     # Check if run is done
-                    if section != "Top Level":
+                    if str(section).lower() != "top level":
                         isdone = self.is_run_done(section, n)
                         if isdone:
                             self.ui.tableWidgetTestPlan.setItem(n, i+1,
@@ -214,6 +212,25 @@ class MainWindow(QtGui.QMainWindow):
                         else:
                             self.ui.tableWidgetTestPlan.setItem(n, i+1,
                                     QtGui.QTableWidgetItem("No"))
+                    elif str(section).lower() == "top level":
+                        self.update_sections_done()
+                                    
+    def update_sections_done(self):
+        for n in range(self.ui.tableWidgetTestPlan.rowCount()):
+#            section_type = str(self.ui.tableWidgetTestPlan.item(n, 0).text())
+#            section_u = str(self.ui.tableWidgetTestPlan.item(n, 0).text())
+#            print section_u
+#            section = section_type + "-" + section_u
+#            isdone = self.is_section_done(section)
+#            print section
+            isdone = None
+            if isdone:
+                text = QtGui.QTableWidgetItem("Yes")
+            elif isdone == None:
+                text = QtGui.QTableWidgetItem("Maybe")
+            else:
+                text = QtGui.QTableWidgetItem("No")
+            self.ui.tableWidgetTestPlan.setItem(n+1, -1, text)
         
     def connect_sigs_slots(self):
         """Connect signals to appropriate slots."""
@@ -249,7 +266,7 @@ class MainWindow(QtGui.QMainWindow):
         tabindex = self.ui.tabWidgetMode.currentIndex()
         tabitem = self.ui.tabWidgetMode.tabText(tabindex)
         section = self.ui.comboBox_testPlanSection.currentText()
-        if tabitem == "Test Plan" and section == "Top Level":
+        if tabitem == "Test Plan" and str(section).lower() == "top level":
             self.ui.actionStart.setDisabled(True)
         else:
             self.ui.actionStart.setEnabled(True)
@@ -288,8 +305,9 @@ class MainWindow(QtGui.QMainWindow):
             
     def on_section_change(self):
         section = self.ui.comboBox_testPlanSection.currentText()
-        if section == "Top Level":
+        if str(section).lower() == "top level":
             self.ui.actionStart.setDisabled(True)
+            self.update_sections_done()
         else:
             self.ui.actionStart.setEnabled(True)
         if section in self.test_plan_data:
