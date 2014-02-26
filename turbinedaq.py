@@ -34,7 +34,6 @@ import os
 import platform
 import subprocess
 import timeseries as ts
-import fdiff
 
 # Some turbine constants
 turbine_params = {"R" : 0.5,
@@ -643,14 +642,7 @@ class MainWindow(QtGui.QMainWindow):
             self.curve_drag.set_data(t, self.nidata["drag_left"]\
                     +self.nidata["drag_right"])
             self.plot_drag.replot()
-        try:
-            rpm = fdiff.second_order_diff(self.nidata["turbine_angle"], t)/6.0
-            rpm = ts.smooth(rpm, 50)
-        except ValueError:
-            rpm = []
-        except IndexError:
-            rpm = []
-        self.curve_rpm_ni.set_data(t, rpm)
+        self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
         self.plot_rpm_ni.replot()
         # Calculated power coefficient
         if self.towinprogress and len(self.nidata["torque_trans"]) > 1:

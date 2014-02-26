@@ -12,7 +12,8 @@ import numpy as np
 import daqmx
 import time
 from acspy import acsc, prgs
-
+import fdiff
+import timeseries as ts
 
 class NiDaqThread(QtCore.QThread):
     collecting = QtCore.pyqtSignal()
@@ -33,13 +34,13 @@ class NiDaqThread(QtCore.QThread):
         
         # Create a dict of arrays for storing data
         self.data = {"turbine_angle" : np.array([]),
+                     "turbine_rpm" : np.array([]),
                      "torque_trans": np.array([]),
                      "torque_arm" : np.array([]),
                      "drag_left" : np.array([]),
                      "drag_right" : np.array([]),
                      "t" : np.array([]),
                      "carriage_pos" : np.array([])}
-        
         # Create one analog and one digital task
         # Probably should be a bridge task in there too!
         self.analogtask = daqmx.TaskHandle()
@@ -156,7 +157,9 @@ class NiDaqThread(QtCore.QThread):
                                                     self.nsamps, 10.0,
                                                     self.nsamps)
             self.data["turbine_angle"] = np.append(self.data["turbine_angle"],
-                                                   turbang)                                           
+                                                   turbang)
+            self.data["turbine_rpm"] \
+                = fdiff.second_order_diff(self.data["turbine_angle"], self.data["t"])/6.0
             return 0 # The function should return an integer
             
         # Convert the python callback function to a CFunction
