@@ -526,8 +526,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorni = False
         self.monitorvec = False
         self.time_last_run = time.time()
-        if self.turbinetow.vec.state == "Not connected":
-            self.label_vecstatus.setText("Vectrino disconnected ")
+        self.label_vecstatus.setText(self.turbinetow.vecstatus)
         # Save data from the run that just finished
         savedir = self.savesubdir
         if not self.abort:
@@ -556,8 +555,6 @@ class MainWindow(QtGui.QMainWindow):
         else: 
             self.ui.actionStart.setChecked(False)
             self.on_start()
-        # Disconnect thread from this function
-        self.turbinetow.towfinished.disconnect()
         
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():

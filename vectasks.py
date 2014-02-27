@@ -83,8 +83,6 @@ class VectrinoThread(QtCore.QThread):
         if self.record:
             self.vec.stop_disk_recording()
         self.vec.stop()
-        while self.vec.state != "Command mode":
-            time.sleep(0.3)
         self.vec.disconnect()
         self.vecstatus = "Vectrino disconnected "
         

@@ -147,11 +147,13 @@ class TurbineTow(QtCore.QThread):
             self.daqthread.clear()
             print "NI tasks cleared"
         if self.vectrino:
+            if self.recordvno:
+                self.vec.stop_disk_recording()
             self.vec.stop()
-            while self.vec.state != "Command mode":
-                time.sleep(0.3)
             self.vec.disconnect()
         print "Tow finished"
+        if self.vec.state == "Not connected":
+            self.vecstatus = "Vectrino disconnected "
         self.towfinished.emit()
 
     def abort(self):
