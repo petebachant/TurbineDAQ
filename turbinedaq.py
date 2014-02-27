@@ -556,6 +556,8 @@ class MainWindow(QtGui.QMainWindow):
         else: 
             self.ui.actionStart.setChecked(False)
             self.on_start()
+        # Disconnect thread from this function
+        self.turbinetow.towfinished.disconnect(self.on_tow_finished)
         
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():
