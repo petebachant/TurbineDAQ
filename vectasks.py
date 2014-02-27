@@ -88,6 +88,16 @@ class VectrinoThread(QtCore.QThread):
         self.vec.disconnect()
         self.vecstatus = "Vectrino disconnected "
         
+
+class StopThread(QtCore.QThread):
+    def __init__(self, vec):
+        QtCore.QThread.__init__(self)
+        self.vec = vec
+        
+    def run(self):
+        self.vec.stop()
+        self.vec.disconnect()
+        
         
 class ResetThread(QtCore.QThread):
     """Thread for running Vectrino"""

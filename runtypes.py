@@ -145,13 +145,15 @@ class TurbineTow(QtCore.QThread):
             prgstate = acsc.getProgramState(self.hc, nbuf)
         if self.nidaq:
             self.daqthread.clear()
+            print "NI tasks cleared"
         if self.vectrino:
             self.vec.stop()
             while self.vec.state != "Command mode":
                 time.sleep(0.3)
             self.vec.disconnect()
+        print "Tow finished"
         self.towfinished.emit()
-            
+
     def abort(self):
         """This should stop everything."""
         acsc.stopBuffer(self.hc, 19)
