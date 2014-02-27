@@ -150,6 +150,7 @@ class TurbineTow(QtCore.QThread):
             if self.recordvno:
                 self.vec.stop_disk_recording()
             self.vec.stop()
+            self.vec.stop()
             self.vec.disconnect()
         print "Tow finished"
         if self.vec.state == "Not connected":
@@ -166,8 +167,9 @@ class TurbineTow(QtCore.QThread):
         self.acsdaqthread.stop()
         self.daqthread.clear()
         if self.vectrino:
+            if self.recordvno:
+                self.vec.stop_disk_recording()
             self.vec.stop()
-            self.vec.stop_disk_recording()
             self.vec.disconnect()
     
 
