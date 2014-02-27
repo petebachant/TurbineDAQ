@@ -251,8 +251,10 @@ class AcsDaqThread(QtCore.QThread):
         self.prg.addstopline()
     def stop(self):
         self.collectdata = False
-        if self.makeprg:
+        try:
             acsc.writeInteger(self.hc, "collect_data", 0)
+        except:
+            print "Could not write collect_data = 0"
 
 
 if __name__ == "__main__":

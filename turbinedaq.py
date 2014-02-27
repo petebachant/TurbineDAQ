@@ -14,8 +14,10 @@ To-do:
     C_P. Use a window of 3 seconds maybe.
   * Make Vectrino stop thread
   * Can't tell if a section is done
-  * Dialog box for deleting data on aborting
   * Detect if Vec is saving to AQD, not VNO, then abort
+  * At end of section, set run button unchecked
+  * Change icon to top view of turbine
+  * Refresh button on test plan
 """
 
 from __future__ import division
@@ -37,6 +39,7 @@ import os
 import platform
 import subprocess
 import timeseries as ts
+import shutil
 
 # Some turbine constants
 turbine_params = {"R" : 0.5,
@@ -471,6 +474,12 @@ class MainWindow(QtGui.QMainWindow):
                 self.turbinetow.abort()
         except AttributeError:
             pass
+        if self.towinprogress:
+            quit_msg = "Delete files from aborted run?"
+            reply = QtGui.QMessageBox.question(self, 'Run Aborted', 
+                     quit_msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+            if reply == QtGui.QMessageBox.Yes:
+                shutil.rmtree(self.savesubdir)
         self.abort = True
         self.towinprogress = False
         self.monitorni = False
@@ -517,6 +526,8 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorni = False
         self.monitorvec = False
         self.time_last_run = time.time()
+        if self.turbinetow.vec.state == "Not connected":
+            self.label_vecstatus.setText("Vectrino disconnected ")
         # Save data from the run that just finished
         savedir = self.savesubdir
         if not self.abort:
