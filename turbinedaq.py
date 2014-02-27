@@ -14,6 +14,8 @@ To-do:
     C_P. Use a window of 3 seconds maybe.
   * Make Vectrino stop thread
   * Can't tell if a section is done
+  * Dialog box for deleting data on aborting
+  * Detect if Vec is saving to AQD, not VNO, then abort
 """
 
 from __future__ import division
@@ -128,7 +130,7 @@ class MainWindow(QtGui.QMainWindow):
         elif section == "Tare Drag":
             runpath = self.wdir + "/Tare drag/" + str(number)
         else: runpath = ""
-        if os.path.isdir(runpath):
+        if os.path.isdir(runpath) and "nidata.mat" in os.listdir(runpath):
             return True
         else:
             return False

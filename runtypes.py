@@ -147,6 +147,8 @@ class TurbineTow(QtCore.QThread):
             self.daqthread.clear()
         if self.vectrino:
             self.vec.stop()
+            while self.vec.state != "Command mode":
+                time.sleep(0.3)
             self.vec.disconnect()
         self.towfinished.emit()
             
