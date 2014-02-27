@@ -451,6 +451,7 @@ class MainWindow(QtGui.QMainWindow):
             
     def on_abort(self):
         """Abort current run and do not save data"""
+        self.abort = True
         if self.ui.actionStart.isChecked():
             self.ui.actionStart.setChecked(False)
             print "Aborting current run..."
@@ -480,7 +481,6 @@ class MainWindow(QtGui.QMainWindow):
                      quit_msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
             if reply == QtGui.QMessageBox.Yes:
                 shutil.rmtree(self.savesubdir)
-        self.abort = True
         self.towinprogress = False
         self.monitorni = False
         self.monitoracs = False
@@ -548,8 +548,15 @@ class MainWindow(QtGui.QMainWindow):
         # If executing a test plan start a single shot timer for next run
         if self.ui.tabTestPlan.isVisible():
             if self.ui.actionStart.isChecked():
-                # Move y and z axes to next location if applicable
-                idlesec = 240
+                # Move y and z axes to next location if applicable?
+                if self.turbinetow.U <= 1.0:
+                    idlesec = 240
+                elif self.turbinetow.U <= 1.2:
+                    idlesec = 240
+                elif self.turbinetow.U <= 1.4:
+                    idlesec = 240
+                else:
+                    idlesec = 480
                 print "Waiting " + str(idlesec) + " seconds until next run..."
                 QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
         else: 
