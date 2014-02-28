@@ -31,7 +31,6 @@ class TurbineTow(QtCore.QThread):
         self.nidaq = nidaq 
         self.build_acsprg()
         self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
-        self.acsdata = self.acsdaqthread.data
         self.maxvel = U*1.2
         self.usetrigger = True
         self.vecsavepath = vecsavepath
@@ -46,7 +45,6 @@ class TurbineTow(QtCore.QThread):
         
         if self.vectrino:
             self.vec = PdControl()
-            self.vecdata = self.vec.data
             self.metadata["Vectrino metadata"] = {}
             
         if self.nidaq:

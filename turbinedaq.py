@@ -495,10 +495,10 @@ class MainWindow(QtGui.QMainWindow):
                                               vecsavepath=vecsavepath)
         self.turbinetow.towfinished.connect(self.on_tow_finished)
         self.turbinetow.metadata["Name"] = self.currentname
-        self.acsdata = self.turbinetow.acsdata
-        self.nidata = self.turbinetow.nidata
+        self.acsdata = self.turbinetow.acsdaqthread.data
+        self.nidata = self.turbinetow.daqthread.data
         if vectrino:
-            self.vecdata = self.turbinetow.vecdata
+            self.vecdata = self.turbinetow.vec.data
         self.towinprogress = True
         self.monitoracs = True
         self.monitorni = True
