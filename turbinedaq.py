@@ -552,9 +552,9 @@ class MainWindow(QtGui.QMainWindow):
                 if self.turbinetow.U <= 1.0:
                     idlesec = 240
                 elif self.turbinetow.U <= 1.2:
-                    idlesec = 240
+                    idlesec = 300
                 elif self.turbinetow.U <= 1.4:
-                    idlesec = 240
+                    idlesec = 360
                 else:
                     idlesec = 480
                 print "Waiting " + str(idlesec) + " seconds until next run..."
@@ -562,7 +562,8 @@ class MainWindow(QtGui.QMainWindow):
         else: 
             self.ui.actionStart.setChecked(False)
             self.on_start()
-        del self.turbinetow.vec
+        # Delete turbinetow object? Maybe use deleteLater method
+        self.turbinetow.deleteLater()
         
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():
