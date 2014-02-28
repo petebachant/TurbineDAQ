@@ -141,6 +141,7 @@ class TurbineTow(QtCore.QThread):
         while prgstate == 3:
             time.sleep(0.3)
             prgstate = acsc.getProgramState(self.hc, nbuf)
+        self.acsdaqthread.collectdata = False
         if self.nidaq:
             self.daqthread.clear()
             print "NI tasks cleared"
