@@ -235,6 +235,7 @@ class AcsDaqThread(QtCore.QThread):
             newdata = acsc.readReal(self.hc, acsc.NONE, "data", 0, 2, self.dblen/2, self.dblen-1)
             t = (newdata[0] - t0)/1000.0
             self.data["t"] = np.append(self.data["t"], t)
+            self.data["t"] = self.data["t"] - self.data["t"][0]
             self.data["carriage_vel"] = np.append(self.data["carriage_vel"], newdata[1])
             self.data["turbine_rpm"] = np.append(self.data["turbine_rpm"], newdata[2])
     def makedaqprg(self):
