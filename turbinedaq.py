@@ -549,7 +549,13 @@ class MainWindow(QtGui.QMainWindow):
         if self.ui.tabTestPlan.isVisible():
             if self.ui.actionStart.isChecked():
                 # Move y and z axes to next location if applicable?
-                if self.turbinetow.U <= 1.0:
+                if self.turbinetow.U <= 0.4:
+                    idlesec = 150
+                elif self.turbinetow.U <= 0.6:
+                    idlesec = 180
+                elif self.turbinetow.U <= 0.8:
+                    idlesec = 210
+                elif self.turbinetow.U <= 1.0:
                     idlesec = 240
                 elif self.turbinetow.U <= 1.2:
                     idlesec = 300
