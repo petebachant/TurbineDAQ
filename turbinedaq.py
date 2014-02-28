@@ -562,6 +562,7 @@ class MainWindow(QtGui.QMainWindow):
         else: 
             self.ui.actionStart.setChecked(False)
             self.on_start()
+        del self.turbinetow.vec
         
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():
