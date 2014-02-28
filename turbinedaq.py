@@ -568,8 +568,6 @@ class MainWindow(QtGui.QMainWindow):
         else: 
             self.ui.actionStart.setChecked(False)
             self.on_start()
-        # Delete turbinetow object? Maybe use deleteLater method
-        self.turbinetow.deleteLater()
         
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():
