@@ -17,7 +17,11 @@ To-do:
   * Detect if Vec is saving to AQD, not VNO, then abort
   * At end of section, set run button unchecked
   * Change icon to top view of turbine
-  * Refresh button on test plan
+  * Refresh button on test plan tab
+  * Allow scrolling while test plan is running
+    Looks like this will involve enabling the table widget, then making it
+    look disabled. 
+  * Maybe we need to delete data in memory once its saved. 
 """
 
 from __future__ import division
@@ -568,6 +572,7 @@ class MainWindow(QtGui.QMainWindow):
         else: 
             self.ui.actionStart.setChecked(False)
             self.on_start()
+        self.turbinetow.deleteLater()
         
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():
