@@ -545,6 +545,7 @@ class MainWindow(QtGui.QMainWindow):
             text = str(self.label_runstatus.text())
             if "in progress" in text:
                 self.label_runstatus.setText(text[:-13] + " saved ")
+            print "Saved"
         # Update test plan table
         self.test_plan_into_table()
         # If executing a test plan start a single shot timer for next run

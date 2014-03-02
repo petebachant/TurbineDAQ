@@ -92,7 +92,7 @@ class TurbineTow(QtCore.QThread):
         acsc.enable(self.hc, 1)
         acsc.toPoint(self.hc, None, 0, self.y_R*self.R)
         acsc.toPoint(self.hc, None, 1, self.z_H*self.H)
-        while not acsc.getMotorState(self.hc, 0)["in position"] and not \
+        while not acsc.getMotorState(self.hc, 0)["in position"] or not \
         acsc.getMotorState(self.hc, 1)["in position"]:
             time.sleep(0.2)
         if self.vectrino:
