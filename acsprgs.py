@@ -45,7 +45,7 @@ JERK(4)= ACC(4)*10
 
 ! Move turbine to zero
 ptp/e 4, 0
-wait 2000
+wait 3000
 
 ! Start controller data acquisition and send trigger pulse in same cycle
 BLOCK
