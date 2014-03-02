@@ -133,8 +133,6 @@ class TurbineTow(QtCore.QThread):
         self.acsdaqthread.start()
         nbuf = 19
         acsc.loadBuffer(self.hc, nbuf, self.acs_prg, 2048)
-        acsc.enable(self.hc, 0)
-        acsc.enable(self.hc, 1)
         acsc.enable(self.hc, 4)
         acsc.enable(self.hc, 5)
         acsc.runBuffer(self.hc, nbuf)
