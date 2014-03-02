@@ -334,8 +334,6 @@ class MainWindow(QtGui.QMainWindow):
         self.label_runstatus = QLabel()
         self.label_runstatus.setText("Not running ")
         self.ui.statusbar.addWidget(self.label_runstatus)
-        self.label_cp = QLabel()
-        self.ui.statusbar.addWidget(self.label_cp)
     
     def connect_to_controller(self):
         self.hc = acsc.openCommEthernetTCP()    
@@ -695,17 +693,6 @@ class MainWindow(QtGui.QMainWindow):
             self.plot_drag.replot()
         self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
         self.plot_rpm_ni.replot()
-        # Calculated power coefficient
-        if self.towinprogress and len(self.nidata["torque_trans"]) > 1:
-            i = -8000
-            rho = fluid_params["rho"]
-            try:
-                cp = np.mean(self.nidata["torque_trans"][i:]*self.nidata["turbine_rpm"][i:])\
-                        /60.0*2*np.pi/(0.5*rho*turbine_params["A"]*self.turbinetow.U**3)
-                self.label_cp.setText("C_P: {:0.3f} ".format(cp))
-            except ValueError:
-                pass
-        
         
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
