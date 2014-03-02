@@ -6,7 +6,7 @@ Created on Sun Sep 08 12:20:14 2013
 """
 from acspy.prgs import ACSPLplusPrg
 
-def turbine_tow_prg(towspeed, tsr, y_R, z_H):
+def turbine_tow_prg(towspeed, tsr):
     """This function builds an ACSPL+ program for turbine towing. Turbine
     radius is assumed to be 0.5 m"""
     
@@ -23,9 +23,6 @@ target = 24.5   ! Do not exceed 24.9 for traverse at x/D = 1
 endpos = 0      ! Where to move carriage at end of tow
 tacc = 5        ! Time (in seconds) for turbine angular acceleration
 tzero = 2.5       ! Time (in seconds) to wait before starting
-
-DISABLE 0
-DISABLE 1
 
 VEL(5) = 0.5
 ptp/e 5, 0
@@ -77,12 +74,6 @@ STOP
 """
     prg = initvars 
     prg += "tsr = " + str(tsr) + "\n" + "U = " + str(towspeed) + "\n"
-    if y_R != None:
-        prg += "ptp/e 0, " + str(y_R*0.5) + "\n"
-    if z_H != None:
-        prg += "ptp/e 1, " + str(z_H)
-        
-    # Set this up as a linear 2 ax-s move?
     prg += prgbody
     return prg
 
@@ -153,4 +144,4 @@ class TurbineTow(ACSPLplusPrg):
         ACSPLplusPrg.__init__(self)
         
 if __name__ == "__main__":
-    print tare_drag_prg(0.5)
+    print turbine_tow_prg(0.5, 1.9)
