@@ -95,6 +95,8 @@ class TurbineTow(QtCore.QThread):
         while not acsc.getMotorState(self.hc, 0)["in position"] or not \
         acsc.getMotorState(self.hc, 1)["in position"]:
             self.msleep(300)
+        acsc.disable(self.hc, 0)
+        acsc.disable(self.hc, 1)
         if self.vectrino:
             self.vec.serial_port = "COM2"
             self.vec.connect()

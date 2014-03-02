@@ -22,6 +22,8 @@ To-do:
     Looks like this will involve enabling the table widget, then making it
     look disabled. 
   * Maybe we need to delete data in memory once its saved. 
+  * Put ACS prgs in text files (JSON?) so they can be edited while program is
+    running. 
 """
 
 from __future__ import division
