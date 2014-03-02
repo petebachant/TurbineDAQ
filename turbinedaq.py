@@ -574,6 +574,9 @@ class MainWindow(QtGui.QMainWindow):
         else: 
             self.ui.actionStart.setChecked(False)
             self.on_start()
+        self.vecdata = {}
+        self.nidata = {}
+        self.acsdata = {}
         
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():
