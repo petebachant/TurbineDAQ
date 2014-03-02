@@ -676,45 +676,60 @@ class MainWindow(QtGui.QMainWindow):
     def update_plots_acs(self):
         """Update the acs plots for carriage speed, rpm, and tsr"""
         t = self.acsdata["t"]
-        self.curve_acs_carvel.set_data(t, self.acsdata["carriage_vel"])
+        if t[-1] > 60:
+            sr = t[1] - t[0]
+            i1 = len(t) - sr*60
+        else:
+            i1 = 0
+        self.curve_acs_carvel.set_data(t[i1:], self.acsdata["carriage_vel"][i1:])
         self.plot_acs_carvel.replot()
-        self.curve_acs_rpm.set_data(t, self.acsdata["turbine_rpm"])
+        self.curve_acs_rpm.set_data(t[i1:], self.acsdata["turbine_rpm"][i1:])
         self.plot_acs_rpm.replot()
         
     def update_plots_ni(self):
         t = self.nidata["t"]
-        self.curve_drag_left.set_data(t, self.nidata["drag_left"])
+        if t[-1] > 60:
+            sr = t[1] - t[0]
+            i1 = len(t) - sr*60
+        else:
+            i1 = 0
+        self.curve_drag_left.set_data(t[i1:], self.nidata["drag_left"][i1:])
         self.plot_drag_left.replot()
-        self.curve_torque_trans.set_data(t, self.nidata["torque_trans"])
-        self.curve_torque_arm.set_data(t, self.nidata["torque_arm"])        
+        self.curve_torque_trans.set_data(t[i1:], self.nidata["torque_trans"][i1:])
+        self.curve_torque_arm.set_data(t[i1:], self.nidata["torque_arm"][i1:])        
         self.plot_torque.replot()
-        self.curve_drag_right.set_data(t, self.nidata["drag_right"])
+        self.curve_drag_right.set_data(t[i1:], self.nidata["drag_right"][i1:])
         self.plot_drag_right.replot()
         if len(self.nidata["drag_left"]) == len(self.nidata["drag_right"]):
-            self.curve_drag.set_data(t, self.nidata["drag_left"]\
-                    +self.nidata["drag_right"])
+            self.curve_drag.set_data(t[i1:], self.nidata["drag_left"][i1:]\
+                    +self.nidata["drag_right"][i1:])
             self.plot_drag.replot()
-        self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
+        self.curve_rpm_ni.set_data(t[i1:], self.nidata["turbine_rpm"][i1:])
         self.plot_rpm_ni.replot()
         
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
         t = self.vecdata["t"]
+        if t[-1] > 60:
+            sr = t[1] - t[0]
+            i1 = len(t) - sr*60
+        else:
+            i1 = 0
 #        meancorr = (self.vecdata["corr_u"] + self.vecdata["corr_v"] \
 #                + self.vecdata["corr_w"])/3.0
 #        meansnr = (self.vecdata["snr_u"] + self.vecdata["snr_v"] \
 #                + self.vecdata["snr_w"])/3.0
         meancorr = ts.smooth(self.vecdata["corr_u"], 200)
         meansnr = ts.smooth(self.vecdata["snr_u"], 200)
-        self.curve_vecu.set_data(t, self.vecdata["u"])
+        self.curve_vecu.set_data(t[i1:], self.vecdata["u"][i1:])
         self.plot_vecu.replot()
-        self.curve_vecv.set_data(t, self.vecdata["v"])
+        self.curve_vecv.set_data(t[i1:], self.vecdata["v"][i1:])
         self.plot_vecv.replot()
-        self.curve_vecw.set_data(t, self.vecdata["w"])
+        self.curve_vecw.set_data(t[i1:], self.vecdata["w"][i1:])
         self.plot_vecw.replot()
-        self.curve_vec_corr.set_data(t, meancorr)
+        self.curve_vec_corr.set_data(t[i1:], meancorr[i1:])
         self.plot_vec_corr.replot()
-        self.curve_vec_snr.set_data(t, meansnr)
+        self.curve_vec_snr.set_data(t[i1:], meansnr[i1:])
         self.plot_vec_snr.replot()
     
     def update_acs(self):
