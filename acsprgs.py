@@ -43,8 +43,12 @@ VEL(4) = rpm
 DEC(4) = ACC(4)
 JERK(4)= ACC(4)*10
 
-! Move turbine to zero
-ptp/e 4, 0
+! Move turbine to zero if necessary
+if RPOS(4) <> 60 | RPOS(4) <> 0
+    ptp 4, 0
+end
+
+! Allow oscillations in shaft to damp out
 wait 3000
 
 ! Start controller data acquisition and send trigger pulse in same cycle
