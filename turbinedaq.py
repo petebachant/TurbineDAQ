@@ -105,7 +105,7 @@ class MainWindow(QtGui.QMainWindow):
         if "Last section" in self.settings:
             self.ui.comboBox_testPlanSection.setCurrentIndex(self.settings["Last section"])
         # Start timer
-        self.timer.start(100)
+        self.timer.start(200)
         
     def load_settings(self):
         """Loads settings"""
@@ -700,10 +700,7 @@ class MainWindow(QtGui.QMainWindow):
         
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
-#        meancorr = (self.vecdata["corr_u"] + self.vecdata["corr_v"] \
-#                + self.vecdata["corr_w"])/3.0
-#        meansnr = (self.vecdata["snr_u"] + self.vecdata["snr_v"] \
-#                + self.vecdata["snr_w"])/3.0
+        t = self.vecdata["t"]
         meancorr = ts.smooth(self.vecdata["corr_u"], 200)
         meansnr = ts.smooth(self.vecdata["snr_u"], 200)
         self.curve_vecu.set_data(t, self.vecdata["u"])
