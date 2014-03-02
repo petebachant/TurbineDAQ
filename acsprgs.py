@@ -44,7 +44,7 @@ DEC(4) = ACC(4)
 JERK(4)= ACC(4)*10
 
 ! Move turbine to zero if necessary
-if RPOS(4) <> 60 | RPOS(4) <> 0
+if RPOS(4) <> 60 & RPOS(4) <> 0
     ptp 4, 0
 end
 
