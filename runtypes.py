@@ -102,7 +102,7 @@ class TurbineTow(QtCore.QThread):
             self.timeout = False
             self.vecstatus = "Connecting to Vectrino..."
             while not self.vec.connected:
-                time.sleep(0.5)
+                self.msleep(300)
                 if time.time() - tstart > 10:
                     print "Vectrino timed out"
                     self.timeout = True
@@ -115,10 +115,10 @@ class TurbineTow(QtCore.QThread):
                 self.vec.start()
                 self.vecstatus = "Vectrino connected "
                 while self.vec.state != "Confirmation mode":
-                    time.sleep(0.1)
+                    self.msleep(100)
                 print "Vectrino in data collection mode"
                 print "Waiting 6 seconds..."
-                time.sleep(6)
+                self.sleep(6)
                 self.daqthread.start()
                 self.start_motion()
         elif self.nidaq:
