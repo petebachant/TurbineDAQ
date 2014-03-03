@@ -24,6 +24,8 @@ class NiDaqThread(QtCore.QThread):
         # Some parameters for the thread
         self.usetrigger = usetrigger
         
+        self.collect = True
+        
         # Create some meta data for the run
         self.metadata = {}
         
@@ -181,7 +183,7 @@ class NiDaqThread(QtCore.QThread):
         self.collecting.emit()
 
         # Keep the acquisition going until task it cleared
-        while True:
+        while self.collect:
             pass
         
     def stopdaq(self):
@@ -194,6 +196,7 @@ class NiDaqThread(QtCore.QThread):
         daqmx.ClearTask(self.analogtask)
         daqmx.ClearTask(self.carpostask)
         daqmx.ClearTask(self.turbangtask)
+        self.collect = False
         self.cleared.emit()
 
 class TareTorqueDAQ(QtCore.QThread):

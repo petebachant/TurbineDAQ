@@ -577,6 +577,9 @@ class MainWindow(QtGui.QMainWindow):
         self.vecdata = {}
         self.nidata = {}
         self.acsdata = {}
+        self.turbinetow.vec.data = {}
+        self.turbinetow.vec = None
+        self.turbinetow.deleteLater()
         self.turbinetow = None
         
     def on_idletimer(self):
