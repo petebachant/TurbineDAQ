@@ -24,6 +24,7 @@ To-do:
   * Maybe we need to delete data in memory once its saved. 
   * Put ACS prgs in text files (JSON?) so they can be edited while program is
     running. 
+  * Abort does weird things if pressed too early in a run
 """
 
 from __future__ import division
