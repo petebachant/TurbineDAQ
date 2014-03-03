@@ -16,7 +16,6 @@ from pdcommpy import PdControl
 
 class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
-    vectrinoreset = QtCore.pyqtSignal()
     def __init__(self, acs_hcomm, U, tsr, y_R, z_H, 
                  R=0.5, H=1.0, nidaq=True, vectrino=True, vecsavepath=""):
         """Turbine tow run object."""
@@ -169,7 +168,6 @@ class TurbineTow(QtCore.QThread):
         self.vec.disconnect()
         self.vec.data = {}
         print "Vectrino reset"
-        self.vectrinoreset.emit()
 
     def abort(self):
         """This should stop everything."""
