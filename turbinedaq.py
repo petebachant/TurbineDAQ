@@ -105,7 +105,7 @@ class MainWindow(QtGui.QMainWindow):
         if "Last section" in self.settings:
             self.ui.comboBox_testPlanSection.setCurrentIndex(self.settings["Last section"])
         # Start timer
-        self.timer.start(150)
+        self.timer.start(125)
         
     def load_settings(self):
         """Loads settings"""
@@ -531,7 +531,6 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorni = False
         self.monitorvec = False
         self.time_last_run = time.time()
-        self.label_vecstatus.setText(self.turbinetow.vecstatus)
         # Save data from the run that just finished
         savedir = self.savesubdir
         if not self.abort:
@@ -574,13 +573,13 @@ class MainWindow(QtGui.QMainWindow):
         else: 
             self.ui.actionStart.setChecked(False)
             self.on_start()
-        self.vecdata = {}
-        self.nidata = {}
-        self.acsdata = {}
-        self.turbinetow.vec.data = {}
-        self.turbinetow.vec = None
-        self.turbinetow.deleteLater()
-        self.turbinetow = None
+#        self.vecdata = {}
+#        self.nidata = {}
+#        self.acsdata = {}
+#        self.turbinetow.vec.data = {}
+#        self.turbinetow.vec = None
+#        self.turbinetow.deleteLater()
+#        self.turbinetow = None
         
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():
