@@ -105,7 +105,7 @@ class MainWindow(QtGui.QMainWindow):
         if "Last section" in self.settings:
             self.ui.comboBox_testPlanSection.setCurrentIndex(self.settings["Last section"])
         # Start timer
-        self.timer.start(200)
+        self.timer.start(150)
         
     def load_settings(self):
         """Loads settings"""
@@ -499,6 +499,7 @@ class MainWindow(QtGui.QMainWindow):
                                               nidaq=True, vectrino=vectrino,
                                               vecsavepath=vecsavepath)
         self.turbinetow.towfinished.connect(self.on_tow_finished)
+        self.turbinetow.vectrinoreset.connect(self.delete_turbinetow)
         self.turbinetow.metadata["Name"] = self.currentname
         self.acsdata = self.turbinetow.acsdaqthread.data
         self.nidata = self.turbinetow.daqthread.data
@@ -577,6 +578,9 @@ class MainWindow(QtGui.QMainWindow):
         self.vecdata = {}
         self.nidata = {}
         self.acsdata = {}
+        
+    def delete_turbinetow(self):
+        self.turbinetow = None
         
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():
