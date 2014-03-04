@@ -25,6 +25,7 @@ To-do:
   * Put ACS prgs in text files (JSON?) so they can be edited while program is
     running. 
   * Abort does weird things if pressed too early in a run
+  * Auto abort for bad Vectrino data (lots of noise)
 """
 
 from __future__ import division
@@ -707,8 +708,8 @@ class MainWindow(QtGui.QMainWindow):
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
         t = self.vecdata["t"]
-        meancorr = ts.smooth(self.vecdata["corr_u"], 200)
-        meansnr = ts.smooth(self.vecdata["snr_u"], 200)
+        meancorr = self.vecdata["corr_u"]
+        meansnr = self.vecdata["snr_u"]
         self.curve_vecu.set_data(t, self.vecdata["u"])
         self.plot_vecu.replot()
         self.curve_vecv.set_data(t, self.vecdata["v"])
