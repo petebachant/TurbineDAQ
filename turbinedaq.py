@@ -572,9 +572,13 @@ class MainWindow(QtGui.QMainWindow):
                     idlesec = 480
                 print "Waiting " + str(idlesec) + " seconds until next run..."
                 QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
-                cr = self.ui.tableWidgetTestPlan.item(int(self.currentrun), 0)
-                self.ui.tableWidgetTestPlan.scrollToItem(cr, 
-                        QtGui.QAbstractItemView.PositionAtCenter)
+                # Scroll test plan so completed run is in view
+                try:
+                    i = int(self.currentrun) + 1
+                    cr = self.ui.tableWidgetTestPlan.item(i, 0)
+                    self.ui.tableWidgetTestPlan.scrollToItem(cr)
+                except:
+                    pass
         else: 
             self.ui.actionStart.setChecked(False)
             self.on_start()
