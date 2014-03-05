@@ -514,6 +514,7 @@ class MainWindow(QtGui.QMainWindow):
         acsc.toPoint(self.hc, None, 4, 0.0)
         acsc.setVelocity(self.hc, 5, 0.5)
         acsc.toPoint(self.hc, None, 5, 0.0)
+        self.do_test_plan()
 
     def on_badvecdata(self):
         print "Bad Vectrino data detected"
@@ -701,10 +702,13 @@ class MainWindow(QtGui.QMainWindow):
             self.update_plots_acs()
         if self.monitorvec:
             self.update_plots_vec()
-            if not self.towinprogress:
-                self.label_vecstatus.setText(self.vecthread.vecstatus)
-            else:
-                self.label_vecstatus.setText(self.turbinetow.vecstatus)
+            try:
+                if not self.towinprogress:
+                    self.label_vecstatus.setText(self.vecthread.vecstatus)
+                else:
+                    self.label_vecstatus.setText(self.turbinetow.vecstatus)
+            except AttributeError:
+                pass
         if self.monitorni:
             self.update_plots_ni()
             
