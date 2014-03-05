@@ -268,6 +268,7 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.actionHome_y.triggered.connect(self.on_home_y)
         self.ui.actionHome_z.triggered.connect(self.on_home_z)
         self.ui.commandLinkButton_process.clicked.connect(self.on_process)
+        self.badvecdata.connect(self.on_badvecdata)
         
     def on_tbutton_wdir(self):
         self.wdir = QFileDialog.getExistingDirectory()
