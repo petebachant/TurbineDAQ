@@ -522,6 +522,7 @@ class MainWindow(QtGui.QMainWindow):
         
     def do_turbine_tow(self, U, tsr, y_R, z_H):
         """Exectutes a single turbine tow"""
+        self.abort = False
         vecsavepath = self.savesubdir+"/vecdata"
         vectrino = True
         self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
