@@ -458,7 +458,8 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.tabWidgetMode.setEnabled(True)
             
     def on_abort(self):
-        """Abort current run and do not save data"""
+        """Abort current run and don't save data, but ask whether or not to
+        delete folder created."""
         self.abort = True
         self.monitorni = False
         self.monitoracs = False
@@ -493,10 +494,29 @@ class MainWindow(QtGui.QMainWindow):
             if reply == QtGui.QMessageBox.Yes:
                 shutil.rmtree(self.savesubdir)
         self.towinprogress = False
+        
+    def on_auto_abort(self):
+        """Abort run, don't save data, and automatically delete any files
+        or folders generated. Also will move turbine and tow axes back
+        to zero."""
+        self.abort = True
+        self.monitorni = False
+        self.monitoracs = False
+        self.monitorvec = False
+        print "Automatically aborting current run..."
+        text = str(self.label_runstatus.text())
+        self.label_runstatus.setText(text[:-13] + " aborted ")
+        self.turbinetow.abort()
+        print "Deleting files from aborted run..."
+        shutil.rmtree(self.savesubdir)
+        self.towinprogress = False
+        acsc.toPoint(self.hc, None, 4, 0.0)
+        acsc.setVelocity(self.hc, 5, 0.5)
+        acsc.toPoint(self.hc, None, 5, 0.0)
 
     def on_badvecdata(self):
         print "Bad Vectrino data detected"
-        self.on_abort()
+        self.on_auto_abort()
         
     def do_turbine_tow(self, U, tsr, y_R, z_H):
         """Exectutes a single turbine tow"""
