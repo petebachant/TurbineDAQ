@@ -647,7 +647,10 @@ class MainWindow(QtGui.QMainWindow):
         if not os.path.isdir(self.savedir):
             os.mkdir(self.savedir)
         self.savesubdir = self.savedir + "/" + str(nextrun)
-        os.mkdir(self.savesubdir)
+        try:
+            os.mkdir(self.savesubdir)
+        except WindowsError:
+            print "Save subdirectory already exists. Files will be overwritten."
         U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
         tsr = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
         if "Perf" in section or "Wake" in section:
