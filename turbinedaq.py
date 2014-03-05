@@ -59,6 +59,7 @@ fluid_params = {"rho" : 1000.0}
 
 
 class MainWindow(QtGui.QMainWindow):
+    badvecdata = QtCore.pyqtSignal()
     def __init__(self, parent=None):
         QtGui.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
@@ -459,6 +460,9 @@ class MainWindow(QtGui.QMainWindow):
     def on_abort(self):
         """Abort current run and do not save data"""
         self.abort = True
+        self.monitorni = False
+        self.monitoracs = False
+        self.monitorvec = False
         if self.ui.actionStart.isChecked():
             self.ui.actionStart.setChecked(False)
             print "Aborting current run..."
@@ -489,9 +493,10 @@ class MainWindow(QtGui.QMainWindow):
             if reply == QtGui.QMessageBox.Yes:
                 shutil.rmtree(self.savesubdir)
         self.towinprogress = False
-        self.monitorni = False
-        self.monitoracs = False
-        self.monitorvec = False
+
+    def on_badvecdata(self):
+        print "Bad Vectrino data detected"
+        self.on_abort()
         
     def do_turbine_tow(self, U, tsr, y_R, z_H):
         """Exectutes a single turbine tow"""
@@ -715,6 +720,9 @@ class MainWindow(QtGui.QMainWindow):
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
         t = self.vecdata["t"]
+        if len(t) > 400 and len(t) < 600:
+            if len(np.where(np.abs(self.vecdata["u"]) > 0.5)[0]) > 50:
+                self.badvecdata.emit()
         meancorr = self.vecdata["corr_u"]
         meansnr = self.vecdata["snr_u"]
         self.curve_vecu.set_data(t, self.vecdata["u"])
