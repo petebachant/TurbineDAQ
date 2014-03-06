@@ -16,6 +16,7 @@ from pdcommpy import PdControl
 
 class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
+    autoabortfinished = QtCore.pyqtSignal()
     def __init__(self, acs_hcomm, U, tsr, y_R, z_H, 
                  R=0.5, H=1.0, nidaq=True, vectrino=True, vecsavepath=""):
         """Turbine tow run object."""
@@ -183,6 +184,28 @@ class TurbineTow(QtCore.QThread):
                 self.vec.stop_disk_recording()
             self.vec.stop()
             self.vec.disconnect()
+        
+    def autoabort(self):
+        """This should stop everything and return carriage and turbine back
+        to zero."""
+        acsc.stopBuffer(self.hc, 19)
+        acsc.halt(self.hc, 0)
+        acsc.halt(self.hc, 1)
+        acsc.halt(self.hc, 4)
+        acsc.halt(self.hc, 5)
+        self.acsdaqthread.stop()
+        self.daqthread.clear()
+        acsc.toPoint(self.hc, None, 4, 0.0)
+        acsc.setVelocity(self.hc, 5, 0.5)
+        acsc.toPoint(self.hc, None, 5, 0.0)
+        if self.vectrino:
+            if self.recordvno:
+                self.vec.stop_disk_recording()
+            self.vec.stop()
+            self.vec.disconnect()
+        # Maybe should wait for tow and turbine to get back to zero, but
+        # probably will be already
+        self.autoabortfinished.emit()
     
 
 class TareDragRun(QtCore.QThread):

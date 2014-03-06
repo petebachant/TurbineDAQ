@@ -21,11 +21,10 @@ To-do:
   * Allow scrolling while test plan is running
     Looks like this will involve enabling the table widget, then making it
     look disabled. 
-  * Maybe we need to delete data in memory once its saved. 
-  * Put ACS prgs in text files (JSON?) so they can be edited while program is
+  * Put ACS prgs in text files so they can be edited while program is
     running. 
   * Abort does weird things if pressed too early in a run
-  * Auto abort for bad Vectrino data (lots of noise)
+  * Highlight run in progress in table
 """
 
 from __future__ import division
@@ -496,7 +495,7 @@ class MainWindow(QtGui.QMainWindow):
                 shutil.rmtree(self.savesubdir)
         self.towinprogress = False
         
-    def on_auto_abort(self):
+    def auto_abort(self):
         """Abort run, don't save data, and automatically delete any files
         or folders generated. Also will move turbine and tow axes back
         to zero."""
@@ -507,18 +506,18 @@ class MainWindow(QtGui.QMainWindow):
         print "Automatically aborting current run..."
         text = str(self.label_runstatus.text())
         self.label_runstatus.setText(text[:-13] + " aborted ")
-        self.turbinetow.abort()
+        self.turbinetow.autoabortfinished.connect(self.on_autoabort_finished)
+        self.turbinetow.autoabort()
+        self.towinprogress = False
+
+    def on_autoabort_finished(self):
         print "Deleting files from aborted run..."
         shutil.rmtree(self.savesubdir)
-        self.towinprogress = False
-        acsc.toPoint(self.hc, None, 4, 0.0)
-        acsc.setVelocity(self.hc, 5, 0.5)
-        acsc.toPoint(self.hc, None, 5, 0.0)
         self.do_test_plan()
 
     def on_badvecdata(self):
         print "Bad Vectrino data detected"
-        self.on_auto_abort()
+        self.auto_abort()
         
     def do_turbine_tow(self, U, tsr, y_R, z_H):
         """Exectutes a single turbine tow"""
