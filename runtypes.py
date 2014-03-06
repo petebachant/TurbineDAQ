@@ -161,8 +161,7 @@ class TurbineTow(QtCore.QThread):
         if self.vectrino:
             print "Resetting Vectrino..."
             self.reset_vec()
-        if not self.autoaborted:
-            self.towfinished.emit()
+        self.towfinished.emit()
         
     def reset_vec(self):
         self.vec.connect()
@@ -193,9 +192,6 @@ class TurbineTow(QtCore.QThread):
         acsc.toPoint(self.hc, None, 4, 0.0)
         acsc.setVelocity(self.hc, 5, 0.5)
         acsc.toPoint(self.hc, None, 5, 0.0)
-        # Maybe should wait for tow and turbine to get back to zero, but
-        # probably will be already
-        self.towfinished.emit()
     
 
 class TareDragRun(QtCore.QThread):
