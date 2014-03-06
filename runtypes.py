@@ -16,7 +16,6 @@ from pdcommpy import PdControl
 
 class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
-    autoabortfinished = QtCore.pyqtSignal()
     def __init__(self, acs_hcomm, U, tsr, y_R, z_H, 
                  R=0.5, H=1.0, nidaq=True, vectrino=True, vecsavepath=""):
         """Turbine tow run object."""
@@ -37,6 +36,8 @@ class TurbineTow(QtCore.QThread):
         self.vecsavepath = vecsavepath
         self.recordvno = True
         self.vecstatus = "Vectrino disconnected "
+        self.autoaborted = False
+        self.aborted = False
         
         self.metadata = {"Tow speed (m/s)" : U,
                          "Tip speed ratio" : tsr,
@@ -145,7 +146,7 @@ class TurbineTow(QtCore.QThread):
         while prgstate == 3:
             time.sleep(0.3)
             prgstate = acsc.getProgramState(self.hc, nbuf)
-        self.acsdaqthread.collectdata = False
+        self.acsdaqthread.stop()
         if self.nidaq:
             self.daqthread.clear()
             print "NI tasks cleared"
@@ -160,7 +161,8 @@ class TurbineTow(QtCore.QThread):
         if self.vectrino:
             print "Resetting Vectrino..."
             self.reset_vec()
-        self.towfinished.emit()
+        if not self.autoaborted:
+            self.towfinished.emit()
         
     def reset_vec(self):
         self.vec.connect()
@@ -172,40 +174,28 @@ class TurbineTow(QtCore.QThread):
 
     def abort(self):
         """This should stop everything."""
+        self.aborted = True
         acsc.stopBuffer(self.hc, 19)
         acsc.halt(self.hc, 0)
         acsc.halt(self.hc, 1)
         acsc.halt(self.hc, 4)
         acsc.halt(self.hc, 5)
-        self.acsdaqthread.stop()
-        self.daqthread.clear()
-        if self.vectrino:
-            if self.recordvno:
-                self.vec.stop_disk_recording()
-            self.vec.stop()
-            self.vec.disconnect()
         
     def autoabort(self):
         """This should stop everything and return carriage and turbine back
         to zero."""
+        self.autoaborted = True
         acsc.stopBuffer(self.hc, 19)
         acsc.halt(self.hc, 0)
         acsc.halt(self.hc, 1)
         acsc.halt(self.hc, 4)
         acsc.halt(self.hc, 5)
-        self.acsdaqthread.stop()
-        self.daqthread.clear()
         acsc.toPoint(self.hc, None, 4, 0.0)
         acsc.setVelocity(self.hc, 5, 0.5)
         acsc.toPoint(self.hc, None, 5, 0.0)
-        if self.vectrino:
-            if self.recordvno:
-                self.vec.stop_disk_recording()
-            self.vec.stop()
-            self.vec.disconnect()
         # Maybe should wait for tow and turbine to get back to zero, but
         # probably will be already
-        self.autoabortfinished.emit()
+        self.towfinished.emit()
     
 
 class TareDragRun(QtCore.QThread):

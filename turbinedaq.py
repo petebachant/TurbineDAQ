@@ -487,12 +487,6 @@ class MainWindow(QtGui.QMainWindow):
                 self.turbinetow.abort()
         except AttributeError:
             pass
-        if self.towinprogress:
-            quit_msg = "Delete files from aborted run?"
-            reply = QtGui.QMessageBox.question(self, 'Run Aborted', 
-                     quit_msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
-            if reply == QtGui.QMessageBox.Yes:
-                shutil.rmtree(self.savesubdir)
         self.towinprogress = False
         
     def auto_abort(self):
@@ -506,14 +500,8 @@ class MainWindow(QtGui.QMainWindow):
         print "Automatically aborting current run..."
         text = str(self.label_runstatus.text())
         self.label_runstatus.setText(text[:-13] + " aborted ")
-        self.turbinetow.autoabortfinished.connect(self.on_autoabort_finished)
         self.turbinetow.autoabort()
         self.towinprogress = False
-
-    def on_autoabort_finished(self):
-        print "Deleting files from aborted run..."
-        shutil.rmtree(self.savesubdir)
-        self.do_test_plan()
 
     def on_badvecdata(self):
         print "Bad Vectrino data detected"
@@ -562,7 +550,7 @@ class MainWindow(QtGui.QMainWindow):
         self.time_last_run = time.time()
         # Save data from the run that just finished
         savedir = self.savesubdir
-        if not self.abort:
+        if not self.turbinetow.aborted and not self.turbinetow.autoaborted:
             # Create directory and save the data inside
             print "Saving to " + savedir + "..."
             nidata = dict(self.nidata)
@@ -577,13 +565,24 @@ class MainWindow(QtGui.QMainWindow):
             if "in progress" in text:
                 self.label_runstatus.setText(text[:-13] + " saved ")
             print "Saved"
+        elif self.turbinetow.aborted:
+            quit_msg = "Delete files from aborted run?"
+            reply = QtGui.QMessageBox.question(self, 'Run Aborted', 
+                     quit_msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+            if reply == QtGui.QMessageBox.Yes:
+                shutil.rmtree(self.savesubdir)
+        elif self.turbinetow.autoaborted:
+            print "Deleting files from aborted run..."
+            shutil.rmtree(self.savesubdir)
         # Update test plan table
         self.test_plan_into_table()
         # If executing a test plan start a single shot timer for next run
         if self.ui.tabTestPlan.isVisible():
             if self.ui.actionStart.isChecked():
                 # Move y and z axes to next location if applicable?
-                if self.turbinetow.U <= 0.4:
+                if self.turbinetow.autoaborted:
+                    idlesec = 5
+                elif self.turbinetow.U <= 0.4:
                     idlesec = 150
                 elif self.turbinetow.U <= 0.6:
                     idlesec = 180
