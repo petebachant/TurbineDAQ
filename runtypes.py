@@ -207,7 +207,7 @@ class TareDragRun(QtCore.QThread):
         self.metadata = {"Tow speed (m/s)" : U,
                          "Time created" : time.asctime()}
             
-        self.daqthread = daqtasks.NiDaqThread(usetrigger=False)
+        self.daqthread = daqtasks.NiDaqThread(usetrigger=True)
         self.nidata = self.daqthread.data
         self.metadata["NI metadata"] = self.daqthread.metadata
         
@@ -231,6 +231,7 @@ class TareDragRun(QtCore.QThread):
         while prgstate == 3: # means the program is running in the controller
             time.sleep(0.3)
             prgstate = acsc.getProgramState(self.hc, nbuf)
+        self.acsdaqthread.stop()
         self.daqthread.clear()
         self.runfinished.emit()
             
@@ -244,7 +245,7 @@ class TareDragRun(QtCore.QThread):
 
 class TareTorqueRun(QtCore.QThread):
     runfinished = QtCore.pyqtSignal()
-    def __init__(self, acs_hcomm, U, tsr):
+    def __init__(self, acs_hcomm, rpm, dur):
         """Tare torque run object."""
         QtCore.QThread.__init__(self)        
         self.hc = acs_hcomm

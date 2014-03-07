@@ -25,6 +25,9 @@ To-do:
     running. 
   * Abort does weird things if pressed too early in a run
   * Highlight run in progress in table
+  * Should check if tow and turbine axes are enabled in order to start a run,
+    since they aren't enabled in the motion programs.
+  * Autoprocess functionality for processing last run.
 """
 
 from __future__ import division
@@ -443,7 +446,6 @@ class MainWindow(QtGui.QMainWindow):
                 self.savesubdir = self.savedir + "/" + str(self.currentrun)
                 os.mkdir(self.savesubdir)
                 self.do_turbine_tow(U, tsr, y_R, z_H)
-                
             elif self.ui.tabTareDrag.isVisible():
                 """Do tare drag runs"""
             elif self.ui.tabTareTorque.isVisible():
@@ -529,16 +531,100 @@ class MainWindow(QtGui.QMainWindow):
         
     def do_tare_drag_tow(self, U):
         """Executes a single tare drag run"""
-        self.tow = runtypes.TareDragRun(U)
-        self.tow.runfinished.connect(self.on_tow_finished)
-        self.tow.metadata["Name"] = self.currentname
-        self.acsdata = self.tow.acsdata
-        self.nidata = self.tow.nidata
+        self.tarerun = runtypes.TareDragRun(self,hc, U)
+        self.tarerun.runfinished.connect(self.on_tare_run_finished)
+        self.tarerun.metadata["Name"] = self.currentname
+        self.acsdata = self.tarerun.acsdata
+        self.nidata = self.tarerun.nidata
         self.monitorni = True
         self.monitoracs = True
+        self.monitorvec = False
+        self.towinprogress = True
+        self.tarerun.start()
         
-    def do_tare_torque_run(self, U, tsr):
+    def do_tare_torque_run(self, rpm, dur):
         """Executes a single tare torque run"""
+        """Executes a single tare drag run"""
+        self.tarerun = runtypes.TareTorqueRun(self.hc, rpm, dur)
+        self.tarerun.runfinished.connect(self.on_tare_run_finished)
+        self.tarerun.metadata["Name"] = self.currentname
+        self.acsdata = self.tarerun.acsdata
+        self.nidata = self.tarerun.nidata
+        self.monitorni = True
+        self.monitoracs = True
+        self.monitorvec = False
+        self.towinprogress = True
+        self.tarerun.start()
+        
+    def on_tare_run_finished(self):
+        """Current tow complete."""
+        # Reset time of last run
+        self.towinprogress = False
+        self.monitoracs = False
+        self.monitorni = False
+        self.time_last_run = time.time()
+        # Save data from the run that just finished
+        savedir = self.savesubdir
+        if not self.tarerun.aborted:
+            # Create directory and save the data inside
+            print "Saving to " + savedir + "..."
+            nidata = dict(self.nidata)
+            if "turbine_rpm" in nidata:
+                del nidata["turbine_rpm"]
+            savemat(savedir+"/acsdata.mat", self.acsdata, oned_as="column")
+            savemat(savedir+"/nidata.mat", nidata, oned_as="column")
+            with open(savedir+"/metadata.json", "w") as fn:
+                json.dump(self.tarerun.metadata, fn, indent=4)
+            text = str(self.label_runstatus.text())
+            if "in progress" in text:
+                self.label_runstatus.setText(text[:-13] + " saved ")
+            print "Saved"
+        elif self.tarerun.aborted:
+            quit_msg = "Delete files from aborted run?"
+            reply = QtGui.QMessageBox.question(self, 'Run Aborted', 
+                     quit_msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+            if reply == QtGui.QMessageBox.Yes:
+                shutil.rmtree(self.savesubdir)
+        # Update test plan table
+        self.test_plan_into_table()
+        # If executing a test plan start a single shot timer for next run
+        if self.ui.tabTestPlan.isVisible():
+            if self.ui.actionStart.isChecked():
+                # Move y and z axes to next location if applicable?
+                try:
+                    U = self.tarerun.U
+                except AttributeError:
+                    U = None
+                if U == None:
+                    idlesec = 5
+                elif U <= 0.4:
+                    idlesec = 150
+                elif U <= 0.6:
+                    idlesec = 180
+                elif U <= 0.8:
+                    idlesec = 210
+                elif U <= 1.0:
+                    idlesec = 240
+                elif U <= 1.2:
+                    idlesec = 300
+                elif U <= 1.4:
+                    idlesec = 360
+                else:
+                    idlesec = 480
+                print "Waiting " + str(idlesec) + " seconds until next run..."
+                QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
+                # Scroll test plan so completed run is in view
+                try:
+                    i = int(self.currentrun) + 1
+                    cr = self.ui.tableWidgetTestPlan.item(i, 0)
+                    self.ui.tableWidgetTestPlan.scrollToItem(cr)
+                except:
+                    pass
+        else: 
+            self.ui.actionStart.setChecked(False)
+            self.on_start()
+        self.nidata = {}
+        self.acsdata = {}
         
     def on_tow_finished(self):
         """Current tow complete."""
@@ -649,16 +735,19 @@ class MainWindow(QtGui.QMainWindow):
             os.mkdir(self.savesubdir)
         except WindowsError:
             print "Save subdirectory already exists. Files will be overwritten."
-        U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
-        tsr = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
         if "Perf" in section or "Wake" in section:
+            U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
+            tsr = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
             y_R = float(self.ui.tableWidgetTestPlan.item(nextrun, 3).text())
             z_H = float(self.ui.tableWidgetTestPlan.item(nextrun, 4).text())
             self.do_turbine_tow(U, tsr, y_R, z_H)
         elif section == "Tare Drag":
+            U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
             self.do_tare_drag_tow(U)
         elif section == "Tare Torque":
-            self.do_tare_torque_run(U, tsr)
+            rpm = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
+            dur = float(self.ui.tableWidgetTestPlan.item(nextrun, 3).text())
+            self.do_tare_torque_run(rpm, dur)
         
     def on_monitor_acs(self):
         if self.ui.actionMonitor_ACS.isChecked():

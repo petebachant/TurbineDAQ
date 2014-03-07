@@ -128,14 +128,15 @@ BLOCK
     collect_data = 1
     DC/c data, 100, 5.0, TIME, FVEL(5), FVEL(4)
     ! Send trigger pulse for data acquisition (may need work)
-    ! OUT4.0 = 1
+    OUT1.16 = 0
 END
 
 ! Define start time from now
 start_time = TIME
 
-PTP/e 5, 24.9
+PTP/e 5, 24.5
 PTP/e 5, 0
+OUT1.16 = 1
 STOP
 """
     return prg
