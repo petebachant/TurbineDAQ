@@ -79,6 +79,7 @@ class MainWindow(QtGui.QMainWindow):
         self.exp_running = False
         self.towinprogress = False
         self.test_plan_loaded = False
+        self.autoprocess = True
         self.enabled_axes = {}
         self.test_plan_data = {}
         
@@ -650,6 +651,11 @@ class MainWindow(QtGui.QMainWindow):
             if "in progress" in text:
                 self.label_runstatus.setText(text[:-13] + " saved ")
             print "Saved"
+            if self.autoprocess:
+                section = str(self.ui.comboBox_testPlanSection.currentText())
+                nrun = self.currentrun
+                subprocess.call(["cd", self.wdir, "&", "python", 
+                         self.wdir+"/processing.py", section, nrun], shell=True)
         elif self.turbinetow.aborted:
             quit_msg = "Delete files from aborted run?"
             reply = QtGui.QMessageBox.question(self, 'Run Aborted', 
