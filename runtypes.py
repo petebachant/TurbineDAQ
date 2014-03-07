@@ -245,14 +245,13 @@ class TareDragRun(QtCore.QThread):
 
 class TareTorqueRun(QtCore.QThread):
     runfinished = QtCore.pyqtSignal()
-    def __init__(self, acs_hcomm, rpm, dur, nidaq=True):
+    def __init__(self, acs_hcomm, rpm, dur):
         """Tare torque run object."""
         QtCore.QThread.__init__(self)        
         self.hc = acs_hcomm
         self.rpm = rpm
         self.dur = dur
         self.build_acsprg()
-        self.nidaq = nidaq
         self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
         self.acsdata = self.acsdaqthread.data
         self.vecsavepath = ""
@@ -261,10 +260,9 @@ class TareTorqueRun(QtCore.QThread):
                          "Duration" : dur,
                          "Time created" : time.asctime()}
         
-        if self.nidaq:
-            self.daqthread = daqtasks.NiDaqThread(usetrigger=False)
-            self.nidata = self.daqthread.data
-            self.metadata["NI metadata"] = self.daqthread.metadata
+        self.daqthread = daqtasks.NiDaqThread(usetrigger=True)
+        self.nidata = self.daqthread.data
+        self.metadata["NI metadata"] = self.daqthread.metadata
         
     def build_acsprg(self):
         """Create the ACSPL+ program for the run.
