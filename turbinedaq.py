@@ -28,6 +28,7 @@ To-do:
   * Should check if tow and turbine axes are enabled in order to start a run,
     since they aren't enabled in the motion programs.
   * Autoprocess functionality for processing last run.
+  * Checkboxes for enabling and disabling axes.
 """
 
 from __future__ import division
@@ -653,7 +654,7 @@ class MainWindow(QtGui.QMainWindow):
             print "Saved"
             if self.autoprocess:
                 section = str(self.ui.comboBox_testPlanSection.currentText())
-                nrun = self.currentrun
+                nrun = str(self.currentrun)
                 subprocess.call(["cd", self.wdir, "&", "python", 
                          self.wdir+"/processing.py", section, nrun], shell=True)
         elif self.turbinetow.aborted:
