@@ -122,6 +122,7 @@ WAIT dur*1000
 HALT turbine
 ptp/e turbine, 0
 OUT1.16 = 1
+collect_data = 0
 STOP
 """
     return prg
@@ -153,6 +154,7 @@ start_time = TIME
 
 PTP/e 5, 24.5
 PTP/e 5, 0
+collect_data = 0
 OUT1.16 = 1
 STOP
 """
