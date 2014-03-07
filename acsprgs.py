@@ -81,30 +81,47 @@ STOP
     prg += prgbody
     return prg
 
-
-def tare_trq_prg(U, tsr):
+def tare_trq_prg(rpm, dur):
     """Builds a tare torque ACSPL+ program"""
-    prg = """GLOBAL INT homeCounter_AKD
-REAL tsr, U, rpm, tacc
+    prg = """REAL rpm, dur, tzero, tacc
+global real data(3)(100)
+global real start_time
+global int collect_data
+collect_data = 0
 
-tsr = 2.3
-U = 1
-rpm = tsr*U/0.5*60/6.28318530718
+""" 
+    prg += "rpm = " + str(rpm) + "\n"
+    prg += "dur = " + str(dur)
+    prg += """
 tacc = 2
+tzero = 2.5
+
+! Move turbine to zero if necessary
+if RPOS(4) <> 60 & RPOS(4) <> 0
+    ptp 4, 0
+end
 
 ACC(turbine) = rpm/tacc
 DEC(turbine) = ACC(turbine)
 VEL(turbine) = rpm
 JERK(turbine) = ACC(turbine)*10
 
-IF homeCounter_AKD > 0
-	jog/v turbine, rpm
+! Start controller data acquisition and send trigger pulse in same cycle
+BLOCK
+    ! Define start time from now
+    start_time = TIME
+    collect_data = 1
+    DC/c data, 100, 1.0, TIME, FVEL(5), FVEL(4)
+    ! Send trigger pulse for data acquisition
+    OUT1.16 = 0
 END
 
-WAIT 32*1000
-! HALT turbine
+wait tzero*1000
+jog/v turbine, rpm
+WAIT dur*1000
+HALT turbine
 ptp/e turbine, 0
-
+OUT1.16 = 1
 STOP
 """
     return prg
@@ -149,4 +166,4 @@ class TurbineTow(ACSPLplusPrg):
         ACSPLplusPrg.__init__(self)
         
 if __name__ == "__main__":
-    print turbine_tow_prg(0.5, 1.9)
+    print tare_trq_prg(40, 30)

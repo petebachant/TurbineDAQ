@@ -245,22 +245,22 @@ class TareDragRun(QtCore.QThread):
 
 class TareTorqueRun(QtCore.QThread):
     runfinished = QtCore.pyqtSignal()
-    def __init__(self, acs_hcomm, rpm, dur):
+    def __init__(self, acs_hcomm, rpm, dur, nidaq=True):
         """Tare torque run object."""
         QtCore.QThread.__init__(self)        
         self.hc = acs_hcomm
-        self.U = U
-        self.tsr = tsr
+        self.rpm = rpm
+        self.dur = dur
         self.build_acsprg()
+        self.nidaq = nidaq
         self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
         self.acsdata = self.acsdaqthread.data
         self.vecsavepath = ""
         
-        self.metadata = {"Tow speed (m/s)" : U,
-                         "Tip speed ratio" : tsr,
+        self.metadata = {"RPM" : rpm,
+                         "Duration" : dur,
                          "Time created" : time.asctime()}
         
-            
         if self.nidaq:
             self.daqthread = daqtasks.NiDaqThread(usetrigger=False)
             self.nidata = self.daqthread.data
@@ -286,6 +286,7 @@ class TareTorqueRun(QtCore.QThread):
         while prgstate == 3:
             time.sleep(0.3)
             prgstate = acsc.getProgramState(self.hc, nbuf)
+        self.acsdaqthread.stop()
         self.daqthread.clear()
         self.runfinished.emit()
             

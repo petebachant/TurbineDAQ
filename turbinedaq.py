@@ -544,7 +544,6 @@ class MainWindow(QtGui.QMainWindow):
         
     def do_tare_torque_run(self, rpm, dur):
         """Executes a single tare torque run"""
-        """Executes a single tare drag run"""
         self.tarerun = runtypes.TareTorqueRun(self.hc, rpm, dur)
         self.tarerun.runfinished.connect(self.on_tare_run_finished)
         self.tarerun.metadata["Name"] = self.currentname
