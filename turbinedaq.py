@@ -29,6 +29,8 @@ To-do:
     since they aren't enabled in the motion programs.
   * Autoprocess functionality for processing last run.
   * Checkboxes for enabling and disabling axes.
+  * Scroll to latest run that isn't done on opening test plan.
+  * Catch exceptions for autoprocessing so next run can begin. 
 """
 
 from __future__ import division
@@ -513,23 +515,26 @@ class MainWindow(QtGui.QMainWindow):
         
     def do_turbine_tow(self, U, tsr, y_R, z_H):
         """Exectutes a single turbine tow"""
-        self.abort = False
-        vecsavepath = self.savesubdir+"/vecdata"
-        vectrino = True
-        self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
-                                              nidaq=True, vectrino=vectrino,
-                                              vecsavepath=vecsavepath)
-        self.turbinetow.towfinished.connect(self.on_tow_finished)
-        self.turbinetow.metadata["Name"] = self.currentname
-        self.acsdata = self.turbinetow.acsdaqthread.data
-        self.nidata = self.turbinetow.daqthread.data
-        if vectrino:
-            self.vecdata = self.turbinetow.vec.data
-        self.towinprogress = True
-        self.monitoracs = True
-        self.monitorni = True
-        self.monitorvec = vectrino
-        self.turbinetow.start()
+        if acsc.getMotorState(self.hc, 5)["enabled"]:
+            self.abort = False
+            vecsavepath = self.savesubdir+"/vecdata"
+            vectrino = True
+            self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
+                                                  nidaq=True, vectrino=vectrino,
+                                                  vecsavepath=vecsavepath)
+            self.turbinetow.towfinished.connect(self.on_tow_finished)
+            self.turbinetow.metadata["Name"] = self.currentname
+            self.acsdata = self.turbinetow.acsdaqthread.data
+            self.nidata = self.turbinetow.daqthread.data
+            if vectrino:
+                self.vecdata = self.turbinetow.vec.data
+            self.towinprogress = True
+            self.monitoracs = True
+            self.monitorni = True
+            self.monitorvec = vectrino
+            self.turbinetow.start()
+        else:
+            print "Cannot start turbine tow because axis is disabled"
         
     def do_tare_drag_tow(self, U):
         """Executes a single tare drag run"""
