@@ -505,7 +505,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorvec = False
         print "Automatically aborting current run..."
         text = str(self.label_runstatus.text())
-        self.label_runstatus.setText(text[:-13] + " aborted ")
+        self.label_runstatus.setText(text[:-13] + " autoaborted ")
         self.turbinetow.autoabort()
         self.towinprogress = False
 
