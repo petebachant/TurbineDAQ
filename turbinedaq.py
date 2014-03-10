@@ -851,7 +851,7 @@ class MainWindow(QtGui.QMainWindow):
         """This function updates the Vectrino plots."""
         t = self.vecdata["t"]
         if len(t) > 400 and len(t) < 600 and self.towinprogress:
-            if len(np.where(np.abs(self.vecdata["u"][:500]) > 0.5)[0]) > 50:
+            if len(np.where(np.abs(self.vecdata["u"][:450]) > 0.5)[0]) > 50:
                 self.badvecdata.emit()
         meancorr = self.vecdata["corr_u"]
         meansnr = self.vecdata["snr_u"]
