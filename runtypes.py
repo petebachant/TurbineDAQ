@@ -31,7 +31,7 @@ class TurbineTow(QtCore.QThread):
         self.nidaq = nidaq 
         self.build_acsprg()
         self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
-        self.maxvel = U*1.2
+        self.maxvel = U*1.3
         self.usetrigger = True
         self.vecsavepath = vecsavepath
         self.recordvno = True
