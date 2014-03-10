@@ -535,6 +535,9 @@ class MainWindow(QtGui.QMainWindow):
             self.turbinetow.start()
         else:
             print "Cannot start turbine tow because axis is disabled"
+            text = str(self.label_runstatus.text()).split()
+            text = " ".join(text[:3])
+            self.label_runstatus.setText(text + " cannot start ")
         
     def do_tare_drag_tow(self, U):
         """Executes a single tare drag run"""
