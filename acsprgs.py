@@ -50,10 +50,6 @@ end
 
 ! Allow oscillations in shaft to damp out
 wait 3000
-DISABLE 4
-SET RPOS(4) = 0
-SET FPOS(4) = 0
-SET APOS(4) = 0
 
 ! Start controller data acquisition and send trigger pulse in same cycle
 BLOCK
@@ -66,7 +62,6 @@ BLOCK
 END
 
 wait tzero*1000
-ENABLE 4
 jog/v 4, rpm
 wait tacc*1000
 ptp/e 5, target
