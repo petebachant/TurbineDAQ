@@ -756,10 +756,10 @@ class MainWindow(QtGui.QMainWindow):
             y_R = float(self.ui.tableWidgetTestPlan.item(nextrun, 3).text())
             z_H = float(self.ui.tableWidgetTestPlan.item(nextrun, 4).text())
             self.do_turbine_tow(U, tsr, y_R, z_H)
-        elif section == "Tare Drag":
+        elif section.lower() == "tare drag":
             U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
             self.do_tare_drag_tow(U)
-        elif section == "Tare Torque":
+        elif section.lower() == "tare torque":
             rpm = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
             dur = float(self.ui.tableWidgetTestPlan.item(nextrun, 3).text())
             self.do_tare_torque_run(rpm, dur)
