@@ -31,6 +31,7 @@ To-do:
   * Checkboxes for enabling and disabling axes.
   * Scroll to latest run that isn't done on opening test plan.
   * Catch exceptions for autoprocessing so next run can begin. 
+  * Run numbers per section must start from zero or else things go wacky. 
 """
 
 from __future__ import division
@@ -541,7 +542,7 @@ class MainWindow(QtGui.QMainWindow):
         
     def do_tare_drag_tow(self, U):
         """Executes a single tare drag run"""
-        self.tarerun = runtypes.TareDragRun(self,hc, U)
+        self.tarerun = runtypes.TareDragRun(self.hc, U)
         self.tarerun.runfinished.connect(self.on_tare_run_finished)
         self.tarerun.metadata["Name"] = self.currentname
         self.acsdata = self.tarerun.acsdata
