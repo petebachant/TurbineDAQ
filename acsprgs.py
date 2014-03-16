@@ -81,7 +81,7 @@ STOP
     prg += prgbody
     return prg
 
-def tare_trq_prg(rpm, dur):
+def tare_torque_prg(rpm, dur):
     """Builds a tare torque ACSPL+ program"""
     prg = """REAL rpm, dur, tzero, tacc
 global real data(3)(100)
