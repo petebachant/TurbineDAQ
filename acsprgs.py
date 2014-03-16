@@ -130,9 +130,10 @@ STOP
 
 def tare_drag_prg(U):
     prg = """global real data(3)(100)
-global real start_time
+global real start_time, tzero
 global int collect_data
 collect_data = 0
+tzero = 2.5
 
 """
     prg += "VEL(5) = " + str(U)
@@ -140,6 +141,8 @@ collect_data = 0
 """
 ACC(5) = 1
 DEC(5) = 1
+
+WAIT tzero*1000
 
 ! Start controller data acquisition and send trigger pulse in same cycle
 BLOCK
