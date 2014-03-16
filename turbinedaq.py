@@ -31,6 +31,7 @@ To-do:
   * Checkboxes for enabling and disabling axes.
   * Scroll to latest run that isn't done on opening test plan.
   * Catch exceptions for autoprocessing so next run can begin. 
+  * Run numbers per section must start from zero or else things go wacky. 
 """
 
 from __future__ import division
