@@ -147,8 +147,8 @@ class MainWindow(QtGui.QMainWindow):
         elif "Wake" in section:
             subdir = self.wdir + "/Wake/U_" + section.split("-")[-1]
             runpath = subdir + "/" + str(number)
-        elif section == "Tare Drag":
-            runpath = self.wdir + "/Tare drag/" + str(number)
+        elif  "Tare" in section:
+            runpath = self.wdir + "/" + section + "/" + str(number)
         else: runpath = ""
         if os.path.isdir(runpath) and "nidata.mat" in os.listdir(runpath):
             return True
@@ -317,8 +317,10 @@ class MainWindow(QtGui.QMainWindow):
             subdir = self.wdir + "\\Performance\\U_" + section.split("-")[-1]
         elif "Wake" in section:
             subdir = self.wdir + "\\Wake\\U_" + section.split("-")[-1]
-        elif section == "Tare drag":
+        elif section.lower() == "tare drag":
             subdir = self.wdir + "\\Tare drag"
+        elif section.lower() == "tare torque":
+            subdir = self.wdir + "\\Tare torque"
         else: subdir = self.wdir
         os.startfile(subdir)
         
@@ -612,20 +614,12 @@ class MainWindow(QtGui.QMainWindow):
                     U = None
                 if U == None:
                     idlesec = 5
-                elif U <= 0.4:
-                    idlesec = 150
                 elif U <= 0.6:
-                    idlesec = 180
-                elif U <= 0.8:
-                    idlesec = 210
+                    idlesec = 30
                 elif U <= 1.0:
-                    idlesec = 240
-                elif U <= 1.2:
-                    idlesec = 300
-                elif U <= 1.4:
-                    idlesec = 360
+                    idlesec = 60
                 else:
-                    idlesec = 480
+                    idlesec = 90
                 print "Waiting " + str(idlesec) + " seconds until next run..."
                 QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
                 # Scroll test plan so completed run is in view
@@ -765,8 +759,8 @@ class MainWindow(QtGui.QMainWindow):
             U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
             self.do_tare_drag_tow(U)
         elif section.lower() == "tare torque":
-            rpm = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
-            dur = float(self.ui.tableWidgetTestPlan.item(nextrun, 3).text())
+            rpm = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
+            dur = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
             self.do_tare_torque_run(rpm, dur)
         
     def on_monitor_acs(self):

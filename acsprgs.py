@@ -122,6 +122,7 @@ WAIT dur*1000
 HALT turbine
 ptp/e turbine, 0
 OUT1.16 = 1
+STOPDC
 collect_data = 0
 STOP
 """
@@ -142,19 +143,21 @@ tzero = 2.5
 ACC(5) = 1
 DEC(5) = 1
 
-WAIT tzero*1000
-
 ! Start controller data acquisition and send trigger pulse in same cycle
 BLOCK
     start_time = TIME
     collect_data = 1
-    DC/c data, 100, 5.0, TIME, FVEL(5), FVEL(4)
-    ! Send trigger pulse for data acquisition (may need work)
+    DC/c data, 100, 1.0, TIME, FVEL(5), FVEL(4)
+    ! Send trigger pulse for data acquisition
     OUT1.16 = 0
 END
 
+WAIT tzero*1000
+
 PTP/e 5, 24.5
+VEL(5) = 0.6
 PTP/e 5, 0
+STOPDC
 collect_data = 0
 OUT1.16 = 1
 STOP

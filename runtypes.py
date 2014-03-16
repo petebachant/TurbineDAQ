@@ -197,7 +197,8 @@ class TurbineTow(QtCore.QThread):
 class TareDragRun(QtCore.QThread):
     runfinished = QtCore.pyqtSignal()
     def __init__(self, acs_hc, U):
-        QtCore.QThread.__init__(self)        
+        QtCore.QThread.__init__(self)
+        self.aborted = False
         self.hc = acs_hc
         self.U = U
         self.build_acsprg()
@@ -237,6 +238,7 @@ class TareDragRun(QtCore.QThread):
             
     def abort(self):
         """This should stop everything."""
+        self.aborted = True
         acsc.stopBuffer(self.hc, 19)
         acsc.halt(self.hc, 5)
         self.acsdaqthread.stop()
