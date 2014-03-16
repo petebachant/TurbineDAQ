@@ -269,7 +269,7 @@ class TareTorqueRun(QtCore.QThread):
     def build_acsprg(self):
         """Create the ACSPL+ program for the run.
         This run should send a trigger pulse."""
-        self.acs_prg = acsprgs.tare_torque_prg(self.U, self.tsr)
+        self.acs_prg = acsprgs.tare_torque_prg(self.rpm, self.dur)
 
     def run(self):
         """Start the run"""
