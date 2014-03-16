@@ -219,8 +219,11 @@ class TareDragRun(QtCore.QThread):
 
     def run(self):
         """Start the run"""
+        """Start the run"""
+        if not acsc.getOutput(self.hc, 1, 16):
+            acsc.setOutput(self.hc, 1, 16, 1)
         self.daqthread.start()
-        self.start_motion()
+        self.msleep(2000) # Wait for NI to start waiting for trigger
 
     def start_motion(self):
         self.acsdaqthread.start()
@@ -249,7 +252,8 @@ class TareTorqueRun(QtCore.QThread):
     runfinished = QtCore.pyqtSignal()
     def __init__(self, acs_hcomm, rpm, dur):
         """Tare torque run object."""
-        QtCore.QThread.__init__(self)        
+        QtCore.QThread.__init__(self)  
+        self.aborted = False
         self.hc = acs_hcomm
         self.rpm = rpm
         self.dur = dur
@@ -273,7 +277,10 @@ class TareTorqueRun(QtCore.QThread):
 
     def run(self):
         """Start the run"""
+        if not acsc.getOutput(self.hc, 1, 16):
+            acsc.setOutput(self.hc, 1, 16, 1)
         self.daqthread.start()
+        self.msleep(2000) # Wait for NI to start waiting for trigger
         self.start_motion()
 
     def start_motion(self):
@@ -296,6 +303,7 @@ class TareTorqueRun(QtCore.QThread):
         acsc.halt(self.hc, 4)
         self.acsdaqthread.stop()
         self.daqthread.clear()
+        self.aborted = True
 
 
 ## Classes that won't be used for now ##
