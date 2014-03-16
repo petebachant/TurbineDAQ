@@ -494,6 +494,11 @@ class MainWindow(QtGui.QMainWindow):
                 self.turbinetow.abort()
         except AttributeError:
             pass
+        try:
+            if self.tarerun.isRunning():
+                self.tarerun.abort()
+        except AttributeError:
+            pass
         self.towinprogress = False
         
     def auto_abort(self):
