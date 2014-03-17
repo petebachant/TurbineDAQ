@@ -224,6 +224,7 @@ class TareDragRun(QtCore.QThread):
             acsc.setOutput(self.hc, 1, 16, 1)
         self.daqthread.start()
         self.msleep(2000) # Wait for NI to start waiting for trigger
+        self.start_motion()
 
     def start_motion(self):
         self.acsdaqthread.start()

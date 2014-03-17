@@ -32,6 +32,7 @@ To-do:
   * Scroll to latest run that isn't done on opening test plan.
   * Catch exceptions for autoprocessing so next run can begin. 
   * Run numbers per section must start from zero or else things go wacky. 
+  * Doesn't end if section is done. 
 """
 
 from __future__ import division
@@ -618,8 +619,10 @@ class MainWindow(QtGui.QMainWindow):
                     idlesec = 30
                 elif U <= 1.0:
                     idlesec = 60
-                else:
+                elif U <= 1.1:
                     idlesec = 90
+                else:
+                    idlesec = 120
                 print "Waiting " + str(idlesec) + " seconds until next run..."
                 QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
                 # Scroll test plan so completed run is in view
