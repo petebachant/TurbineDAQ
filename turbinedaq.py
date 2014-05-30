@@ -107,9 +107,8 @@ class MainWindow(QtGui.QMainWindow):
         self.connect_to_controller()
         # Initialize plots
         self.initialize_plots()
-        if self.wdir != "C:\\temp":
-            # Import test plan
-            self.import_test_plan()
+        # Import test plan
+        self.import_test_plan()
         self.connect_sigs_slots()
         # Set test plan visible in tab widget
         self.ui.tabWidgetMode.setCurrentWidget(self.ui.tabTestPlan)
@@ -172,10 +171,16 @@ class MainWindow(QtGui.QMainWindow):
         """Imports test plan from Excel spreadsheet in working directory"""
         test_plan_found = False
         self.test_plan_loaded = False
-        for item in os.listdir(self.wdir):
-            if "Test plan" in item or "Test Plan" in item:
-                wb = xlrd.open_workbook(self.wdir + "/" + item)
+        try:
+            wb = xlrd.open_workbook(self.wdir + "/Test plan/Test plan.xlsx")
+            test_plan_found = True
+        except IOError:
+            try:
+                wb = xlrd.open_workbook(self.wdir + "/Test plan.xlsx")
                 test_plan_found = True
+            except IOError:
+                test_plan_found = False
+
         if test_plan_found:
             # Set combobox items to reflect sheet names
             self.ui.comboBox_testPlanSection.clear()
