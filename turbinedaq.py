@@ -35,7 +35,7 @@ To-do:
   * Doesn't end if section is done. 
 """
 
-from __future__ import division
+from __future__ import division, print_function
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import *
 import PyQt4.Qwt5 as Qwt
@@ -204,7 +204,7 @@ class MainWindow(QtGui.QMainWindow):
         else:
             """Clear everything from table widget. Doesn't work right now."""
             self.ui.tableWidgetTestPlan.clearContents()
-            print "No test plan found in working directory"
+            print("No test plan found in working directory")
             
     def test_plan_into_table(self):
         """Takes test plan values and puts them in table widget"""
@@ -355,13 +355,13 @@ class MainWindow(QtGui.QMainWindow):
     def connect_to_controller(self):
         self.hc = acsc.openCommEthernetTCP()    
         if self.hc == acsc.INVALID:
-            print "Cannot connect to ACS controller. Attempting to connect to simulator..."
+            print("Cannot connect to ACS controller. Attempting to connect to simulator...")
             self.label_acs_connect.setText(" Not connected to ACS controller ")
             self.hc = acsc.openCommDirect()
             if self.hc == acsc.INVALID:
-                print "Cannot connect to simulator"
+                print("Cannot connect to simulator")
             else:
-                print "Connected to simulator"
+                print("Connected to simulator")
                 self.label_acs_connect.setText(" Connected to SPiiPlus simulator ")
         else:
             self.label_acs_connect.setText(" Connected to ACS controller ")
@@ -476,7 +476,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorvec = False
         if self.ui.actionStart.isChecked():
             self.ui.actionStart.setChecked(False)
-            print "Aborting current run..."
+            print("Aborting current run...")
             text = str(self.label_runstatus.text())
             self.label_runstatus.setText(text[:-13] + " aborted ")
         if self.ui.actionMonitor_ACS.isChecked():
@@ -512,14 +512,14 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorni = False
         self.monitoracs = False
         self.monitorvec = False
-        print "Automatically aborting current run..."
+        print("Automatically aborting current run...")
         text = str(self.label_runstatus.text())
         self.label_runstatus.setText(text[:-13] + " autoaborted ")
         self.turbinetow.autoabort()
         self.towinprogress = False
 
     def on_badvecdata(self):
-        print "Bad Vectrino data detected"
+        print("Bad Vectrino data detected")
         self.auto_abort()
         
     def do_turbine_tow(self, U, tsr, y_R, z_H):
@@ -543,7 +543,7 @@ class MainWindow(QtGui.QMainWindow):
             self.monitorvec = vectrino
             self.turbinetow.start()
         else:
-            print "Cannot start turbine tow because axis is disabled"
+            print("Cannot start turbine tow because axis is disabled")
             text = str(self.label_runstatus.text()).split()
             text = " ".join(text[:3])
             self.label_runstatus.setText(text + " cannot start ")
@@ -585,7 +585,7 @@ class MainWindow(QtGui.QMainWindow):
         savedir = self.savesubdir
         if not self.tarerun.aborted:
             # Create directory and save the data inside
-            print "Saving to " + savedir + "..."
+            print("Saving to " + savedir + "...")
             nidata = dict(self.nidata)
             if "turbine_rpm" in nidata:
                 del nidata["turbine_rpm"]
@@ -596,7 +596,7 @@ class MainWindow(QtGui.QMainWindow):
             text = str(self.label_runstatus.text())
             if "in progress" in text:
                 self.label_runstatus.setText(text[:-13] + " saved ")
-            print "Saved"
+            print("Saved")
         elif self.tarerun.aborted:
             quit_msg = "Delete files from aborted run?"
             reply = QtGui.QMessageBox.question(self, 'Run Aborted', 
@@ -623,7 +623,7 @@ class MainWindow(QtGui.QMainWindow):
                     idlesec = 90
                 else:
                     idlesec = 120
-                print "Waiting " + str(idlesec) + " seconds until next run..."
+                print("Waiting " + str(idlesec) + " seconds until next run...")
                 QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
                 # Scroll test plan so completed run is in view
                 try:
@@ -650,7 +650,7 @@ class MainWindow(QtGui.QMainWindow):
         savedir = self.savesubdir
         if not self.turbinetow.aborted and not self.turbinetow.autoaborted:
             # Create directory and save the data inside
-            print "Saving to " + savedir + "..."
+            print("Saving to " + savedir + "...")
             nidata = dict(self.nidata)
             if "turbine_rpm" in nidata:
                 del nidata["turbine_rpm"]
@@ -662,7 +662,7 @@ class MainWindow(QtGui.QMainWindow):
             text = str(self.label_runstatus.text())
             if "in progress" in text:
                 self.label_runstatus.setText(text[:-13] + " saved ")
-            print "Saved"
+            print("Saved")
             if self.autoprocess:
                 section = str(self.ui.comboBox_testPlanSection.currentText())
                 nrun = str(self.currentrun)
@@ -675,7 +675,7 @@ class MainWindow(QtGui.QMainWindow):
             if reply == QtGui.QMessageBox.Yes:
                 shutil.rmtree(self.savesubdir)
         elif self.turbinetow.autoaborted:
-            print "Deleting files from aborted run..."
+            print("Deleting files from aborted run...")
             shutil.rmtree(self.savesubdir)
         # Update test plan table
         self.test_plan_into_table()
@@ -699,7 +699,7 @@ class MainWindow(QtGui.QMainWindow):
                     idlesec = 360
                 else:
                     idlesec = 480
-                print "Waiting " + str(idlesec) + " seconds until next run..."
+                print("Waiting " + str(idlesec) + " seconds until next run...")
                 QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
                 # Scroll test plan so completed run is in view
                 try:
@@ -726,7 +726,7 @@ class MainWindow(QtGui.QMainWindow):
     def do_test_plan(self):
         """Continue test plan"""
         section = str(self.ui.comboBox_testPlanSection.currentText())
-        print "Continuing", section+"..."
+        print("Continuing", section+"...")
         # Find next run to do by looking in the Done? column
         nruns = self.ui.tableWidgetTestPlan.rowCount()
         donecol = self.ui.tableWidgetTestPlan.columnCount()-1
@@ -735,7 +735,7 @@ class MainWindow(QtGui.QMainWindow):
             if doneval == "No":
                 nextrun = int(float(self.ui.tableWidgetTestPlan.item(n, 0).text()))
                 break
-        print "Starting run", str(nextrun) + "..."
+        print("Starting run", str(nextrun) + "...")
         if "Perf" in section:
             self.savedir = self.wdir + "/Performance/U_" + section.split("-")[-1]
         elif "Wake" in section:
@@ -751,7 +751,7 @@ class MainWindow(QtGui.QMainWindow):
         try:
             os.mkdir(self.savesubdir)
         except WindowsError:
-            print "Save subdirectory already exists. Files will be overwritten."
+            print("Save subdirectory already exists. Files will be overwritten.")
         if "Perf" in section or "Wake" in section:
             U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
             tsr = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
