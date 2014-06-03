@@ -38,7 +38,6 @@ To-do:
 from __future__ import division, print_function
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import *
-import PyQt4.Qwt5 as Qwt
 import numpy as np
 from acspy import acsc
 import daqtasks

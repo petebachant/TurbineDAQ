@@ -7,6 +7,7 @@ Created on Mon Aug 19 10:51:28 2013
 This module contains the DAQ stuff for TurbineDAQ
 
 """
+from __future__ import division, print_function
 from PyQt4 import QtCore
 import numpy as np
 import daqmx
@@ -171,7 +172,7 @@ class NiDaqThread(QtCore.QThread):
                 daqmx.Val_Acquired_Into_Buffer, self.nsamps, 0, 
                 EveryNCallback, id_data)    
         def DoneCallback_py(taskHandle, status, callbackData_ptr):
-            print "Status", status.value
+            print("Status", status.value)
             return 0
         DoneCallback = daqmx.DoneEventCallbackPtr(DoneCallback_py)
         daqmx.RegisterDoneEvent(self.analogtask, 0, DoneCallback, None) 
@@ -258,7 +259,7 @@ class AcsDaqThread(QtCore.QThread):
         try:
             acsc.writeInteger(self.hc, "collect_data", 0)
         except:
-            print "Could not write collect_data = 0"
+            print("Could not write collect_data = 0")
 
 
 if __name__ == "__main__":

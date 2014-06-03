@@ -16,7 +16,7 @@ class VectrinoThread(QtCore.QThread):
     connectsignal = QtCore.pyqtSignal(bool)
     def __init__(self, maxvel=2.5, usetrigger=True, record=False):
         QtCore.QThread.__init__(self)
-        print "Vectrino thread initialized"
+        print("Vectrino thread initialized")
         self.vec = PdControl()
         self.vecdata = self.vec.data
         self.usetrigger = usetrigger
@@ -27,7 +27,7 @@ class VectrinoThread(QtCore.QThread):
         self.savepath = ""
         self.vecstatus = "Vectrino disconnected "
         self.enable = True
-        print "Vectrino thread init done"
+        print("Vectrino thread init done")
         
     def setconfig(self):
         self.vec.start_on_sync = self.usetrigger
@@ -45,7 +45,7 @@ class VectrinoThread(QtCore.QThread):
         elif self.maxvel <= 1.0 and self.maxvel > 0.3:
             self.vec.vel_range = 2
         self.vec.set_config()
-        print "Vectrino configuration set"
+        print("Vectrino configuration set")
 
     def run(self):
         self.vec.serial_port = self.comport
@@ -56,7 +56,7 @@ class VectrinoThread(QtCore.QThread):
         while not self.vec.connected:
             time.sleep(0.5)
             if time.time() - tstart > 10:
-                print "Vectrino timed out"
+                print("Vectrino timed out")
                 self.timeout = True
                 self.connectsignal.emit(False)
                 break
@@ -70,10 +70,10 @@ class VectrinoThread(QtCore.QThread):
             self.vecstatus = "Vectrino connected "
             while self.vec.state != "Confirmation mode":
                 time.sleep(0.1)
-            print "Vectrino in data collection mode"
+            print("Vectrino in data collection mode")
             time.sleep(6)
             self.collecting.emit()
-            print "Vectrino collecting"
+            print("Vectrino collecting")
 
     def getstatus(self):
         return self.vec.state
@@ -101,13 +101,13 @@ class ResetThread(QtCore.QThread):
     """Thread for resetting Vectrino"""
     def __init__(self):
         QtCore.QThread.__init__(self)
-        print "Vectrino reset thread initialized"
+        print("Vectrino reset thread initialized")
         self.vec = PdControl()
         self.comport = "COM2"
         self.isconnected = self.vec.connected
         self.vecstatus = "Vectrino disconnected "
         self.enable = True
-        print "Vectrino thread init done"
+        print("Vectrino thread init done")
 
     def run(self):
         self.vec.serial_port = self.comport
@@ -118,7 +118,7 @@ class ResetThread(QtCore.QThread):
         while not self.vec.connected:
             time.sleep(0.3)
             if time.time() - tstart > 10:
-                print "Vectrino timed out"
+                print("Vectrino timed out")
                 self.timeout = True
                 break
         if not self.timeout:
@@ -126,7 +126,7 @@ class ResetThread(QtCore.QThread):
             self.vecstatus = "Vectrino connected "
             while self.vec.state != "Confirmation mode":
                 time.sleep(0.3)
-            print "Vectrino in data confirmation mode"
+            print("Vectrino in data confirmation mode")
             self.stop()
         
     def stop(self):
@@ -143,7 +143,7 @@ class ConnectThread(QtCore.QThread):
     def __init__(self, vecthread):
         QtCore.QThread.__init__(self)
         self.vecthread = vecthread
-        print "Connect thread initiated..."
+        print("Connect thread initiated...")
         
     def run(self):
         self.vecthread.vec.connect()
@@ -160,7 +160,7 @@ class MonitorThread(QtCore.QThread):
     def run(self):
         while self.vec.state == "Confirmation mode":
             time.sleep(0.3)
-            print len(self.vec.data["t"])
+            print(len(self.vec.data["t"]))
             
             
 if __name__ == "__main__":
