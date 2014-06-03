@@ -168,6 +168,7 @@ class MainWindow(QtGui.QMainWindow):
     
     def import_test_plan(self):
         """Imports test plan from Excel spreadsheet in working directory"""
+        print("Loading test plan...")
         test_plan_found = False
         self.test_plan_loaded = False
         try:
@@ -179,7 +180,6 @@ class MainWindow(QtGui.QMainWindow):
                 test_plan_found = True
             except IOError:
                 test_plan_found = False
-
         if test_plan_found:
             # Set combobox items to reflect sheet names
             self.ui.comboBox_testPlanSection.clear()
@@ -204,6 +204,7 @@ class MainWindow(QtGui.QMainWindow):
                             if run != "":
                                 run = int(run)
             self.test_plan_loaded = True
+            print("Test plan loaded")
             self.test_plan_into_table()
         else:
             """Clear everything from table widget. Doesn't work right now."""
