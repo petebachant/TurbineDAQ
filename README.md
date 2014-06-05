@@ -2,6 +2,11 @@ TurbineDAQ
 ==========
 A Python desktop app for automated turbine data acquisition in the UNH tow tank. 
 
+Screenshot
+----------
+
+![Screenshot](screenshots/TurbineDAQ_2014.03.03.png)
+
 License
 -------
 
