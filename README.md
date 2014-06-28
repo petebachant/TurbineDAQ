@@ -57,6 +57,11 @@ In the `runtypes` module, there are classes to represent each type of run:
 Each of these subclass PyQt's `QThread`. For future experiments, there will likely be
 a `TurbineTowInWaves` or options in `TurbineTow` for wave generation with `makewaves`. 
 
+Screenshot
+----------
+
+![Screenshot](screenshots/TurbineDAQ_2014.03.03.PNG)
+
 License
 -------
 
