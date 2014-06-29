@@ -28,23 +28,24 @@ subdirectory with a similar structure.
 Test plan/
     Top level.csv
     Perf-0.8.csv
+    Tare_drag.csv
 Raw/
     Perf-0.8/
         run_0_metadata.json
-	run_0_data.h5
-	run_1_metadata.json
-	run_1_data.h5
+        run_0_data.h5
+        run_0_vecdata.vno
+	    run_1_metadata.json
+	    run_1_data.h5
+        run_1_vecdata.vno
     Tare_drag/
         run_0_metadata.json
-	run_0_data.h5
+	    run_0_data.h5
 Processed/
-    Perf-0.8/
-        processed.csv
-    Tare_drag/
-        processed.csv
+    Perf-0.8.csv
+    Tare_drag.csv
 ```
 
-Inside each HDF5 file (which will be saved through pandas), there will be a table for
+Inside each HDF5 file (which will be saved via pandas), there will be a table for
 each type of data--ACS, NI, and Vectrino.
 
 ## Types of runs
