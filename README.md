@@ -32,7 +32,7 @@ Data/
             metadata.json
             data.h5
             vecdata.vno
-	1/    
+        1/    
 	    metadata.json
 	    data.h5
             vecdata.vno
