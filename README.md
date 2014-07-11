@@ -20,29 +20,29 @@ This is influenced by the OpenFOAM directory structure. Metadata is currently sa
 each run in JSON format, while raw data is saved in `*.mat` files. 
 
 ### Future
-There should be a `Raw` directory, where each section gets a subdirectory, and each file
-is named like `run_0_metadata.json` and so on. This way there can then be a `Processed`
-subdirectory with a similar structure. 
 
 ```
 Test plan/
     Top level.csv
     Perf-0.8.csv
     Tare_drag.csv
-Raw/
+Data/
     Perf-0.8/
-        run_0_metadata.json
-        run_0_data.h5
-        run_0_vecdata.vno
-	    run_1_metadata.json
-	    run_1_data.h5
-        run_1_vecdata.vno
+        0/
+            metadata.json
+            data.h5
+            vecdata.vno
+	1/    
+	    metadata.json
+	    data.h5
+            vecdata.vno
+        processed.csv
     Tare_drag/
-        run_0_metadata.json
-	    run_0_data.h5
-Processed/
-    Perf-0.8.csv
-    Tare_drag.csv
+        0/
+            metadata.json
+	    data.h5
+        processed.csv
+
 ```
 
 Inside each HDF5 file (which will be saved via pandas), there will be a table for
