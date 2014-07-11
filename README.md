@@ -33,8 +33,8 @@ Data/
             data.h5
             vecdata.vno
         1/    
-	    metadata.json
-	    data.h5
+            metadata.json
+            data.h5
             vecdata.vno
         processed.csv
     Tare_drag/
