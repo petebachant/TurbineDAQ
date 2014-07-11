@@ -40,7 +40,7 @@ Data/
     Tare_drag/
         0/
             metadata.json
-	    data.h5
+            data.h5
         processed.csv
 
 ```
