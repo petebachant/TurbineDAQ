@@ -13,8 +13,7 @@ import numpy as np
 import daqmx
 import time
 from acspy import acsc, prgs
-import fdiff
-import timeseries as ts
+from pxl import fdiff, timeseries as ts
 
 class NiDaqThread(QtCore.QThread):
     collecting = QtCore.pyqtSignal()

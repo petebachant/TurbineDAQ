@@ -52,7 +52,7 @@ import xlrd
 import os
 import platform
 import subprocess
-import timeseries as ts
+from pxl import timeseries as ts
 import shutil
 
 # Some turbine constants
@@ -119,11 +119,11 @@ class MainWindow(QtGui.QMainWindow):
     def load_settings(self):
         """Loads settings"""
         self.pcid = platform.node()
-        with open("settings/settings.json", "r") as fn:
-            try:
+        try:
+            with open("settings/settings.json", "r") as fn:
                 self.settings = json.load(fn)
-            except ValueError:
-                self.settings = {}
+        except FileNotFoundError:
+            self.settings = {}
         if "Last PC name" in self.settings:
             if self.settings["Last PC name"] == self.pcid:
                 if "Last working directory" in self.settings:
@@ -927,6 +927,8 @@ class MainWindow(QtGui.QMainWindow):
         self.settings["Last PC name"] = self.pcid
         self.settings["Last size"] = (self.size().height(), 
                                       self.size().width())
+        if not os.path.isdir("settings"):
+            os.mkdir("settings")
         with open("settings/settings.json", "w") as fn:
             json.dump(self.settings, fn, indent=4)
         acsc.closeComm(self.hc)

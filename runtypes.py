@@ -7,6 +7,7 @@ Created on Mon Aug 05 14:17:51 2013
 This module contains classes for experiment run types
 
 """
+from __future__ import print_function, division
 import acsprgs
 from acspy import acsc
 import daqtasks
@@ -83,7 +84,7 @@ class TurbineTow(QtCore.QThread):
                 self.vec.sample_rate
         self.metadata["Vectrino metadata"]["Coordinate system"] = \
                 self.vec.coordinate_system
-        print "Vectrino configuration set"
+        print("Vectrino configuration set")
 
     def run(self):
         """Start the run. Comms should be open already with the controller."""
@@ -99,7 +100,7 @@ class TurbineTow(QtCore.QThread):
         while not acsc.getMotorState(self.hc, 0)["in position"] or not \
         acsc.getMotorState(self.hc, 1)["in position"]:
             self.msleep(300)
-        print "y- and z-axes in position"
+        print("y- and z-axes in position")
         acsc.disable(self.hc, 0)
         acsc.disable(self.hc, 1)
         if self.vectrino:
@@ -111,7 +112,7 @@ class TurbineTow(QtCore.QThread):
             while not self.vec.connected:
                 self.msleep(300)
                 if time.time() - tstart > 10:
-                    print "Vectrino timed out"
+                    print("Vectrino timed out")
                     self.timeout = True
                     break
             if not self.timeout:
@@ -123,8 +124,8 @@ class TurbineTow(QtCore.QThread):
                 self.vecstatus = "Vectrino connected "
                 while self.vec.state != "Confirmation mode":
                     self.msleep(100)
-                print "Vectrino in data collection mode"
-                print "Waiting 6 seconds..."
+                print("Vectrino in data collection mode")
+                print("Waiting 6 seconds...")
                 self.sleep(6)
                 self.daqthread.start()
                 self.start_motion()
@@ -149,17 +150,17 @@ class TurbineTow(QtCore.QThread):
         self.acsdaqthread.stop()
         if self.nidaq:
             self.daqthread.clear()
-            print "NI tasks cleared"
+            print("NI tasks cleared")
         if self.vectrino:
             if self.recordvno:
                 self.vec.stop_disk_recording()
             self.vec.stop()
             self.vec.disconnect()
-        print "Tow finished"
+        print("Tow finished")
         if self.vec.state == "Not connected":
             self.vecstatus = "Vectrino disconnected "
         if self.vectrino:
-            print "Resetting Vectrino..."
+            print("Resetting Vectrino...")
             self.reset_vec()
         self.towfinished.emit()
         
@@ -169,7 +170,7 @@ class TurbineTow(QtCore.QThread):
         self.vec.stop()
         self.vec.disconnect()
         self.vec.data = {}
-        print "Vectrino reset"
+        print("Vectrino reset")
 
     def abort(self):
         """This should stop everything."""

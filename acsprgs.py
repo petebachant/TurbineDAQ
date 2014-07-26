@@ -4,6 +4,7 @@ Created on Sun Sep 08 12:20:14 2013
 
 @author: Pete
 """
+from __future__ import division, print_function
 from acspy.prgs import ACSPLplusPrg
 
 def turbine_tow_prg(towspeed, tsr):
@@ -172,4 +173,4 @@ class TurbineTow(ACSPLplusPrg):
         ACSPLplusPrg.__init__(self)
         
 if __name__ == "__main__":
-    print tare_trq_prg(40, 30)
+    print(tare_trq_prg(40, 30))
