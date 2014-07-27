@@ -22,27 +22,29 @@ each run in JSON format, while raw data is saved in `*.mat` files.
 ### Future
 
 ```
-Test plan/
-    Top level.csv
-    Perf-0.8.csv
-    Tare_drag.csv
-Data/
-    Perf-0.8/
-        0/
-            metadata.json
-            data.h5
-            vecdata.vno
-        1/    
-            metadata.json
-            data.h5
-            vecdata.vno
-        processed.csv
-    Tare_drag/
-        0/
-            metadata.json
-            data.h5
-        processed.csv
-
+Experiment name/
+    Test plan/
+        Top level.csv
+        Perf-0.8.csv
+        Tare_drag.csv
+    Data/
+        Processed/
+            Perf-0.8.csv
+            Tare_drag.csv
+        Raw/
+            Perf-0.8/
+                0/
+                    metadata.json
+                    data.h5
+                    vecdata.vno
+                1/    
+                    metadata.json
+                    data.h5
+                    vecdata.vno
+            Tare_drag/
+                0/
+                    metadata.json
+                    data.h5
 ```
 
 Inside each HDF5 file (which will be saved via pandas), there will be a table for
