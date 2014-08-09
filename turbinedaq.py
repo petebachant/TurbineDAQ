@@ -495,15 +495,15 @@ class MainWindow(QtGui.QMainWindow):
         print("Bad Vectrino data detected")
         self.auto_abort()
         
-    def do_turbine_tow(self, U, tsr, y_R, z_H):
+    def do_turbine_tow(self, U, tsr, vectrino, y_R, z_H, fbg=False):
         """Exectutes a single turbine tow"""
         if acsc.getMotorState(self.hc, 5)["enabled"]:
             self.abort = False
             vecsavepath = self.savesubdir+"/vecdata"
-            vectrino = True
             self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
                                                   nidaq=True, vectrino=vectrino,
-                                                  vecsavepath=vecsavepath)
+                                                  vecsavepath=vecsavepath,
+                                                  fbg=fbg)
             self.turbinetow.towfinished.connect(self.on_tow_finished)
             self.turbinetow.metadata["Name"] = self.currentname
             self.acsdata = self.turbinetow.acsdaqthread.data
@@ -709,35 +709,40 @@ class MainWindow(QtGui.QMainWindow):
                 nextrun = int(float(self.ui.tableWidgetTestPlan.item(n, 0).text()))
                 break
         print("Starting run", str(nextrun) + "...")
-        if "Perf" in section:
-            self.savedir = self.wdir + "/Performance/U_" + section.split("-")[-1]
-        elif "Wake" in section:
-            self.savedir = self.wdir + "/Wake/U_" + section.split("-")[-1]
-        elif section == "Tare drag" or section == "Tare torque":
-            self.savedir = self.wdir + "/" + section
+        self.savedir = os.path.join(self.wdir, "Raw", section)
         self.currentrun = nextrun
         self.currentname = section + " run " + str(nextrun)
         self.label_runstatus.setText(self.currentname + " in progress ")
         if not os.path.isdir(self.savedir):
             os.mkdir(self.savedir)
-        self.savesubdir = self.savedir + "/" + str(nextrun)
+        self.savesubdir = os.path.join(self.savedir, str(nextrun))
         try:
             os.mkdir(self.savesubdir)
         except WindowsError:
             print("Save subdirectory already exists. Files will be overwritten.")
-        if "Perf" in section or "Wake" in section:
-            U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
-            tsr = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
-            y_R = float(self.ui.tableWidgetTestPlan.item(nextrun, 3).text())
-            z_H = float(self.ui.tableWidgetTestPlan.item(nextrun, 4).text())
-            self.do_turbine_tow(U, tsr, y_R, z_H)
-        elif section.lower() == "tare drag":
+        if section.lower() == "tare drag":
             U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
             self.do_tare_drag_tow(U)
         elif section.lower() == "tare torque":
             rpm = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
             dur = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
             self.do_tare_torque_run(rpm, dur)
+        else:
+            run_df = self.test_plan[section]
+            run_df = run_df[run_df.run == nextrun].iloc[0]
+            U = run_df.tow_speed
+            tsr = run_df.tsr
+            vectrino = run_df.vectrino
+            if vectrino:
+                y_R = run_df.y_R
+                z_H = run_df.z_H
+            else:
+                y_R = z_H = None
+            try: 
+                fbg = run_df["fbg"]
+            except KeyError:
+                fbg = False
+            self.do_turbine_tow(U, tsr, vectrino, y_R, z_H, fbg)
         
     def on_monitor_acs(self):
         if self.ui.actionMonitor_ACS.isChecked():

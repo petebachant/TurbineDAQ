@@ -18,7 +18,8 @@ from pdcommpy import PdControl
 class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
     def __init__(self, acs_hcomm, U, tsr, y_R, z_H, 
-                 R=0.5, H=1.0, nidaq=True, vectrino=True, vecsavepath=""):
+                 R=0.5, H=1.0, nidaq=True, vectrino=True, vecsavepath="",
+                 fbg=False):
         """Turbine tow run object."""
         QtCore.QThread.__init__(self)        
         self.hc = acs_hcomm
