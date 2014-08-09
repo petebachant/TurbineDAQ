@@ -141,31 +141,15 @@ class MainWindow(QtGui.QMainWindow):
         
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
-        if "Perf" in section:
-            subdir = self.wdir + "/Performance/U_" + section.split("-")[-1]
-            runpath = subdir + "/" + str(number)
-        elif "Wake" in section:
-            subdir = self.wdir + "/Wake/U_" + section.split("-")[-1]
-            runpath = subdir + "/" + str(number)
-        elif  "Tare" in section:
-            runpath = self.wdir + "/" + section + "/" + str(number)
-        else: runpath = ""
-        if os.path.isdir(runpath) and "nidata.mat" in os.listdir(runpath):
+        runpath = os.path.join(self.wdir, "Raw", section, str(number))
+        if os.path.isdir(runpath) and "metadata.json" in os.listdir(runpath):
             return True
         else:
             return False
     
     def is_section_done(self, section):
-        if "Perf" in section:
-            subdir = self.wdir + "/Performance/U_" + section.split("-")[-1]
-            runlist = self.test_plan[section]["Run"]
-            runlist = [int(run) for run in runlist]
-            runsdone = [int(run) for run in os.listdir(subdir).remove("Processed")]
-            runsdone.sort()         
-            if runlist == runsdone:
-                return True
-            else:
-                return False
+        """Currently does not work."""
+        return False
     
     def import_test_plan(self):
         """Imports test plan from CSVs in "Test plan" subdirectory"""
