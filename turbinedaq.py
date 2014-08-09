@@ -196,18 +196,15 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.comboBox_process_section.addItems(self.test_plan_sections)
             self.test_plan_loaded = True
             print("Test plan loaded")
-            print(self.test_plan)
             self.test_plan_into_table()
-
-            
+         
     def test_plan_into_table(self):
         """Takes test plan values and puts them in table widget"""
         section = str(self.ui.comboBox_testPlanSection.currentText())
         if section in self.test_plan:
-            paramlist = self.test_plan[section]["Parameter list"]
+            paramlist = list(self.test_plan[section].columns)
             self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist)+1)
-            self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(
-                    QtCore.QStringList(paramlist+["Done?"]))       
+            self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(paramlist+["Done?"])       
             self.ui.tableWidgetTestPlan.setRowCount(
                     len(self.test_plan[section][paramlist[0]]))
             for i in range(len(paramlist)):
