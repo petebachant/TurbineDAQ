@@ -154,7 +154,6 @@ class MainWindow(QtGui.QMainWindow):
     def import_test_plan(self):
         """Imports test plan from CSVs in "Test plan" subdirectory"""
         print("Loading test plan...")
-        test_plan_found = False
         tpdir = os.path.join(self.wdir, "Test plan")
         self.test_plan_loaded = False
         self.test_plan = {}
@@ -168,7 +167,6 @@ class MainWindow(QtGui.QMainWindow):
                     self.test_plan_sections.append(f.replace(".csv",""))
         if not self.test_plan:
             """Clear everything from table widget. Doesn't work right now."""
-            test_plan_found = False
             self.ui.tableWidgetTestPlan.clearContents()
             print("No test plan found in working directory")
         else:
