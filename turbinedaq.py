@@ -54,6 +54,7 @@ import platform
 import subprocess
 from pxl import timeseries as ts
 import shutil
+import pandas as pd
 
 # Some turbine constants
 turbine_params = {"R" : 0.5,
@@ -85,7 +86,7 @@ class MainWindow(QtGui.QMainWindow):
         self.test_plan_loaded = False
         self.autoprocess = True
         self.enabled_axes = {}
-        self.test_plan_data = {}
+        self.test_plan = {}
         
         # Add file path combobox to toolbar
         self.line_edit_wdir = QtGui.QLineEdit()
@@ -157,7 +158,7 @@ class MainWindow(QtGui.QMainWindow):
     def is_section_done(self, section):
         if "Perf" in section:
             subdir = self.wdir + "/Performance/U_" + section.split("-")[-1]
-            runlist = self.test_plan_data[section]["Run"]
+            runlist = self.test_plan[section]["Run"]
             runlist = [int(run) for run in runlist]
             runsdone = [int(run) for run in os.listdir(subdir).remove("Processed")]
             runsdone.sort()         
@@ -167,62 +168,50 @@ class MainWindow(QtGui.QMainWindow):
                 return False
     
     def import_test_plan(self):
-        """Imports test plan from Excel spreadsheet in working directory"""
+        """Imports test plan from CSVs in "Test plan" subdirectory"""
         print("Loading test plan...")
         test_plan_found = False
+        tpdir = os.path.join(self.wdir, "Test plan")
         self.test_plan_loaded = False
-        try:
-            wb = xlrd.open_workbook(self.wdir + "/Test plan/Test plan.xlsx")
-            test_plan_found = True
-        except IOError:
-            try:
-                wb = xlrd.open_workbook(self.wdir + "/Test plan.xlsx")
-                test_plan_found = True
-            except IOError:
-                test_plan_found = False
-        if test_plan_found:
-            # Set combobox items to reflect sheet names
-            self.ui.comboBox_testPlanSection.clear()
-            self.ui.comboBox_process_section.clear()
-            self.test_plan_sections = wb.sheet_names()
-            self.ui.comboBox_testPlanSection.addItems(QtCore.QStringList(self.test_plan_sections))
-            self.ui.comboBox_process_section.addItem("Shakedown")
-            self.ui.comboBox_process_section.addItems(\
-                    QtCore.QStringList([s for s in self.test_plan_sections if "U" in s]))
-            # Pull data from each sheet
-            for sheetname in self.test_plan_sections:
-                self.test_plan_data[sheetname] = {}
-                self.test_plan_data[sheetname]["Parameter list"] = []
-                ws = wb.sheet_by_name(sheetname)
-                for column in range(ws.ncols):
-                    colname = ws.cell(0,column).value
-                    if colname != "Notes":
-                        self.test_plan_data[sheetname]["Parameter list"].append(colname) 
-                        self.test_plan_data[sheetname][colname] = ws.col_values(column)[1:]
-                    if colname == "Run":
-                        for run in self.test_plan_data[sheetname][colname]:
-                            if run != "":
-                                run = int(run)
-            self.test_plan_loaded = True
-            print("Test plan loaded")
-            self.test_plan_into_table()
-        else:
+        self.test_plan = {}
+        self.test_plan_sections = []
+        if os.path.isdir(tpdir):
+            test_plan_files = os.listdir(os.path.join(tpdir))
+            for f in test_plan_files:
+                if ".csv" in f:
+                    self.test_plan[f.replace(".csv","")] \
+                    = pd.read_csv(os.path.join(tpdir, f))
+                    self.test_plan_sections.append(f.replace(".csv",""))
+        if not self.test_plan:
             """Clear everything from table widget. Doesn't work right now."""
+            test_plan_found = False
             self.ui.tableWidgetTestPlan.clearContents()
             print("No test plan found in working directory")
+        else:
+            # Set combobox items to reflect test plan sections
+            self.ui.comboBox_testPlanSection.clear()
+            self.ui.comboBox_process_section.clear()
+            self.ui.comboBox_testPlanSection.addItems(self.test_plan_sections)
+            self.ui.comboBox_process_section.addItem("Shakedown")
+            self.ui.comboBox_process_section.addItems(self.test_plan_sections)
+            self.test_plan_loaded = True
+            print("Test plan loaded")
+            print(self.test_plan)
+            self.test_plan_into_table()
+
             
     def test_plan_into_table(self):
         """Takes test plan values and puts them in table widget"""
         section = str(self.ui.comboBox_testPlanSection.currentText())
-        if section in self.test_plan_data:
-            paramlist = self.test_plan_data[section]["Parameter list"]
+        if section in self.test_plan:
+            paramlist = self.test_plan[section]["Parameter list"]
             self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist)+1)
             self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(
                     QtCore.QStringList(paramlist+["Done?"]))       
             self.ui.tableWidgetTestPlan.setRowCount(
-                    len(self.test_plan_data[section][paramlist[0]]))
+                    len(self.test_plan[section][paramlist[0]]))
             for i in range(len(paramlist)):
-                itemlist = self.test_plan_data[section][paramlist[i]]
+                itemlist = self.test_plan[section][paramlist[i]]
                 for n in range(len(itemlist)):
                     self.ui.tableWidgetTestPlan.setItem(n, i, 
                                 QtGui.QTableWidgetItem(str(itemlist[n])))
@@ -341,7 +330,7 @@ class MainWindow(QtGui.QMainWindow):
             self.update_sections_done()
         else:
             self.ui.actionStart.setEnabled(True)
-        if section in self.test_plan_data:
+        if section in self.test_plan:
             self.test_plan_into_table()
         
     def add_labels_to_statusbar(self):
