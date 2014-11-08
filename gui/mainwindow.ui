@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1186</width>
-    <height>960</height>
+    <width>1266</width>
+    <height>949</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -30,7 +30,7 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QGridLayout" name="gridLayout_7">
+   <layout class="QGridLayout" name="gridLayout_11">
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidgetMode">
       <property name="minimumSize">
@@ -620,10 +620,125 @@
       </widget>
      </widget>
     </item>
-    <item row="0" column="3" rowspan="2">
-     <widget class="QDockWidget" name="dockWidgetVectrino">
+    <item row="0" column="1" rowspan="2">
+     <widget class="QDockWidget" name="dockWidgetNISignals">
+      <property name="floating">
+       <bool>false</bool>
+      </property>
       <property name="features">
-       <set>QDockWidget::DockWidgetMovable</set>
+       <set>QDockWidget::AllDockWidgetFeatures</set>
+      </property>
+      <property name="allowedAreas">
+       <set>Qt::AllDockWidgetAreas</set>
+      </property>
+      <property name="windowTitle">
+       <string>NI Signals</string>
+      </property>
+      <widget class="QWidget" name="dockWidgetContents_2">
+       <layout class="QGridLayout" name="gridLayout_8">
+        <item row="0" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>            Torque (Nm)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotTorque">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>            Drag (N)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotDrag">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>             Drag Left (N)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotDragL">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>            Drag Right (N)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotDragR">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>           Turbine RPM</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotRPM_ni">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="0" column="2" rowspan="2">
+     <widget class="QDockWidget" name="dockWidgetVectrino">
+      <property name="minimumSize">
+       <size>
+        <width>198</width>
+        <height>601</height>
+       </size>
+      </property>
+      <property name="features">
+       <set>QDockWidget::AllDockWidgetFeatures</set>
       </property>
       <property name="windowTitle">
        <string>Vectrino</string>
@@ -939,115 +1054,6 @@
       </widget>
      </widget>
     </item>
-    <item row="0" column="1" rowspan="2">
-     <widget class="QDockWidget" name="dockWidgetNISignals">
-      <property name="floating">
-       <bool>false</bool>
-      </property>
-      <property name="features">
-       <set>QDockWidget::DockWidgetMovable</set>
-      </property>
-      <property name="allowedAreas">
-       <set>Qt::AllDockWidgetAreas</set>
-      </property>
-      <property name="windowTitle">
-       <string>NI Signals</string>
-      </property>
-      <widget class="QWidget" name="dockWidgetContents_2">
-       <layout class="QGridLayout" name="gridLayout_8">
-        <item row="0" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>            Torque (Nm)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotTorque">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>            Drag (N)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotDrag">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>             Drag Left (N)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotDragL">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>            Drag Right (N)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotDragR">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_16">
-            <property name="text">
-             <string>           Turbine RPM</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotRPM_ni">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -1055,7 +1061,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1186</width>
+     <width>1266</width>
      <height>21</height>
     </rect>
    </property>
@@ -1078,6 +1084,9 @@
     <property name="title">
      <string>View</string>
     </property>
+    <addaction name="actionNI_Signals"/>
+    <addaction name="actionVectrino_2"/>
+    <addaction name="actionFBG"/>
    </widget>
    <widget class="QMenu" name="menuSetings">
     <property name="title">
@@ -1135,6 +1144,7 @@
    <addaction name="actionMonitor_ACS"/>
    <addaction name="actionMonitor_NI"/>
    <addaction name="actionMonitor_Vectrino"/>
+   <addaction name="actionMonitor_FBG"/>
   </widget>
   <widget class="QToolBar" name="toolBar_directory">
    <property name="windowTitle">
@@ -1335,6 +1345,36 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionMonitor_FBG">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/resources.qrc">
+     <normaloff>:/icons/micron.svg</normaloff>:/icons/micron.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Monitor FBG</string>
+   </property>
+   <property name="toolTip">
+    <string>Monitor FBG...</string>
+   </property>
+  </action>
+  <action name="actionNI_Signals">
+   <property name="text">
+    <string>NI Signals</string>
+   </property>
+  </action>
+  <action name="actionVectrino_2">
+   <property name="text">
+    <string>Vectrino</string>
+   </property>
+  </action>
+  <action name="actionFBG">
+   <property name="text">
+    <string>FBG</string>
    </property>
   </action>
  </widget>
