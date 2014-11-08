@@ -21,8 +21,6 @@ To-do:
   * Allow scrolling while test plan is running
     Looks like this will involve enabling the table widget, then making it
     look disabled. 
-  * Put ACS prgs in text files so they can be edited while program is
-    running. 
   * Abort does weird things if pressed too early in a run
   * Highlight run in progress in table
   * Should check if tow and turbine axes are enabled in order to start a run,
@@ -109,6 +107,9 @@ class MainWindow(QtGui.QMainWindow):
         self.initialize_plots()
         # Import test plan
         self.import_test_plan()
+        # Read turbine properties
+        self.read_turbine_properties()
+        # Connect signals and slots
         self.connect_sigs_slots()
         # Set test plan visible in tab widget
         self.ui.tabWidgetMode.setCurrentWidget(self.ui.tabTestPlan)
@@ -138,6 +139,17 @@ class MainWindow(QtGui.QMainWindow):
             oldheight = self.settings["Last size"][0]
             oldwidth = self.settings["Last size"][1]
             self.resize(oldwidth, oldheight)
+            
+    def read_turbine_properties(self):
+        """Reads turbine properties from `Config/turbine_properties.json` in 
+        the experiment's working directory."""
+        fpath = os.path.join(self.wdir, "Config", "turbine_properties.json")
+        try:
+            with open(fpath) as f:
+                self.turbine_properties = json.load(f)
+            print("Turbine properties loaded")
+        except IOError:
+            print("No turbine properties file found")
         
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
@@ -153,7 +165,6 @@ class MainWindow(QtGui.QMainWindow):
     
     def import_test_plan(self):
         """Imports test plan from CSVs in "Test plan" subdirectory"""
-        print("Loading test plan...")
         tpdir = os.path.join(self.wdir, "Test plan")
         self.test_plan_loaded = False
         self.test_plan = {}
@@ -910,6 +921,14 @@ class MainWindow(QtGui.QMainWindow):
         if self.monitorvec and not self.towinprogress:
             self.vecthread.stop()
 
+def test_read_turbine_properties():
+    import sys
+    app = QtGui.QApplication(sys.argv)
+    w = MainWindow()
+    w.read_turbine_properties()
+    print(w.turbine_properties)
+    sys.exit(app.exec_())
+
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
@@ -919,3 +938,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+#    test_read_turbine_properties()
