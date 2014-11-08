@@ -427,9 +427,13 @@ class MainWindow(QtGui.QMainWindow):
                 """Do a single run"""
                 U = self.ui.doubleSpinBox_singleRun_U.value()
                 tsr = self.ui.doubleSpinBox_singleRun_tsr.value()
+                radius = self.ui.doubleSpinBox_turbineRadius.value()
+                height = self.ui.doubleSpinBox_turbineHeight.value()
+                self.turbine_properties["shakedown"]["radius"] = radius
+                self.turbine_properties["shakedown"]["height"] = height
                 y_R = self.ui.doubleSpinBox_singleRun_y_R.value()
                 z_H = self.ui.doubleSpinBox_singleRun_z_H.value()
-                self.savedir = self.wdir + "/Shakedown"
+                self.savedir = self.wdir + "Raw/Shakedown"
                 runsdone = os.listdir(self.savedir)
                 if len(runsdone) == 0:
                     self.currentrun = 0
@@ -439,7 +443,7 @@ class MainWindow(QtGui.QMainWindow):
                 self.label_runstatus.setText(self.currentname + " in progress ")
                 self.savesubdir = self.savedir + "/" + str(self.currentrun)
                 os.mkdir(self.savesubdir)
-                self.do_turbine_tow(U, tsr, y_R, z_H)
+                self.do_turbine_tow(U, tsr, y_R, z_H, turbine="shakedown")
             elif self.ui.tabTareDrag.isVisible():
                 """Do tare drag runs"""
             elif self.ui.tabTareTorque.isVisible():
