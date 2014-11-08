@@ -150,6 +150,8 @@ class MainWindow(QtGui.QMainWindow):
             print("Turbine properties loaded")
         except IOError:
             print("No turbine properties file found")
+            self.turbine_properties = {"RVAT" : {"radius" : 0.5,
+                                                 "height" : 1.0}}
         
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
