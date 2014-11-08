@@ -5,7 +5,6 @@ Created on Sun Sep 08 12:20:14 2013
 @author: Pete
 """
 from __future__ import division, print_function
-from acspy.prgs import ACSPLplusPrg
 import os
 
 def turbine_tow_prg(tow_speed, tsr, turbine_radius, prgdir="./acsprgs"):
