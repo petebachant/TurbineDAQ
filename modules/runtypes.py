@@ -59,7 +59,7 @@ class TurbineTow(QtCore.QThread):
     def build_acsprg(self):
         """Create the ACSPL+ program for running the run.
         This run should send a trigger pulse."""
-        self.acs_prg = acsprgs.turbine_tow_prg(self.U, self.tsr)
+        self.acs_prg = acsprgs.turbine_tow_prg(self.U, self.tsr, self.R)
                                                
     def setvecconfig(self):
         self.vec.start_on_sync = self.usetrigger
