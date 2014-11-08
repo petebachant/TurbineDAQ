@@ -40,10 +40,10 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import *
 import numpy as np
 from acspy import acsc
-import daqtasks
-import vectasks
-import runtypes
-from mainwindow import *
+from modules import daqtasks
+from modules import vectasks
+from modules import runtypes
+from modules.mainwindow import *
 import json
 import guiqwt
 import time
