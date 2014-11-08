@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>micron.svg</file>
     <file>acs.png</file>
     <file>pause.png</file>
     <file>button_cancel.png</file>
