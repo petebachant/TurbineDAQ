@@ -517,9 +517,8 @@ class MainWindow(QtGui.QMainWindow):
             radius = self.turbine_properties[turbine]["radius"]
             height = self.turbine_properties[turbine]["height"]
             self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
-                                                  nidaq=True, vectrino=vectrino,
-                                                  vecsavepath=vecsavepath,
-                                                  R=radius, H=height, fbg=fbg)
+                    nidaq=True, vectrino=vectrino, vecsavepath=vecsavepath,
+                    R=radius, H=height, fbg=fbg)
             self.turbinetow.towfinished.connect(self.on_tow_finished)
             self.turbinetow.metadata["Name"] = self.currentname
             self.turbinetow.metadata["Turbine"] = turbine
