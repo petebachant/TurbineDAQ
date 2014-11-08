@@ -508,17 +508,21 @@ class MainWindow(QtGui.QMainWindow):
         print("Bad Vectrino data detected")
         self.auto_abort()
         
-    def do_turbine_tow(self, U, tsr, vectrino, y_R, z_H, fbg=False):
+    def do_turbine_tow(self, U, tsr, vectrino, y_R, z_H, turbine="RVAT", 
+                       fbg=False):
         """Exectutes a single turbine tow"""
         if acsc.getMotorState(self.hc, 5)["enabled"]:
             self.abort = False
             vecsavepath = self.savesubdir+"/vecdata"
+            radius = self.turbine_properties[turbine]["radius"]
+            height = self.turbine_properties[turbine]["height"]
             self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
                                                   nidaq=True, vectrino=vectrino,
                                                   vecsavepath=vecsavepath,
-                                                  fbg=fbg)
+                                                  R=radius, H=height, fbg=fbg)
             self.turbinetow.towfinished.connect(self.on_tow_finished)
             self.turbinetow.metadata["Name"] = self.currentname
+            self.turbinetow.metadata["Turbine"] = turbine
             self.acsdata = self.turbinetow.acsdaqthread.data
             self.nidata = self.turbinetow.daqthread.data
             if vectrino:
