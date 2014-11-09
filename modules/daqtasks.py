@@ -14,6 +14,7 @@ import daqmx
 import time
 from acspy import acsc, prgs
 from pxl import fdiff, timeseries as ts
+import micronopt
 
 class NiDaqThread(QtCore.QThread):
     collecting = QtCore.pyqtSignal()
@@ -259,6 +260,35 @@ class AcsDaqThread(QtCore.QThread):
             acsc.writeInteger(self.hc, "collect_data", 0)
         except:
             print("Could not write collect_data = 0")
+
+
+class FbgDaqThread(QtCore.QThread):
+    def __init__(self, properties_file_path, usetrigger=False):
+        QtCore.QThread.__init__(self)
+        self.interr = micronopt.Interrogator()
+        self.interr.connect()
+        self.interr.add_sensors(properties_file_path)
+        self.interr.zero_strain_sensors()
+        self.collectdata = True
+        self.data = {"sensor0" : np.array([]),
+                     "sensor1" : np.array([]),
+                     "timestamp" : np.array([]),
+                     "serial_no" : np.array([])}
+    def run(self):
+        while self.collectdata:
+            self.interr.get_data()
+            self.data["sensor0"] = np.append(self.data["sensor0"], 
+                                             self.interr.sensors[0].temperature)
+            self.data["sensor1"] = np.append(self.data["sensor1"], 
+                                             self.interr.sensors[1].strain)
+            self.data["timestamp"] = np.append(self.data["timestamp"], 
+                                               self.interr.kernel_timestamp)
+            self.data["serial_no"] = np.append(self.data["serial_no"], 
+                                               self.interr.data_serial_no)
+            self.usleep(500)
+    def stop(self):
+        self.collectdata = False
+        self.interr.disconnect()
 
 
 if __name__ == "__main__":

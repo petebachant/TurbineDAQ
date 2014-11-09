@@ -74,6 +74,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitoracs = False
         self.monitorni = False
         self.monitorvec = False
+        self.monitorfbg = False
         self.exp_running = False
         self.towinprogress = False
         self.test_plan_loaded = False
@@ -250,6 +251,7 @@ class MainWindow(QtGui.QMainWindow):
         self.timer.timeout.connect(self.on_timer)
         self.ui.actionMonitor_Vectrino.triggered.connect(self.on_monitor_vec)
         self.ui.actionMonitor_NI.triggered.connect(self.on_monitor_ni)
+        self.ui.actionMonitor_FBG.triggered.connect(self.on_monitor_fbg)
         self.ui.actionStart.triggered.connect(self.on_start)
         self.ui.actionAbort.triggered.connect(self.on_abort)
         self.ui.actionImportTestPlan.triggered.connect(self.import_test_plan)
@@ -409,7 +411,15 @@ class MainWindow(QtGui.QMainWindow):
         # ACS turbine RPM plot
         self.curve_acs_rpm = guiqwt.curve.CurveItem()
         self.plot_acs_rpm = self.ui.plotRPM_acs.get_plot()
-        self.plot_acs_rpm.add_item(self.curve_acs_rpm)     
+        self.plot_acs_rpm.add_item(self.curve_acs_rpm)
+        # FBG plot 1
+        self.curve_fbg_1 = guiqwt.curve.CurveItem()
+        self.plot_fbg_1 = self.ui.plot_FBG_1.get_plot()
+        self.plot_fbg_1.add_item(self.curve_fbg_1)
+        # FBG plot 2
+        self.curve_fbg_2 = guiqwt.curve.CurveItem()
+        self.plot_fbg_2 = self.ui.plot_FBG_2.get_plot()
+        self.plot_fbg_2.add_item(self.curve_fbg_2)
         
     def on_start(self):
         """Start whatever is visible in the tab widget."""
@@ -806,6 +816,17 @@ class MainWindow(QtGui.QMainWindow):
             self.vecthread.stop()
             self.monitorvec = False
             self.label_vecstatus.setText(self.vecthread.vecstatus)
+            
+    def on_monitor_fbg(self):
+        if self.ui.actionMonitor_FBG.isChecked():
+            fp = os.path.join(self.wdir, "Config", "fbg_properties.json")
+            self.fbgthread = daqtasks.FbgDaqThread(fp, usetrigger=False)
+            self.fbgdata = self.fbgthread.data
+            self.fbgthread.start()
+            self.monitorfbg = True
+        else:
+            self.fbgthread.stop()
+            self.monitorfbg = False
     
     def on_timer(self):
         self.update_acs()
@@ -826,6 +847,8 @@ class MainWindow(QtGui.QMainWindow):
                 pass
         if self.monitorni:
             self.update_plots_ni()
+        if self.monitorfbg:
+            self.update_plots_fbg()
             
     def on_process(self):
         section = str(self.ui.comboBox_process_section.currentText())
@@ -875,6 +898,15 @@ class MainWindow(QtGui.QMainWindow):
         self.plot_vec_corr.replot()
         self.curve_vec_snr.set_data(t, meansnr)
         self.plot_vec_snr.replot()
+        
+    def update_plots_fbg(self):
+        """This function updates the FBG plots."""
+        t = self.fbgdata["timestamp"]
+        t = t - t[0]
+        self.curve_fbg_1.set_data(t, self.fbgdata["sensor0"])
+        self.plot_fbg_1.replot()
+        self.curve_fbg_2.set_data(t, self.fbgdata["sensor1"])
+        self.plot_fbg_2.replot()
     
     def update_acs(self):
         """This function updates all the non-time-critical 
