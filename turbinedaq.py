@@ -600,18 +600,17 @@ class MainWindow(QtGui.QMainWindow):
         self.towinprogress = False
         self.monitoracs = False
         self.monitorni = False
+        self.monitorfbg = False
         self.time_last_run = time.time()
         # Save data from the run that just finished
         savedir = self.savesubdir
         if not self.tarerun.aborted:
-            # Create directory and save the data inside
-            print("Saving to " + savedir + "...")
             nidata = dict(self.nidata)
             if "turbine_rpm" in nidata:
                 del nidata["turbine_rpm"]
-            savemat(savedir+"/acsdata.mat", self.acsdata, oned_as="column")
-            savemat(savedir+"/nidata.mat", nidata, oned_as="column")
-            with open(savedir+"/metadata.json", "w") as fn:
+            self.save_raw_data(savedir, "acsdata.h5", self.acsdata)
+            self.save_raw_data(savedir, "nidata.h5", nidata)
+            with open(os.path.join(savedir, "metadata.json"), "w") as fn:
                 json.dump(self.tarerun.metadata, fn, indent=4)
             text = str(self.label_runstatus.text())
             if "in progress" in text:
@@ -665,6 +664,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitoracs = False
         self.monitorni = False
         self.monitorvec = False
+        self.monitorfbg = False
         self.time_last_run = time.time()
         # Save data from the run that just finished
         savedir = self.savesubdir
@@ -674,10 +674,13 @@ class MainWindow(QtGui.QMainWindow):
             nidata = dict(self.nidata)
             if "turbine_rpm" in nidata:
                 del nidata["turbine_rpm"]
-            savemat(savedir+"/acsdata.mat", self.acsdata, oned_as="column")
-            savemat(savedir+"/nidata.mat", nidata, oned_as="column")
-            savemat(savedir+"/vecdata.mat", self.vecdata, oned_as="column")
-            with open(savedir+"/metadata.json", "w") as fn:
+            self.save_raw_data(savedir, "acsdata.h5", self.acsdata)
+            self.save_raw_data(savedir, "nidata.h5", nidata)
+            if self.turbinetow.vectrino:
+                self.save_raw_data(savedir, "vecdata.h5", self.vecdata)
+            if self.turbinetow.fbg:
+                self.save_raw_data(savedir, "fbgdata.h5", self.fbgdata)
+            with open(os.path.join(savedir, "metadata.json"), "w") as fn:
                 json.dump(self.turbinetow.metadata, fn, indent=4)
             text = str(self.label_runstatus.text())
             if "in progress" in text:
@@ -734,6 +737,7 @@ class MainWindow(QtGui.QMainWindow):
         self.vecdata = {}
         self.nidata = {}
         self.acsdata = {}
+        self.fbgdata = {}
         self.turbinetow.vec.data = {}
         self.turbinetow.vec = None
         self.turbinetow.deleteLater()
@@ -960,6 +964,15 @@ class MainWindow(QtGui.QMainWindow):
                 QtGui.QTableWidgetItem(str(acsc.getRPosition(self.hc, 0))))
         self.ui.tableWidget_acs.setItem(3, 3, 
                 QtGui.QTableWidgetItem(str(acsc.getRPosition(self.hc, 1))))
+                
+    def save_raw_data(self, savedir, fname, datadict, verbose=True):
+        """Saves a dict of raw data in HDF5 format."""
+        fpath = os.path.join(savedir, fname)
+        if verbose:
+            print("Saving {} to {}".format(fname, savedir))
+        if not os.path.isdir(savedir):
+            os.makedirs(savedir)
+        ts.savehdf(fpath, datadict)
     
     def closeEvent(self, event):
         self.settings["Last window location"] = [self.pos().x(), 
@@ -989,6 +1002,22 @@ def test_read_turbine_properties():
     w.read_turbine_properties()
     print(w.turbine_properties)
     sys.exit(app.exec_())
+    
+def test_save_raw_data():
+    """Test whether data is being saved correctly."""
+    import sys
+    app = QtGui.QApplication(sys.argv)
+    w = MainWindow()
+    savedir = os.path.join(w.wdir, "data_save_test")
+    data = {"arange(5)" : np.arange(5), "zeros(5)" : np.zeros(5)}
+    w.save_raw_data(savedir, "testdata.h5", data)
+    try:
+        data = ts.loadhdf(os.path.join(savedir, "testdata.h5"))
+        shutil.rmtree(savedir)
+        print("test_save_raw_data passed")
+    except IOError:
+        print("test_save_raw_data failed")
+    sys.exit(app.exec_())
 
 def main():
     import sys
@@ -1000,3 +1029,4 @@ def main():
 if __name__ == "__main__":
     main()
 #    test_read_turbine_properties()
+#    test_save_raw_data()
