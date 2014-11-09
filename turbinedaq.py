@@ -112,6 +112,13 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.comboBox_testPlanSection.setCurrentIndex(self.settings["Last section"])
         # Start timer
         self.timer.start(125)
+        # Remember FBG dock widget visibility from last session
+        if "FBG visible" in self.settings:
+            self.ui.dockWidget_FBG.setVisible(self.settings["FBG visible"])
+            self.ui.actionFBG.setChecked(self.settings["FBG visible"])
+        else:
+            self.ui.dockWidget_FBG.close()
+            self.ui.actionFBG.setChecked(False)
         
     def load_settings(self):
         """Loads settings"""
@@ -922,6 +929,7 @@ class MainWindow(QtGui.QMainWindow):
         self.settings["Last PC name"] = self.pcid
         self.settings["Last size"] = (self.size().height(), 
                                       self.size().width())
+        self.settings["FBG visible"] = self.ui.dockWidget_FBG.isVisible()
         if not os.path.isdir("settings"):
             os.mkdir("settings")
         with open("settings/settings.json", "w") as fn:
