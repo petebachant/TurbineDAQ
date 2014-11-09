@@ -305,20 +305,20 @@ class MainWindow(QtGui.QMainWindow):
     
     def on_open_section_folder(self):
         section = str(self.ui.comboBox_testPlanSection.currentText())
-        if "Perf" in section:
-            subdir = self.wdir + "\\Performance\\U_" + section.split("-")[-1]
-        elif "Wake" in section:
-            subdir = self.wdir + "\\Wake\\U_" + section.split("-")[-1]
-        elif section.lower() == "tare drag":
-            subdir = self.wdir + "\\Tare drag"
-        elif section.lower() == "tare torque":
-            subdir = self.wdir + "\\Tare torque"
-        else: subdir = self.wdir
-        os.startfile(subdir)
+        subdir = os.path.join(self.wdir, "Raw", section)
+        try:
+            os.startfile(subdir)
+        except WindowsError:
+            os.makedirs(subdir)
+            os.startfile(subdir)
         
     def on_open_shakedown(self):
-        subdir = self.wdir + "\\Shakedown"
-        os.startfile(subdir)
+        subdir = os.path.join(self.wdir, "Raw", "Shakedown")
+        try:
+            os.startfile(subdir)
+        except WindowsError:
+            os.makedirs(subdir)
+            os.startfile(subdir)
             
     def on_section_change(self):
         section = self.ui.comboBox_testPlanSection.currentText()
