@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui\mainwindow.ui'
 #
-# Created: Sat Nov 08 19:33:26 2014
+# Created: Sat Nov 08 19:38:38 2014
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -677,6 +677,8 @@ class Ui_MainWindow(object):
         self.tabWidgetMode.setCurrentIndex(2)
         QtCore.QObject.connect(self.actionNI_Signals, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.dockWidgetNISignals.setVisible)
         QtCore.QObject.connect(self.actionVectrino_2, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.dockWidgetVectrino.setVisible)
+        QtCore.QObject.connect(self.dockWidgetNISignals, QtCore.SIGNAL(_fromUtf8("visibilityChanged(bool)")), self.actionNI_Signals.setChecked)
+        QtCore.QObject.connect(self.dockWidgetVectrino, QtCore.SIGNAL(_fromUtf8("visibilityChanged(bool)")), self.actionVectrino_2.setChecked)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

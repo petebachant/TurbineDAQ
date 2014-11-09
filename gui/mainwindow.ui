@@ -1490,5 +1490,37 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>dockWidgetNISignals</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionNI_Signals</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>615</x>
+     <y>491</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dockWidgetVectrino</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionVectrino_2</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1045</x>
+     <y>491</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
