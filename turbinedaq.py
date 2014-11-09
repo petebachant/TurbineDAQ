@@ -459,7 +459,7 @@ class MainWindow(QtGui.QMainWindow):
                     self.currentrun = np.max([int(run) for run in runsdone])+1
                 self.currentname = "Shakedown run " + str(self.currentrun)
                 self.label_runstatus.setText(self.currentname + " in progress ")
-                self.savesubdir = self.savedir + "/" + str(self.currentrun)
+                self.savesubdir = os.path.join(self.savedir, str(self.currentrun))
                 os.mkdir(self.savesubdir)
                 self.do_turbine_tow(U, tsr, y_R, z_H, turbine="shakedown",
                                     vectrino=vectrino, fbg=fbg)
