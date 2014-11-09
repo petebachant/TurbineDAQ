@@ -971,6 +971,8 @@ class MainWindow(QtGui.QMainWindow):
             self.daqthread.clear()
         if self.monitorvec and not self.towinprogress:
             self.vecthread.stop()
+        if self.monitorfbg and not self.towinprogress:
+            self.fbgthread.stop()
 
 def test_read_turbine_properties():
     import sys
