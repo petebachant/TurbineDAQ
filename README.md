@@ -3,13 +3,9 @@ TurbineDAQ
 A Python desktop app for automated turbine data acquisition in the UNH tow tank. 
 
 ## Test plan
-Currently, a test plan is created as an Excel spreadsheet either in the top level 
-of the working directory or in a subdirectory named `Test plan`. Inside the test plan
-there are sheets named `Top level`, `Perf-0.5`, `Tare drag`, etc., which correspond
-to "sections" of the experiment, with the exception of `Top level`, which is an 
-(optional)index of sections. 
-
-The test plan, if one exists, is loaded into the GUI at startup. To change, it must be
+A matrix of test parameters should be created and placed in the `Test plan` directory.
+Each "section" of the experiment gets its own CSV file. See `test/Test plan` for an
+example. The test plan, if one exists, is loaded into the GUI at startup. To change, it must be
 edited externally and reloaded. 
 
 ## Directory and file structure
@@ -21,34 +17,38 @@ each run in JSON format, while raw data is saved in `*.mat` files.
 
 ### Future
 
+Raw data will be saved in HDF5 format, using the following directory structure:
+
 ```
 Experiment name/
     Test plan/
         Top level.csv
         Perf-0.8.csv
         Tare_drag.csv
-    Data/
-        Processed/
-            Perf-0.8.csv
-            Tare_drag.csv
-        Raw/
-            Perf-0.8/
-                0/
-                    metadata.json
-                    data.h5
-                    vecdata.vno
-                1/    
-                    metadata.json
-                    data.h5
-                    vecdata.vno
-            Tare_drag/
-                0/
-                    metadata.json
-                    data.h5
+    Processed/
+        Perf-0.8.csv
+        Tare_drag.csv
+    Raw/
+        Perf-0.8/
+            0/
+                metadata.json
+                acsdata.h5
+                nidata.h5
+                vecdata.h5
+                fbgdata.h5
+                vecdata.vno
+            1/    
+                metadata.json
+                acsdata.h5
+                fbgdata.h5
+                nidata.h5
+                vecdata.h5
+                vecdata.vno
+        Tare_drag/
+            0/
+                metadata.json
+                data.h5
 ```
-
-Inside each HDF5 file (which will be saved via pandas), there will be a table for
-each type of data--ACS, NI, and Vectrino.
 
 ## Types of runs
 In the `runtypes` module, there are classes to represent each type of run:
