@@ -10,7 +10,7 @@ This module contains classes for experiment run types
 from __future__ import print_function, division
 import acsprgs
 from acspy import acsc
-import daqtasks
+from . import daqtasks
 import time
 from PyQt4 import QtCore
 from pdcommpy import PdControl
