@@ -142,6 +142,9 @@ class MainWindow(QtGui.QMainWindow):
             oldheight = self.settings["Last size"][0]
             oldwidth = self.settings["Last size"][1]
             self.resize(oldwidth, oldheight)
+        # Creat some additional constants for paths
+        self.configdir = self.wdir
+        self.fbg_prop_fpath = os.path.join(self.wdir, "Config", "fbg_properties.json")
             
     def read_turbine_properties(self):
         """Reads turbine properties from `Config/turbine_properties.json` in 
@@ -521,6 +524,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorni = False
         self.monitoracs = False
         self.monitorvec = False
+        self.monitorfbg = False
         print("Automatically aborting current run...")
         text = str(self.label_runstatus.text())
         self.label_runstatus.setText(text[:-13] + " autoaborted ")
@@ -536,23 +540,27 @@ class MainWindow(QtGui.QMainWindow):
         """Exectutes a single turbine tow"""
         if acsc.getMotorState(self.hc, 5)["enabled"]:
             self.abort = False
-            vecsavepath = self.savesubdir+"/vecdata"
+            vecsavepath = os.path.join(self.savesubdir, "vecdata")
             radius = self.turbine_properties[turbine]["radius"]
             height = self.turbine_properties[turbine]["height"]
             self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
                     nidaq=True, vectrino=vectrino, vecsavepath=vecsavepath,
-                    R=radius, H=height, fbg=fbg)
+                    R=radius, H=height, fbg=fbg, fbg_prop_fpath=self.fbg_prop_fpath)
             self.turbinetow.towfinished.connect(self.on_tow_finished)
             self.turbinetow.metadata["Name"] = self.currentname
-            self.turbinetow.metadata["Turbine"] = turbine
+            self.turbinetow.metadata["Turbine"] = self.turbine_properties[turbine]
+            self.turbinetow.metadata["Turbine"]["Name"] = turbine
             self.acsdata = self.turbinetow.acsdaqthread.data
             self.nidata = self.turbinetow.daqthread.data
             if vectrino:
                 self.vecdata = self.turbinetow.vec.data
+            if fbg:
+                self.fbgdata = self.turbinetow.fbgdata
             self.towinprogress = True
             self.monitoracs = True
             self.monitorni = True
             self.monitorvec = vectrino
+            self.monitorfbg = fbg
             self.turbinetow.start()
         else:
             print("Cannot start turbine tow because axis is disabled")

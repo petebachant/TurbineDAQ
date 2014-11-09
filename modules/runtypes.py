@@ -19,7 +19,7 @@ class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
     def __init__(self, acs_hcomm, U, tsr, y_R, z_H, 
                  R=0.5, H=1.0, nidaq=True, vectrino=True, vecsavepath="",
-                 fbg=False):
+                 fbg=False, fbg_prop_fpath="./"):
         """Turbine tow run object."""
         QtCore.QThread.__init__(self)        
         self.hc = acs_hcomm
@@ -31,6 +31,7 @@ class TurbineTow(QtCore.QThread):
         self.H = H
         self.vectrino = vectrino
         self.nidaq = nidaq 
+        self.fbg = fbg
         self.build_acsprg()
         self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
         self.maxvel = U*1.3
@@ -55,6 +56,10 @@ class TurbineTow(QtCore.QThread):
             self.daqthread = daqtasks.NiDaqThread(usetrigger=self.usetrigger)
             self.nidata = self.daqthread.data
             self.metadata["NI metadata"] = self.daqthread.metadata
+        
+        if self.fbg:
+            self.fbgthread = daqtasks.FbgDaqThread(fbg_prop_fpath, self.usetrigger)
+            self.metadata["FBG metadata"] = self.fbgthread.metadata
         
     def build_acsprg(self):
         """Create the ACSPL+ program for running the run.

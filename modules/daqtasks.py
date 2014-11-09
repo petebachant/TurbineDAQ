@@ -274,6 +274,7 @@ class FbgDaqThread(QtCore.QThread):
                      "sensor1" : np.array([]),
                      "timestamp" : np.array([]),
                      "serial_no" : np.array([])}
+        self.metadata = {}
     def run(self):
         while self.collectdata:
             self.interr.get_data()
