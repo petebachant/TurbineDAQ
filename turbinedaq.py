@@ -54,11 +54,6 @@ from pxl import timeseries as ts
 import shutil
 import pandas as pd
 
-# Some turbine constants
-turbine_params = {"R" : 0.5,
-                  "D" : 1.0,
-                  "A" : 1.0,
-                  "H" : 1.0}
                   
 fluid_params = {"rho" : 1000.0}
 
@@ -429,11 +424,16 @@ class MainWindow(QtGui.QMainWindow):
                 tsr = self.ui.doubleSpinBox_singleRun_tsr.value()
                 radius = self.ui.doubleSpinBox_turbineRadius.value()
                 height = self.ui.doubleSpinBox_turbineHeight.value()
+                self.turbine_properties["shakedown"] = {}
                 self.turbine_properties["shakedown"]["radius"] = radius
                 self.turbine_properties["shakedown"]["height"] = height
                 y_R = self.ui.doubleSpinBox_singleRun_y_R.value()
                 z_H = self.ui.doubleSpinBox_singleRun_z_H.value()
-                self.savedir = self.wdir + "Raw/Shakedown"
+                vectrino = self.ui.checkBox_singleRunVectrino.isChecked()
+                fbg = self.ui.checkBox_singleRunFBG.isChecked()
+                self.savedir = os.path.join(self.wdir, "Raw", "Shakedown")
+                if not os.path.isdir(self.savedir):
+                    os.makedirs(self.savedir)
                 runsdone = os.listdir(self.savedir)
                 if len(runsdone) == 0:
                     self.currentrun = 0
@@ -443,7 +443,8 @@ class MainWindow(QtGui.QMainWindow):
                 self.label_runstatus.setText(self.currentname + " in progress ")
                 self.savesubdir = self.savedir + "/" + str(self.currentrun)
                 os.mkdir(self.savesubdir)
-                self.do_turbine_tow(U, tsr, y_R, z_H, turbine="shakedown")
+                self.do_turbine_tow(U, tsr, y_R, z_H, turbine="shakedown",
+                                    vectrino=vectrino, fbg=fbg)
             elif self.ui.tabTareDrag.isVisible():
                 """Do tare drag runs"""
             elif self.ui.tabTareTorque.isVisible():
@@ -512,8 +513,8 @@ class MainWindow(QtGui.QMainWindow):
         print("Bad Vectrino data detected")
         self.auto_abort()
         
-    def do_turbine_tow(self, U, tsr, vectrino, y_R, z_H, turbine="RVAT", 
-                       fbg=False):
+    def do_turbine_tow(self, U, tsr, y_R, z_H, turbine="RVAT", 
+                       vectrino=True, fbg=False):
         """Exectutes a single turbine tow"""
         if acsc.getMotorState(self.hc, 5)["enabled"]:
             self.abort = False

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui\mainwindow.ui'
 #
-# Created: Sat Nov 08 18:52:29 2014
+# Created: Sat Nov 08 19:07:50 2014
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -130,7 +130,7 @@ class Ui_MainWindow(object):
         self.tabSingleRun = QtGui.QWidget()
         self.tabSingleRun.setObjectName(_fromUtf8("tabSingleRun"))
         self.gridLayoutWidget_4 = QtGui.QWidget(self.tabSingleRun)
-        self.gridLayoutWidget_4.setGeometry(QtCore.QRect(10, 10, 211, 152))
+        self.gridLayoutWidget_4.setGeometry(QtCore.QRect(10, 10, 211, 251))
         self.gridLayoutWidget_4.setObjectName(_fromUtf8("gridLayoutWidget_4"))
         self.gridLayout_singleRun = QtGui.QGridLayout(self.gridLayoutWidget_4)
         self.gridLayout_singleRun.setMargin(0)
@@ -195,6 +195,12 @@ class Ui_MainWindow(object):
         self.doubleSpinBox_turbineHeight.setProperty("value", 1.0)
         self.doubleSpinBox_turbineHeight.setObjectName(_fromUtf8("doubleSpinBox_turbineHeight"))
         self.gridLayout_singleRun.addWidget(self.doubleSpinBox_turbineHeight, 2, 1, 1, 1)
+        self.checkBox_singleRunVectrino = QtGui.QCheckBox(self.gridLayoutWidget_4)
+        self.checkBox_singleRunVectrino.setObjectName(_fromUtf8("checkBox_singleRunVectrino"))
+        self.gridLayout_singleRun.addWidget(self.checkBox_singleRunVectrino, 6, 1, 1, 1)
+        self.checkBox_singleRunFBG = QtGui.QCheckBox(self.gridLayoutWidget_4)
+        self.checkBox_singleRunFBG.setObjectName(_fromUtf8("checkBox_singleRunFBG"))
+        self.gridLayout_singleRun.addWidget(self.checkBox_singleRunFBG, 7, 1, 1, 1)
         self.tabWidgetMode.addTab(self.tabSingleRun, _fromUtf8(""))
         self.tabTestPlan = QtGui.QWidget()
         self.tabTestPlan.setObjectName(_fromUtf8("tabTestPlan"))
@@ -686,6 +692,8 @@ class Ui_MainWindow(object):
         self.label_33.setText(_translate("MainWindow", "z/H", None))
         self.toolButtonOpenShakedown.setText(_translate("MainWindow", "...", None))
         self.label_35.setText(_translate("MainWindow", "H (m)", None))
+        self.checkBox_singleRunVectrino.setText(_translate("MainWindow", "Vectrino", None))
+        self.checkBox_singleRunFBG.setText(_translate("MainWindow", "FBG", None))
         self.tabWidgetMode.setTabText(self.tabWidgetMode.indexOf(self.tabSingleRun), _translate("MainWindow", "Single Run", None))
         self.label_32.setText(_translate("MainWindow", "Section", None))
         self.toolButtonOpenSection.setText(_translate("MainWindow", "...", None))
