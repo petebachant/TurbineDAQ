@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui\mainwindow.ui'
 #
-# Created: Sat Nov 08 19:07:50 2014
+# Created: Sat Nov 08 19:33:26 2014
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -638,10 +638,15 @@ class Ui_MainWindow(object):
         self.actionMonitor_FBG.setIcon(icon10)
         self.actionMonitor_FBG.setObjectName(_fromUtf8("actionMonitor_FBG"))
         self.actionNI_Signals = QtGui.QAction(MainWindow)
+        self.actionNI_Signals.setCheckable(True)
+        self.actionNI_Signals.setChecked(True)
         self.actionNI_Signals.setObjectName(_fromUtf8("actionNI_Signals"))
         self.actionVectrino_2 = QtGui.QAction(MainWindow)
+        self.actionVectrino_2.setCheckable(True)
+        self.actionVectrino_2.setChecked(True)
         self.actionVectrino_2.setObjectName(_fromUtf8("actionVectrino_2"))
         self.actionFBG = QtGui.QAction(MainWindow)
+        self.actionFBG.setCheckable(True)
         self.actionFBG.setObjectName(_fromUtf8("actionFBG"))
         self.menuFile.addAction(self.actionQuit)
         self.menuHoming.addAction(self.actionHome_Tow)
@@ -670,6 +675,8 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabWidgetMode.setCurrentIndex(2)
+        QtCore.QObject.connect(self.actionNI_Signals, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.dockWidgetNISignals.setVisible)
+        QtCore.QObject.connect(self.actionVectrino_2, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.dockWidgetVectrino.setVisible)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

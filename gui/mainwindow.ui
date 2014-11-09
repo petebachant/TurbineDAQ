@@ -1417,16 +1417,31 @@
    </property>
   </action>
   <action name="actionNI_Signals">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>NI Signals</string>
    </property>
   </action>
   <action name="actionVectrino_2">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Vectrino</string>
    </property>
   </action>
   <action name="actionFBG">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>FBG</string>
    </property>
@@ -1442,5 +1457,38 @@
  <resources>
   <include location="icons/resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionNI_Signals</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>dockWidgetNISignals</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>615</x>
+     <y>491</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionVectrino_2</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>dockWidgetVectrino</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1045</x>
+     <y>491</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
