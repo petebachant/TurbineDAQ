@@ -276,7 +276,8 @@ class MainWindow(QtGui.QMainWindow):
         else:
             self.ui.actionStart.setEnabled(True)
         if tabitem == "Processing":
-            runsdone = sorted([int(n) for n in os.listdir(self.wdir+"/Shakedown")])
+            savedir = os.path.join(self.wdir, "Raw", "Shakedown")
+            runsdone = sorted([int(n) for n in os.listdir(savedir)])
             runsdone = [str(n) for n in runsdone]
             self.ui.comboBox_process_nrun.clear()
             self.ui.comboBox_process_nrun.addItems(runsdone)
