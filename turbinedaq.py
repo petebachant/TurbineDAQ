@@ -103,8 +103,9 @@ class MainWindow(QtGui.QMainWindow):
         self.initialize_plots()
         # Import test plan
         self.import_test_plan()
-        # Read turbine properties
+        # Read turbine and fbg properties
         self.read_turbine_properties()
+        self.read_fbg_properties()
         # Connect signals and slots
         self.connect_sigs_slots()
         # Set test plan visible in tab widget
@@ -142,9 +143,6 @@ class MainWindow(QtGui.QMainWindow):
             oldheight = self.settings["Last size"][0]
             oldwidth = self.settings["Last size"][1]
             self.resize(oldwidth, oldheight)
-        # Creat some additional constants for paths
-        self.configdir = self.wdir
-        self.fbg_prop_fpath = os.path.join(self.wdir, "Config", "fbg_properties.json")
             
     def read_turbine_properties(self):
         """Reads turbine properties from `Config/turbine_properties.json` in 
@@ -158,6 +156,15 @@ class MainWindow(QtGui.QMainWindow):
             print("No turbine properties file found")
             self.turbine_properties = {"RVAT" : {"radius" : 0.5,
                                                  "height" : 1.0}}
+                                                 
+    def read_fbg_properties(self):
+        fpath = os.path.join(self.wdir, "Config", "fbg_properties.json")
+        try:
+            with open(fpath) as f:
+                self.fbg_properties = json.load(f)
+            print("FBG properties loaded")
+        except IOError:
+            self.fbg_properties = {}
         
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
@@ -831,8 +838,8 @@ class MainWindow(QtGui.QMainWindow):
             
     def on_monitor_fbg(self):
         if self.ui.actionMonitor_FBG.isChecked():
-            fp = os.path.join(self.wdir, "Config", "fbg_properties.json")
-            self.fbgthread = daqtasks.FbgDaqThread(fp, usetrigger=False)
+            fbg_props = self.fbg_properties
+            self.fbgthread = daqtasks.FbgDaqThread(fbg_props, usetrigger=False)
             self.fbgdata = self.fbgthread.data
             self.fbgthread.start()
             self.monitorfbg = True
@@ -913,11 +920,11 @@ class MainWindow(QtGui.QMainWindow):
         
     def update_plots_fbg(self):
         """This function updates the FBG plots."""
-        t = self.fbgdata["timestamp"]
-        t = t - t[0]
-        self.curve_fbg_1.set_data(t, self.fbgdata["sensor0"])
+        t = self.fbgdata["time"]
+        fbgs = self.fbgthread.interr.sensors
+        self.curve_fbg_1.set_data(t, self.fbgdata[fbgs[0].name + "_wavelength"])
         self.plot_fbg_1.replot()
-        self.curve_fbg_2.set_data(t, self.fbgdata["sensor1"])
+        self.curve_fbg_2.set_data(t, self.fbgdata[fbgs[1].name + "_wavelength"])
         self.plot_fbg_2.replot()
     
     def update_acs(self):

@@ -263,32 +263,23 @@ class AcsDaqThread(QtCore.QThread):
 
 
 class FbgDaqThread(QtCore.QThread):
-    def __init__(self, properties_file_path, usetrigger=False):
+    def __init__(self, fbg_props, usetrigger=False):
         QtCore.QThread.__init__(self)
-        self.interr = micronopt.Interrogator()
+        self.interr = micronopt.Interrogator(fbg_props=fbg_props)
         self.interr.connect()
-        self.interr.add_sensors(properties_file_path)
+        self.interr.create_sensors()
+        self.interr.setup_append_data()
         self.interr.zero_strain_sensors()
         self.collectdata = True
-        self.data = {"sensor0" : np.array([]),
-                     "sensor1" : np.array([]),
-                     "timestamp" : np.array([]),
-                     "serial_no" : np.array([])}
         self.metadata = {}
+        self.data = self.interr.data
     def run(self):
         while self.collectdata:
             self.interr.get_data()
-            self.data["sensor0"] = np.append(self.data["sensor0"], 
-                                             self.interr.sensors[0].temperature)
-            self.data["sensor1"] = np.append(self.data["sensor1"], 
-                                             self.interr.sensors[1].strain)
-            self.data["timestamp"] = np.append(self.data["timestamp"], 
-                                               self.interr.kernel_timestamp)
-            self.data["serial_no"] = np.append(self.data["serial_no"], 
-                                               self.interr.data_serial_no)
-            self.usleep(500)
+            self.interr.sleep()
     def stop(self):
         self.collectdata = False
+        self.metadata["Triggering mode"] = self.interr.data_header["Triggering mode"]
         self.interr.disconnect()
 
 
