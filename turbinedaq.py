@@ -168,7 +168,7 @@ class MainWindow(QtGui.QMainWindow):
         
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
-        runpath = os.path.join(self.wdir, "Raw", section, str(number))
+        runpath = os.path.join(self.wdir, "Data", "Raw", section, str(number))
         if os.path.isdir(runpath) and "metadata.json" in os.listdir(runpath):
             return True
         else:
@@ -180,7 +180,7 @@ class MainWindow(QtGui.QMainWindow):
     
     def import_test_plan(self):
         """Imports test plan from CSVs in "Test plan" subdirectory"""
-        tpdir = os.path.join(self.wdir, "Test plan")
+        tpdir = os.path.join(self.wdir, "Config", "Test plan")
         self.test_plan_loaded = False
         self.test_plan = {}
         self.test_plan_sections = []
@@ -295,7 +295,7 @@ class MainWindow(QtGui.QMainWindow):
         else:
             self.ui.actionStart.setEnabled(True)
         if tabitem == "Processing":
-            savedir = os.path.join(self.wdir, "Raw", "Shakedown")
+            savedir = os.path.join(self.wdir, "Data", "Raw", "Shakedown")
             runsdone = sorted([int(n) for n in os.listdir(savedir)])
             runsdone = [str(n) for n in runsdone]
             self.ui.comboBox_process_nrun.clear()
@@ -315,7 +315,7 @@ class MainWindow(QtGui.QMainWindow):
     
     def on_open_section_folder(self):
         section = str(self.ui.comboBox_testPlanSection.currentText())
-        subdir = os.path.join(self.wdir, "Raw", section)
+        subdir = os.path.join(self.wdir, "Data", "Raw", section)
         try:
             os.startfile(subdir)
         except WindowsError:
@@ -323,7 +323,7 @@ class MainWindow(QtGui.QMainWindow):
             os.startfile(subdir)
         
     def on_open_shakedown(self):
-        subdir = os.path.join(self.wdir, "Raw", "Shakedown")
+        subdir = os.path.join(self.wdir, "Data", "Raw", "Shakedown")
         try:
             os.startfile(subdir)
         except WindowsError:
@@ -459,7 +459,7 @@ class MainWindow(QtGui.QMainWindow):
                 z_H = self.ui.doubleSpinBox_singleRun_z_H.value()
                 vectrino = self.ui.checkBox_singleRunVectrino.isChecked()
                 fbg = self.ui.checkBox_singleRunFBG.isChecked()
-                self.savedir = os.path.join(self.wdir, "Raw", "Shakedown")
+                self.savedir = os.path.join(self.wdir, "Data", "Raw", "Shakedown")
                 if not os.path.isdir(self.savedir):
                     os.makedirs(self.savedir)
                 runsdone = os.listdir(self.savedir)
