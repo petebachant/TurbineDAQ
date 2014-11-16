@@ -1030,6 +1030,16 @@ def test_save_raw_data():
     except IOError:
         print("test_save_raw_data failed")
     sys.exit(app.exec_())
+    
+def test_import_test_plan():
+    import sys
+    app = QtGui.QApplication(sys.argv)
+    w = MainWindow()
+    print("Test plan has {} sections".format(len(w.test_plan)))
+    for k,v in w.test_plan.items():
+        print(k + ":")
+        print(v)
+    sys.exit(app.exec_())
 
 def main():
     import sys
@@ -1042,3 +1052,4 @@ if __name__ == "__main__":
     main()
 #    test_read_turbine_properties()
 #    test_save_raw_data()
+#    test_import_test_plan()
