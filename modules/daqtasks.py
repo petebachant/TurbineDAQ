@@ -270,6 +270,7 @@ class FbgDaqThread(QtCore.QThread):
         self.interr.create_sensors()
         self.interr.setup_append_data()
         self.interr.zero_strain_sensors()
+        self.interr.set_trigger_defaults(usetrigger)
         self.collectdata = True
         self.metadata = {}
         self.data = self.interr.data
