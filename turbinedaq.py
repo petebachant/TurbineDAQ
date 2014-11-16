@@ -115,7 +115,7 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.comboBox_testPlanSection.setCurrentIndex(self.settings["Last section"])
         # Start timers
         self.timer.start(200)
-        self.plot_timer.start(10)
+        self.plot_timer.start(100)
         # Remember FBG dock widget visibility from last session
         if "FBG visible" in self.settings:
             self.ui.dockWidget_FBG.setVisible(self.settings["FBG visible"])
