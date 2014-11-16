@@ -271,8 +271,11 @@ class FbgDaqThread(QtCore.QThread):
         self.interr.setup_append_data()
         self.interr.zero_strain_sensors()
         self.interr.set_trigger_defaults(usetrigger)
+        self.interr.data_interleave = 5
+        self.interr.set_num_averages(5)
         self.collectdata = True
         self.metadata = {}
+        self.metadata["Data interleave"] = self.interr.data_interleave
         self.data = self.interr.data
     def run(self):
         while self.collectdata:
