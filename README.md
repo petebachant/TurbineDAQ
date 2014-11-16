@@ -9,45 +9,41 @@ example. The test plan, if one exists, is loaded into the GUI at startup. To cha
 edited externally and reloaded. 
 
 ## Directory and file structure
-### Current 
-Currently, raw data from a performance curve is saved in `Performance/U_0.5/1`, for 
-an example tow at 0.5 m/s, with run index 1. Note that each run gets its own subdirectory.
-This is influenced by the OpenFOAM directory structure. Metadata is currently saved for 
-each run in JSON format, while raw data is saved in `*.mat` files. 
-
-### Future
-
-Raw data will be saved in HDF5 format, using the following directory structure:
 
 ```
 Experiment name/
-    Test plan/
-        Top level.csv
-        Perf-0.8.csv
-        Tare_drag.csv
-    Processed/
-        Perf-0.8.csv
-        Tare_drag.csv
-    Raw/
-        Perf-0.8/
-            0/
-                metadata.json
-                acsdata.h5
-                nidata.h5
-                vecdata.h5
-                fbgdata.h5
-                vecdata.vno
-            1/    
-                metadata.json
-                acsdata.h5
-                fbgdata.h5
-                nidata.h5
-                vecdata.h5
-                vecdata.vno
-        Tare_drag/
-            0/
-                metadata.json
-                data.h5
+    Config/
+        Test plan/
+            Top level.csv
+            Perf-0.8.csv
+            Tare_drag.csv
+        fbg_properties.json
+        turbine_properties.json
+    Data/
+        Processed/
+            Perf-0.8.csv
+            Tare_drag.csv
+        Raw/
+            Perf-0.8/
+                0/
+                    metadata.json
+                    acsdata.h5
+                    nidata.h5
+                    vecdata.h5
+                    fbgdata.h5
+                    vecdata.vno
+                1/    
+                    metadata.json
+                    acsdata.h5
+                    fbgdata.h5
+                    nidata.h5
+                    vecdata.h5
+                    vecdata.vno
+            Tare_drag/
+                0/
+                    metadata.json
+                    acsdata.h5
+                    nidata.h5
 ```
 
 ## Types of runs
