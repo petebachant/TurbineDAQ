@@ -95,8 +95,9 @@ class MainWindow(QtGui.QMainWindow):
         self.add_labels_to_statusbar()
         # Read in and apply settings from last session
         self.load_settings()
-        # Create a timer
+        # Create timers
         self.timer = QtCore.QTimer()
+        self.plot_timer = QtCore.QTimer()
         # Connect to controller
         self.connect_to_controller()
         # Initialize plots
@@ -112,8 +113,9 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.tabWidgetMode.setCurrentWidget(self.ui.tabTestPlan)
         if "Last section" in self.settings:
             self.ui.comboBox_testPlanSection.setCurrentIndex(self.settings["Last section"])
-        # Start timer
-        self.timer.start(125)
+        # Start timers
+        self.timer.start(200)
+        self.plot_timer.start(10)
         # Remember FBG dock widget visibility from last session
         if "FBG visible" in self.settings:
             self.ui.dockWidget_FBG.setVisible(self.settings["FBG visible"])
@@ -263,6 +265,7 @@ class MainWindow(QtGui.QMainWindow):
         self.toolbutton_wdir.clicked.connect(self.on_tbutton_wdir)
         self.ui.actionQuit.triggered.connect(self.close)
         self.timer.timeout.connect(self.on_timer)
+        self.plot_timer.timeout.connect(self.on_plot_timer)
         self.ui.actionMonitor_Vectrino.triggered.connect(self.on_monitor_vec)
         self.ui.actionMonitor_NI.triggered.connect(self.on_monitor_ni)
         self.ui.actionMonitor_FBG.triggered.connect(self.on_monitor_fbg)
@@ -856,7 +859,8 @@ class MainWindow(QtGui.QMainWindow):
         self.time_since_last_run = time.time() - self.time_last_run
         self.label_timer.setText("Time since last run: " + \
         str(int(self.time_since_last_run)) + " s ")
-        
+            
+    def on_plot_timer(self):
         if self.monitoracs:
             self.update_plots_acs()
         if self.monitorvec:
