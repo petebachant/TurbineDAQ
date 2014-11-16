@@ -121,6 +121,10 @@ class MainWindow(QtGui.QMainWindow):
         else:
             self.ui.dockWidget_FBG.close()
             self.ui.actionFBG.setChecked(False)
+        # Remember Vectrino dock widget visibility from last session
+        if "Vectrino visible" in self.settings:
+            self.ui.dockWidgetVectrino.setVisible(self.settings["Vectrino visible"])
+            self.ui.actionVectrino_View.setChecked(self.settings["Vectrino visible"])
         
     def load_settings(self):
         """Loads settings"""
@@ -990,6 +994,7 @@ class MainWindow(QtGui.QMainWindow):
         self.settings["Last size"] = (self.size().height(), 
                                       self.size().width())
         self.settings["FBG visible"] = self.ui.dockWidget_FBG.isVisible()
+        self.settings["Vectrino visible"] = self.ui.dockWidgetVectrino.isVisible()
         if not os.path.isdir("settings"):
             os.mkdir("settings")
         with open("settings/settings.json", "w") as fn:

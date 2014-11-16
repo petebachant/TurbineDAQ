@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui\mainwindow.ui'
 #
-# Created: Sat Nov 08 20:26:05 2014
+# Created: Sun Nov 16 13:19:47 2014
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -694,10 +694,10 @@ class Ui_MainWindow(object):
         self.actionNI_Signals.setCheckable(True)
         self.actionNI_Signals.setChecked(True)
         self.actionNI_Signals.setObjectName(_fromUtf8("actionNI_Signals"))
-        self.actionVectrino_2 = QtGui.QAction(MainWindow)
-        self.actionVectrino_2.setCheckable(True)
-        self.actionVectrino_2.setChecked(True)
-        self.actionVectrino_2.setObjectName(_fromUtf8("actionVectrino_2"))
+        self.actionVectrino_View = QtGui.QAction(MainWindow)
+        self.actionVectrino_View.setCheckable(True)
+        self.actionVectrino_View.setChecked(True)
+        self.actionVectrino_View.setObjectName(_fromUtf8("actionVectrino_View"))
         self.actionFBG = QtGui.QAction(MainWindow)
         self.actionFBG.setCheckable(True)
         self.actionFBG.setChecked(True)
@@ -708,7 +708,7 @@ class Ui_MainWindow(object):
         self.menuHoming.addAction(self.actionHome_y)
         self.menuHoming.addAction(self.actionHome_z)
         self.menuView.addAction(self.actionNI_Signals)
-        self.menuView.addAction(self.actionVectrino_2)
+        self.menuView.addAction(self.actionVectrino_View)
         self.menuView.addAction(self.actionFBG)
         self.menuSetings.addAction(self.actionVectrino)
         self.menuSetings.addAction(self.actionTurbine_Characteristics)
@@ -730,9 +730,9 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.tabWidgetMode.setCurrentIndex(2)
         QtCore.QObject.connect(self.actionNI_Signals, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.dockWidgetNISignals.setVisible)
-        QtCore.QObject.connect(self.actionVectrino_2, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.dockWidgetVectrino.setVisible)
+        QtCore.QObject.connect(self.actionVectrino_View, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.dockWidgetVectrino.setVisible)
         QtCore.QObject.connect(self.dockWidgetNISignals, QtCore.SIGNAL(_fromUtf8("visibilityChanged(bool)")), self.actionNI_Signals.setChecked)
-        QtCore.QObject.connect(self.dockWidgetVectrino, QtCore.SIGNAL(_fromUtf8("visibilityChanged(bool)")), self.actionVectrino_2.setChecked)
+        QtCore.QObject.connect(self.dockWidgetVectrino, QtCore.SIGNAL(_fromUtf8("visibilityChanged(bool)")), self.actionVectrino_View.setChecked)
         QtCore.QObject.connect(self.actionFBG, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.dockWidget_FBG.setVisible)
         QtCore.QObject.connect(self.dockWidget_FBG, QtCore.SIGNAL(_fromUtf8("visibilityChanged(bool)")), self.actionFBG.setChecked)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -873,8 +873,8 @@ class Ui_MainWindow(object):
         self.actionMonitor_FBG.setText(_translate("MainWindow", "Monitor FBG", None))
         self.actionMonitor_FBG.setToolTip(_translate("MainWindow", "Monitor FBG...", None))
         self.actionNI_Signals.setText(_translate("MainWindow", "NI Signals", None))
-        self.actionVectrino_2.setText(_translate("MainWindow", "Vectrino", None))
+        self.actionVectrino_View.setText(_translate("MainWindow", "Vectrino", None))
         self.actionFBG.setText(_translate("MainWindow", "FBG", None))
 
 from guiqwt.plot import CurveWidget
-from . import resources_rc
+import resources_rc
