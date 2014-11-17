@@ -779,7 +779,7 @@ class MainWindow(QtGui.QMainWindow):
         self.currentname = section + " run " + str(nextrun)
         self.label_runstatus.setText(self.currentname + " in progress ")
         if not os.path.isdir(self.savedir):
-            os.mkdir(self.savedir)
+            os.makedirs(self.savedir)
         self.savesubdir = os.path.join(self.savedir, str(nextrun))
         try:
             os.mkdir(self.savesubdir)
