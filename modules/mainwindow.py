@@ -789,4 +789,4 @@ class Ui_MainWindow(object):
 
 from guiqwt.plot import CurveWidget
 from pyqtgraph import PlotWidget
-import resources_rc
+from . import resources_rc
