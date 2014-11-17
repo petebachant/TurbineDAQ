@@ -693,89 +693,26 @@
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>            Torque (Nm)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotTorque">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+           <widget class="PlotWidget" name="plotTorque">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>            Drag (N)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
+           <widget class="PlotWidget" name="plotDrag"/>
           </item>
           <item>
-           <widget class="CurveWidget" name="plotDrag">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
+           <widget class="PlotWidget" name="plotDragL"/>
           </item>
           <item>
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>             Drag Left (N)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
+           <widget class="PlotWidget" name="plotDragR"/>
           </item>
           <item>
-           <widget class="CurveWidget" name="plotDragL">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>            Drag Right (N)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotDragR">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_16">
-            <property name="text">
-             <string>           Turbine RPM</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotRPM_ni">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
+           <widget class="PlotWidget" name="plotRPM_ni"/>
           </item>
          </layout>
         </item>
@@ -802,89 +739,19 @@
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QLabel" name="label_vecu">
-            <property name="text">
-             <string>            u (m/s)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
+           <widget class="PlotWidget" name="plotVecU"/>
           </item>
           <item>
-           <widget class="CurveWidget" name="plotVecU">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
+           <widget class="PlotWidget" name="plotVecV"/>
           </item>
           <item>
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>          v (m/s)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
+           <widget class="PlotWidget" name="plotVecW"/>
           </item>
           <item>
-           <widget class="CurveWidget" name="plotVecV">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
+           <widget class="QGraphicsView" name="plotVecCorr"/>
           </item>
           <item>
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string>          w (m/s)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotVecW">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_15">
-            <property name="text">
-             <string>            Correlation (%)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotVecCorr">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>            SNR (dB)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotVecSNR">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
+           <widget class="QGraphicsView" name="plotVecSNR"/>
           </item>
          </layout>
         </item>
@@ -911,89 +778,19 @@
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <widget class="QLabel" name="label_FBG_1">
-            <property name="text">
-             <string>             Sensor 1</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
+           <widget class="PlotWidget" name="plot_FBG_1"/>
           </item>
           <item>
-           <widget class="CurveWidget" name="plot_FBG_1">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
+           <widget class="PlotWidget" name="plot_FBG_2"/>
           </item>
           <item>
-           <widget class="QLabel" name="label_FBG_2">
-            <property name="text">
-             <string>            Sensor 2</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
+           <widget class="PlotWidget" name="plot_FBG_3"/>
           </item>
           <item>
-           <widget class="CurveWidget" name="plot_FBG_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
+           <widget class="PlotWidget" name="plot_FBG_4"/>
           </item>
           <item>
-           <widget class="QLabel" name="label_FBG_3">
-            <property name="text">
-             <string>            Sensor 3</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plot_FBG_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_FBG_4">
-            <property name="text">
-             <string>            Sensor 4</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plot_FBG_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_FBG_5">
-            <property name="text">
-             <string>           Sensor 5</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plot_FBG_5">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
+           <widget class="PlotWidget" name="plot_FBG_5"/>
           </item>
          </layout>
         </item>
@@ -1564,6 +1361,11 @@
    <class>CurveWidget</class>
    <extends>QSplitter</extends>
    <header>guiqwt.plot</header>
+  </customwidget>
+  <customwidget>
+   <class>PlotWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>pyqtgraph</header>
   </customwidget>
  </customwidgets>
  <resources>

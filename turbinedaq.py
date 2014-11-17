@@ -45,17 +45,19 @@ from modules.mainwindow import *
 import json
 import guiqwt
 import time
-from scipy.io import savemat
-import xlrd
 import os
 import platform
 import subprocess
 from pxl import timeseries as ts
 import shutil
 import pandas as pd
+import pyqtgraph as pg
 
                   
 fluid_params = {"rho" : 1000.0}
+
+pg.setConfigOption('background', 'w')
+pg.setConfigOption('foreground', 'k')
 
 
 class MainWindow(QtGui.QMainWindow):
@@ -375,68 +377,57 @@ class MainWindow(QtGui.QMainWindow):
             self.label_acs_connect.setText(" Connected to ACS controller ")
             
     def initialize_plots(self):
-        # Torque trans plot
-        self.curve_torque_trans = guiqwt.curve.CurveItem()
-        self.plot_torque = self.ui.plotTorque.get_plot()
-        self.plot_torque.add_item(self.curve_torque_trans)
-        # Torque arm plot
-        self.curve_torque_arm = guiqwt.curve.CurveItem()
-        self.curve_torque_arm.setPen(QtGui.QPen(QtCore.Qt.red, 1))
-        self.plot_torque.add_item(self.curve_torque_arm)
+        # Torque plot
+        self.ui.plotTorque.setLabel('left', 'Torque', units='Nm')
+        self.ui.plotTorque.setLabel('bottom', 'Time', units='s')
         # Drag plot
-        self.curve_drag = guiqwt.curve.CurveItem()
-        self.plot_drag = self.ui.plotDrag.get_plot()
-        self.plot_drag.add_item(self.curve_drag)
+        self.ui.plotDrag.setLabel('left', 'Drag', units='N')
+        self.ui.plotDrag.setLabel('bottom', 'Time', units='s')
         # Drag left plot
-        self.curve_drag_left = guiqwt.curve.CurveItem()
-        self.curve_drag_left.setPen(QtGui.QPen(QtCore.Qt.darkGreen, 1))
-        self.plot_drag_left = self.ui.plotDragL.get_plot()
-        self.plot_drag_left.add_item(self.curve_drag_left)
+        self.ui.plotDragL.setLabel('left', 'Drag, Left', units='N')
+        self.ui.plotDragL.setLabel('bottom', 'Time', units='s')
         # Drag right plot
-        self.curve_drag_right = guiqwt.curve.CurveItem()
-        self.curve_drag_right.setPen(QtGui.QPen(QtCore.Qt.red, 1))
-        self.plot_drag_right = self.ui.plotDragR.get_plot()
-        self.plot_drag_right.add_item(self.curve_drag_right)
+        self.ui.plotDragR.setLabel('left', 'Drag, Right', units='N')
+        self.ui.plotDragR.setLabel('bottom', 'Time', units='s')
         # NI turbine RPM plot
-        self.curve_rpm_ni = guiqwt.curve.CurveItem()
-        self.plot_rpm_ni = self.ui.plotRPM_ni.get_plot()
-        self.plot_rpm_ni.add_item(self.curve_rpm_ni)
-        # Vectrino u plot
-        self.curve_vecu = guiqwt.curve.CurveItem()
-        self.plot_vecu = self.ui.plotVecU.get_plot()
-        self.plot_vecu.add_item(self.curve_vecu)
-        # Vectrino v plot
-        self.curve_vecv = guiqwt.curve.CurveItem()
-        self.plot_vecv = self.ui.plotVecV.get_plot()
-        self.plot_vecv.add_item(self.curve_vecv)
-        # Vectrino w plot
-        self.curve_vecw = guiqwt.curve.CurveItem()
-        self.plot_vecw = self.ui.plotVecW.get_plot()
-        self.plot_vecw.add_item(self.curve_vecw)
-        # Vectrino correlation plot
-        self.curve_vec_corr = guiqwt.curve.CurveItem()
-        self.plot_vec_corr = self.ui.plotVecCorr.get_plot()
-        self.plot_vec_corr.add_item(self.curve_vec_corr)
-        # Vectrino SNR plot
-        self.curve_vec_snr = guiqwt.curve.CurveItem()
-        self.plot_vec_snr = self.ui.plotVecSNR.get_plot()
-        self.plot_vec_snr.add_item(self.curve_vec_snr)
-        # ACS carriage speed plot
-        self.curve_acs_carvel = guiqwt.curve.CurveItem()
-        self.plot_acs_carvel = self.ui.plotTowSpeed.get_plot()
-        self.plot_acs_carvel.add_item(self.curve_acs_carvel)
-        # ACS turbine RPM plot
-        self.curve_acs_rpm = guiqwt.curve.CurveItem()
-        self.plot_acs_rpm = self.ui.plotRPM_acs.get_plot()
-        self.plot_acs_rpm.add_item(self.curve_acs_rpm)
-        # FBG plot 1
-        self.curve_fbg_1 = guiqwt.curve.CurveItem()
-        self.plot_fbg_1 = self.ui.plot_FBG_1.get_plot()
-        self.plot_fbg_1.add_item(self.curve_fbg_1)
-        # FBG plot 2
-        self.curve_fbg_2 = guiqwt.curve.CurveItem()
-        self.plot_fbg_2 = self.ui.plot_FBG_2.get_plot()
-        self.plot_fbg_2.add_item(self.curve_fbg_2)
+        self.ui.plotRPM_ni.setLabel('left', 'RPM', units='N')
+        self.ui.plotRPM_ni.setLabel('bottom', 'Time', units='s')
+#        # Vectrino u plot
+#        self.curve_vecu = guiqwt.curve.CurveItem()
+#        self.plot_vecu = self.ui.plotVecU.get_plot()
+#        self.plot_vecu.add_item(self.curve_vecu)
+#        # Vectrino v plot
+#        self.curve_vecv = guiqwt.curve.CurveItem()
+#        self.plot_vecv = self.ui.plotVecV.get_plot()
+#        self.plot_vecv.add_item(self.curve_vecv)
+#        # Vectrino w plot
+#        self.curve_vecw = guiqwt.curve.CurveItem()
+#        self.plot_vecw = self.ui.plotVecW.get_plot()
+#        self.plot_vecw.add_item(self.curve_vecw)
+#        # Vectrino correlation plot
+#        self.curve_vec_corr = guiqwt.curve.CurveItem()
+#        self.plot_vec_corr = self.ui.plotVecCorr.get_plot()
+#        self.plot_vec_corr.add_item(self.curve_vec_corr)
+#        # Vectrino SNR plot
+#        self.curve_vec_snr = guiqwt.curve.CurveItem()
+#        self.plot_vec_snr = self.ui.plotVecSNR.get_plot()
+#        self.plot_vec_snr.add_item(self.curve_vec_snr)
+#        # ACS carriage speed plot
+#        self.curve_acs_carvel = guiqwt.curve.CurveItem()
+#        self.plot_acs_carvel = self.ui.plotTowSpeed.get_plot()
+#        self.plot_acs_carvel.add_item(self.curve_acs_carvel)
+#        # ACS turbine RPM plot
+#        self.curve_acs_rpm = guiqwt.curve.CurveItem()
+#        self.plot_acs_rpm = self.ui.plotRPM_acs.get_plot()
+#        self.plot_acs_rpm.add_item(self.curve_acs_rpm)
+#        # FBG plot 1
+#        self.curve_fbg_1 = guiqwt.curve.CurveItem()
+#        self.plot_fbg_1 = self.ui.plot_FBG_1.get_plot()
+#        self.plot_fbg_1.add_item(self.curve_fbg_1)
+#        # FBG plot 2
+#        self.curve_fbg_2 = guiqwt.curve.CurveItem()
+#        self.plot_fbg_2 = self.ui.plot_FBG_2.get_plot()
+#        self.plot_fbg_2.add_item(self.curve_fbg_2)
         
     def on_start(self):
         """Start whatever is visible in the tab widget."""
@@ -893,19 +884,22 @@ class MainWindow(QtGui.QMainWindow):
         
     def update_plots_ni(self):
         t = self.nidata["t"]
-        self.curve_drag_left.set_data(t, self.nidata["drag_left"])
-        self.plot_drag_left.replot()
-        self.curve_torque_trans.set_data(t, self.nidata["torque_trans"])
-        self.curve_torque_arm.set_data(t, self.nidata["torque_arm"])        
-        self.plot_torque.replot()
-        self.curve_drag_right.set_data(t, self.nidata["drag_right"])
-        self.plot_drag_right.replot()
+        # Update left drag plot
+        dragl = self.nidata["drag_left"][:len(t)]
+        self.ui.plotDragL.plot(t, dragl, clear=True, pen="g")
+        # Update torque plots
+        torque_trans = self.nidata["torque_trans"][:len(t)]
+        torque_arm = self.nidata["torque_arm"][:len(t)]
+        self.ui.plotTorque.plot(t, torque_trans, clear=True, pen="k", grid=True)
+        self.ui.plotTorque.plot(t, torque_arm, clear=True, pen="r", grid=True)
+        # Update drag right plot
+        dragr = self.nidata["drag_right"][:len(t)]
+        self.ui.plotDragR.plot(t, dragr, pen="r", clear=True)
         if len(self.nidata["drag_left"]) == len(self.nidata["drag_right"]):
-            self.curve_drag.set_data(t, self.nidata["drag_left"]\
-                    +self.nidata["drag_right"])
-            self.plot_drag.replot()
-        self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
-        self.plot_rpm_ni.replot()
+            drag = dragr + dragl
+            self.ui.plotDrag.plot(t, drag, pen="k", clear=True)
+        rpm = self.nidata["turbine_rpm"][:len(t)]
+        self.ui.plotRPM_ni.plot(t, rpm, clear=True, pen="k")
         
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
