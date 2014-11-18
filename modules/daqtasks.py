@@ -230,13 +230,13 @@ class AcsDaqThread(QtCore.QThread):
         while self.collectdata:
             time.sleep(self.sleeptime)
             t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
-            newdata = acsc.readReal(self.hc, acsc.NONE, "data", 0, 2, 0, self.dblen/2-1)
+            newdata = acsc.readReal(self.hc, acsc.NONE, "data", 0, 2, 0, self.dblen//2-1)
             t = (newdata[0] - t0)/1000.0
             self.data["t"] = np.append(self.data["t"], t)
             self.data["carriage_vel"] = np.append(self.data["carriage_vel"], newdata[1])
             self.data["turbine_rpm"] = np.append(self.data["turbine_rpm"], newdata[2])
             time.sleep(self.sleeptime)
-            newdata = acsc.readReal(self.hc, acsc.NONE, "data", 0, 2, self.dblen/2, self.dblen-1)
+            newdata = acsc.readReal(self.hc, acsc.NONE, "data", 0, 2, self.dblen//2, self.dblen-1)
             t = (newdata[0] - t0)/1000.0
             self.data["t"] = np.append(self.data["t"], t)
             self.data["t"] = self.data["t"] - self.data["t"][0]
