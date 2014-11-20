@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'gui\mainwindow.ui'
 #
-# Created: Sun Nov 16 13:19:47 2014
-#      by: PyQt4 UI code generator 4.9.6
+# Created: Thu Nov 20 12:04:57 2014
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -33,7 +33,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/turbine.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/turbinedaq.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtGui.QWidget(MainWindow)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
@@ -656,39 +656,41 @@ class Ui_MainWindow(object):
         self.actionAbort.setObjectName(_fromUtf8("actionAbort"))
         self.actionEnable_Turbine = QtGui.QAction(MainWindow)
         self.actionEnable_Turbine.setCheckable(True)
-        self.actionEnable_Turbine.setIcon(icon)
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/turbine.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionEnable_Turbine.setIcon(icon6)
         self.actionEnable_Turbine.setObjectName(_fromUtf8("actionEnable_Turbine"))
         self.actionEnable_y = QtGui.QAction(MainWindow)
         self.actionEnable_y.setCheckable(True)
-        icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/agt_back.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionEnable_y.setIcon(icon6)
+        icon7 = QtGui.QIcon()
+        icon7.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/agt_back.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionEnable_y.setIcon(icon7)
         self.actionEnable_y.setObjectName(_fromUtf8("actionEnable_y"))
         self.actionEnable_z = QtGui.QAction(MainWindow)
         self.actionEnable_z.setCheckable(True)
-        icon7 = QtGui.QIcon()
-        icon7.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/up.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionEnable_z.setIcon(icon7)
+        icon8 = QtGui.QIcon()
+        icon8.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/up.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionEnable_z.setIcon(icon8)
         self.actionEnable_z.setObjectName(_fromUtf8("actionEnable_z"))
         self.actionEnable_All = QtGui.QAction(MainWindow)
         self.actionEnable_All.setCheckable(True)
-        icon8 = QtGui.QIcon()
-        icon8.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/button_ok.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionEnable_All.setIcon(icon8)
+        icon9 = QtGui.QIcon()
+        icon9.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/button_ok.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionEnable_All.setIcon(icon9)
         self.actionEnable_All.setObjectName(_fromUtf8("actionEnable_All"))
         self.actionMonitor_ACS = QtGui.QAction(MainWindow)
         self.actionMonitor_ACS.setCheckable(True)
-        icon9 = QtGui.QIcon()
-        icon9.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/acs.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionMonitor_ACS.setIcon(icon9)
+        icon10 = QtGui.QIcon()
+        icon10.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/acs.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionMonitor_ACS.setIcon(icon10)
         self.actionMonitor_ACS.setObjectName(_fromUtf8("actionMonitor_ACS"))
         self.actionAbout = QtGui.QAction(MainWindow)
         self.actionAbout.setObjectName(_fromUtf8("actionAbout"))
         self.actionMonitor_FBG = QtGui.QAction(MainWindow)
         self.actionMonitor_FBG.setCheckable(True)
-        icon10 = QtGui.QIcon()
-        icon10.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/micron.svg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionMonitor_FBG.setIcon(icon10)
+        icon11 = QtGui.QIcon()
+        icon11.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/micron.svg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionMonitor_FBG.setIcon(icon11)
         self.actionMonitor_FBG.setObjectName(_fromUtf8("actionMonitor_FBG"))
         self.actionNI_Signals = QtGui.QAction(MainWindow)
         self.actionNI_Signals.setCheckable(True)
@@ -877,4 +879,4 @@ class Ui_MainWindow(object):
         self.actionFBG.setText(_translate("MainWindow", "FBG", None))
 
 from guiqwt.plot import CurveWidget
-from . import resources_rc
+import resources_rc

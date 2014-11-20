@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="icons/resources.qrc">
-    <normaloff>:/icons/turbine.png</normaloff>:/icons/turbine.png</iconset>
+    <normaloff>:/icons/turbinedaq.png</normaloff>:/icons/turbinedaq.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -1352,7 +1352,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="icons/resources.qrc">
+    <iconset>
      <normaloff>:/icons/tow_icon_b.ico</normaloff>:/icons/tow_icon_b.ico</iconset>
    </property>
    <property name="text">

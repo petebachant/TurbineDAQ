@@ -1,12 +1,12 @@
 <RCC>
   <qresource prefix="icons">
+    <file>turbinedaq.png</file>
     <file>micron.svg</file>
     <file>acs.png</file>
     <file>pause.png</file>
     <file>button_cancel.png</file>
     <file>button_ok.png</file>
     <file>agt_back.png</file>
-    <file>tow_icon_b.ico</file>
     <file>up.png</file>
     <file>turbine.png</file>
     <file>stop_normal_red.png</file>
