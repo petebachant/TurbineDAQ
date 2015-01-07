@@ -3,34 +3,8 @@
 Created on Thu Aug 15 20:43:44 2013
 @author: Pete Bachant
 
-This is the TurbineDAQ main code.
+This is the TurbineDAQ main module.
 
-To-do:
-  * After "pausing" need some way to know a run is done to enable controls
-    rather than enabling them right away
-  * Add last couple of working directories to a dropdown list in directory
-    selection box
-  * Calculate statistics of various quantities during the run, including
-    C_P. Use a window of 3 seconds maybe.
-  * Make Vectrino stop thread
-  * Can't tell if a section is done
-  * Detect if Vec is saving to AQD, not VNO, then abort
-  * At end of section, set run button unchecked
-  * Change icon to top view of turbine
-  * Refresh button on test plan tab
-  * Allow scrolling while test plan is running
-    Looks like this will involve enabling the table widget, then making it
-    look disabled. 
-  * Abort does weird things if pressed too early in a run
-  * Highlight run in progress in table
-  * Should check if tow and turbine axes are enabled in order to start a run,
-    since they aren't enabled in the motion programs.
-  * Autoprocess functionality for processing last run.
-  * Checkboxes for enabling and disabling axes.
-  * Scroll to latest run that isn't done on opening test plan.
-  * Catch exceptions for autoprocessing so next run can begin. 
-  * Run numbers per section must start from zero or else things go wacky. 
-  * Doesn't end if section is done. 
 """
 
 from __future__ import division, print_function
