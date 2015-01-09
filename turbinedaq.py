@@ -81,6 +81,8 @@ class MainWindow(QtGui.QMainWindow):
         # Read turbine and fbg properties
         self.read_turbine_properties()
         self.read_fbg_properties()
+        # Add checkboxes to ACS table widget
+        self.add_acs_checkboxes()
         # Connect signals and slots
         self.connect_sigs_slots()
         # Set test plan visible in tab widget
@@ -237,6 +239,45 @@ class MainWindow(QtGui.QMainWindow):
             else:
                 text = QtGui.QTableWidgetItem("No")
             self.ui.tableWidgetTestPlan.setItem(n+1, -1, text)
+            
+    def add_acs_checkboxes(self):
+        """Add checkboxes for axes being enabled."""
+        self.checkbox_tow_axis = QtGui.QCheckBox()
+        self.checkbox_turbine_axis = QtGui.QCheckBox()
+        self.checkbox_y_axis = QtGui.QCheckBox()
+        self.checkbox_z_axis = QtGui.QCheckBox()
+        # Tow axis checkbox widget centering
+        widget_tow = QtGui.QWidget()
+        layout_tow = QtGui.QHBoxLayout(widget_tow)
+        layout_tow.addWidget(self.checkbox_tow_axis)
+        layout_tow.setAlignment(QtCore.Qt.AlignCenter)
+        layout_tow.setContentsMargins(0, 0, 0, 0)
+        widget_tow.setLayout(layout_tow)
+        # Turbine axis checkbox widget centering
+        widget_turbine = QtGui.QWidget()
+        layout_turbine = QtGui.QHBoxLayout(widget_turbine)
+        layout_turbine.addWidget(self.checkbox_turbine_axis)
+        layout_turbine.setAlignment(QtCore.Qt.AlignCenter)
+        layout_turbine.setContentsMargins(0, 0, 0, 0)
+        widget_turbine.setLayout(layout_turbine)
+        # y axis checkbox widget centering
+        widget_y = QtGui.QWidget()
+        layout_y = QtGui.QHBoxLayout(widget_y)
+        layout_y.addWidget(self.checkbox_y_axis)
+        layout_y.setAlignment(QtCore.Qt.AlignCenter)
+        layout_y.setContentsMargins(0, 0, 0, 0)
+        widget_y.setLayout(layout_y)
+        # z axis checkbox widget centering
+        widget_z = QtGui.QWidget()
+        layout_z = QtGui.QHBoxLayout(widget_z)
+        layout_z.addWidget(self.checkbox_z_axis)
+        layout_z.setAlignment(QtCore.Qt.AlignCenter)
+        layout_z.setContentsMargins(0, 0, 0, 0)
+        widget_z.setLayout(layout_z)
+        self.ui.tableWidget_acs.setCellWidget(0, 1, widget_tow)
+        self.ui.tableWidget_acs.setCellWidget(1, 1, widget_turbine)
+        self.ui.tableWidget_acs.setCellWidget(2, 1, widget_y)
+        self.ui.tableWidget_acs.setCellWidget(3, 1, widget_z)
         
     def connect_sigs_slots(self):
         """Connect signals to appropriate slots."""
@@ -262,6 +303,10 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.actionHome_z.triggered.connect(self.on_home_z)
         self.ui.commandLinkButton_process.clicked.connect(self.on_process)
         self.badvecdata.connect(self.on_badvecdata)
+        self.checkbox_tow_axis.clicked.connect(self.on_checkbox_tow_axis)
+        self.checkbox_turbine_axis.clicked.connect(self.on_checkbox_turbine_axis)
+        self.checkbox_y_axis.clicked.connect(self.on_checkbox_y_axis)
+        self.checkbox_z_axis.clicked.connect(self.on_checkbox_z_axis)
         
     def on_tbutton_wdir(self):
         self.wdir = QFileDialog.getExistingDirectory()
@@ -838,6 +883,30 @@ class MainWindow(QtGui.QMainWindow):
             self.fbgthread.stop()
             self.monitorfbg = False
     
+    def on_checkbox_tow_axis(self):
+        if self.checkbox_tow_axis.isChecked():
+            acsc.enable(self.hc, 5)
+        else:
+            acsc.disable(self.hc, 5)
+            
+    def on_checkbox_turbine_axis(self):
+        if self.checkbox_turbine_axis.isChecked():
+            acsc.enable(self.hc, 4)
+        else:
+            acsc.disable(self.hc, 4)
+            
+    def on_checkbox_y_axis(self):
+        if self.checkbox_y_axis.isChecked():
+            acsc.enable(self.hc, 0)
+        else:
+            acsc.disable(self.hc, 0)
+            
+    def on_checkbox_z_axis(self):
+        if self.checkbox_z_axis.isChecked():
+            acsc.enable(self.hc, 1)
+        else:
+            acsc.disable(self.hc, 1)
+    
     def on_timer(self):
         self.update_acs()
         self.time_since_last_run = time.time() - self.time_last_run
@@ -922,47 +991,34 @@ class MainWindow(QtGui.QMainWindow):
     def update_acs(self):
         """This function updates all the non-time-critical 
         ACS controller data"""
-        if acsc.getMotorState(self.hc, 0)["enabled"]:
-            self.enabled_axes["y"] = "Yes"
-        else:
-            self.enabled_axes["y"] = "No"
-        if acsc.getMotorState(self.hc, 1)["enabled"]:
-            self.enabled_axes["z"] = "Yes"
-        else:
-            self.enabled_axes["z"] = "No"            
-        if acsc.getMotorState(self.hc, 4)["enabled"]:
-            self.enabled_axes["turbine"] = "Yes"
-        else:
-            self.enabled_axes["turbine"] = "No"
-        if acsc.getMotorState(self.hc, 5)["enabled"]:
-            self.enabled_axes["tow"] = "Yes"
-        else:
-            self.enabled_axes["tow"] = "No"            
+        self.checkbox_y_axis.setChecked(acsc.getMotorState(self.hc, 0)["enabled"])
+        self.checkbox_z_axis.setChecked(acsc.getMotorState(self.hc, 1)["enabled"])
+        self.checkbox_turbine_axis.setChecked(acsc.getMotorState(self.hc, 4)["enabled"])
+        self.checkbox_tow_axis.setChecked(acsc.getMotorState(self.hc, 5)["enabled"])  
         # Put this data into table widget
-        self.ui.tableWidget_acs.setItem(0, 1, 
-                QtGui.QTableWidgetItem(str(self.enabled_axes["tow"])))
-        self.ui.tableWidget_acs.setItem(1, 1, 
-                QtGui.QTableWidgetItem(str(self.enabled_axes["turbine"])))
-        self.ui.tableWidget_acs.setItem(2, 1, 
-                QtGui.QTableWidgetItem(str(self.enabled_axes["y"])))
-        self.ui.tableWidget_acs.setItem(3, 1, 
-                QtGui.QTableWidgetItem(str(self.enabled_axes["z"])))
         hc_tow = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_tow")
         hc_turbine = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_AKD")
         hc_y = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_y")
         hc_z = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_z")
-        self.ui.tableWidget_acs.setItem(0, 2, QtGui.QTableWidgetItem(str(hc_tow)))
-        self.ui.tableWidget_acs.setItem(1, 2, QtGui.QTableWidgetItem(str(hc_turbine)))
-        self.ui.tableWidget_acs.setItem(2, 2, QtGui.QTableWidgetItem(str(hc_y)))
-        self.ui.tableWidget_acs.setItem(3, 2, QtGui.QTableWidgetItem(str(hc_z)))
-        self.ui.tableWidget_acs.setItem(0, 3, 
-                QtGui.QTableWidgetItem(str(acsc.getRPosition(self.hc, 5))))
-        self.ui.tableWidget_acs.setItem(1, 3, 
-                QtGui.QTableWidgetItem(str(acsc.getRPosition(self.hc, 4))))
-        self.ui.tableWidget_acs.setItem(2, 3, 
-                QtGui.QTableWidgetItem(str(acsc.getRPosition(self.hc, 0))))
-        self.ui.tableWidget_acs.setItem(3, 3, 
-                QtGui.QTableWidgetItem(str(acsc.getRPosition(self.hc, 1))))
+        self.ui.tableWidget_acs.item(0, 2).setText(str(hc_tow))
+        self.ui.tableWidget_acs.item(1, 2).setText(str(hc_turbine))
+        self.ui.tableWidget_acs.item(2, 2).setText(str(hc_y))
+        self.ui.tableWidget_acs.item(3, 2).setText(str(hc_z))
+        # Set reference position text
+        self.ui.tableWidget_acs.item(0, 3).setText(str(acsc.getRPosition(self.hc, 5)))
+        self.ui.tableWidget_acs.item(1, 3).setText(str(acsc.getRPosition(self.hc, 4)))
+        self.ui.tableWidget_acs.item(2, 3).setText(str(acsc.getRPosition(self.hc, 0)))
+        self.ui.tableWidget_acs.item(3, 3).setText(str(acsc.getRPosition(self.hc, 1)))
+        # Set feedback position text
+        self.ui.tableWidget_acs.item(0, 4).setText(str(acsc.getFPosition(self.hc, 5)))
+        self.ui.tableWidget_acs.item(1, 4).setText(str(acsc.getFPosition(self.hc, 4)))
+        self.ui.tableWidget_acs.item(2, 4).setText(str(acsc.getFPosition(self.hc, 0)))
+        self.ui.tableWidget_acs.item(3, 4).setText(str(acsc.getFPosition(self.hc, 1)))
+        # Set feedback velocity text
+        self.ui.tableWidget_acs.item(0, 5).setText(str(acsc.getFVelocity(self.hc, 5)))
+        self.ui.tableWidget_acs.item(1, 5).setText(str(acsc.getFVelocity(self.hc, 4)))
+        self.ui.tableWidget_acs.item(2, 5).setText(str(acsc.getFVelocity(self.hc, 0)))
+        self.ui.tableWidget_acs.item(3, 5).setText(str(acsc.getFVelocity(self.hc, 1)))
                 
     def save_raw_data(self, savedir, fname, datadict, verbose=True):
         """Saves a dict of raw data in HDF5 format."""
