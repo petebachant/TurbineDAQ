@@ -14,6 +14,7 @@ from . import daqtasks
 import time
 from PyQt4 import QtCore
 from pdcommpy import PdControl
+from subprocess import check_output
 
 class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
@@ -42,11 +43,14 @@ class TurbineTow(QtCore.QThread):
         self.autoaborted = False
         self.aborted = False
         
+        commit = check_output(["git", "rev-parse", "--verify", "HEAD"])[:-1]
+        
         self.metadata = {"Tow speed (m/s)" : U,
                          "Tip speed ratio" : tsr,
                          "Vectrino y/R" : y_R,
                          "Vectrino z/H" : z_H, 
-                         "Time created" : time.asctime()}
+                         "Time created" : time.asctime(),
+                         "TurbineDAQ version" : commit}
         
         if self.vectrino:
             self.vec = PdControl()
@@ -212,8 +216,11 @@ class TareDragRun(QtCore.QThread):
         self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
         self.acsdata = self.acsdaqthread.data
         
+        commit = check_output(["git", "rev-parse", "--verify", "HEAD"])[:-1]
+        
         self.metadata = {"Tow speed (m/s)" : U,
-                         "Time created" : time.asctime()}
+                         "Time created" : time.asctime(),
+                         "TurbineDAQ version" : commit}
             
         self.daqthread = daqtasks.NiDaqThread(usetrigger=True)
         self.nidata = self.daqthread.data
@@ -270,9 +277,12 @@ class TareTorqueRun(QtCore.QThread):
         self.acsdata = self.acsdaqthread.data
         self.vecsavepath = ""
         
+        commit = check_output(["git", "rev-parse", "--verify", "HEAD"])[:-1]
+        
         self.metadata = {"RPM" : rpm,
                          "Duration" : dur,
-                         "Time created" : time.asctime()}
+                         "Time created" : time.asctime(),
+                         "TurbineDAQ version" : commit}
         
         self.daqthread = daqtasks.NiDaqThread(usetrigger=True)
         self.nidata = self.daqthread.data
