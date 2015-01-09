@@ -155,8 +155,12 @@ class MainWindow(QtGui.QMainWindow):
             return False
     
     def is_section_done(self, section):
-        """Currently does not work."""
-        return False
+        """Detects if a test plan section is done."""
+        done = True
+        for nrun in self.test_plan[section]["run"]:
+            if not self.is_run_done(section, nrun):
+                done = False
+        return done
     
     def import_test_plan(self):
         """Imports test plan from CSVs in "Test plan" subdirectory"""
@@ -337,7 +341,8 @@ class MainWindow(QtGui.QMainWindow):
     def connect_to_controller(self):
         self.hc = acsc.openCommEthernetTCP()    
         if self.hc == acsc.INVALID:
-            print("Cannot connect to ACS controller. Attempting to connect to simulator...")
+            print("Cannot connect to ACS controller")
+            print("Attempting to connect to simulator")
             self.label_acs_connect.setText(" Not connected to ACS controller ")
             self.hc = acsc.openCommDirect()
             if self.hc == acsc.INVALID:
@@ -984,40 +989,6 @@ class MainWindow(QtGui.QMainWindow):
             self.vecthread.stop()
         if self.monitorfbg and not self.towinprogress:
             self.fbgthread.stop()
-
-def test_read_turbine_properties():
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    w = MainWindow()
-    w.read_turbine_properties()
-    print(w.turbine_properties)
-    sys.exit(app.exec_())
-    
-def test_save_raw_data():
-    """Test whether data is being saved correctly."""
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    w = MainWindow()
-    savedir = os.path.join(w.wdir, "data_save_test")
-    data = {"arange(5)" : np.arange(5), "zeros(5)" : np.zeros(5)}
-    w.save_raw_data(savedir, "testdata.h5", data)
-    try:
-        data = ts.loadhdf(os.path.join(savedir, "testdata.h5"))
-        shutil.rmtree(savedir)
-        print("test_save_raw_data passed")
-    except IOError:
-        print("test_save_raw_data failed")
-    sys.exit(app.exec_())
-    
-def test_import_test_plan():
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    w = MainWindow()
-    print("Test plan has {} sections".format(len(w.test_plan)))
-    for k,v in w.test_plan.items():
-        print(k + ":")
-        print(v)
-    sys.exit(app.exec_())
 
 def main():
     import sys
