@@ -222,6 +222,11 @@ class MainWindow(QtGui.QMainWindow):
                                     QtGui.QTableWidgetItem("No"))
                     elif str(section).lower() == "top level":
                         self.update_sections_done()
+                    self.ui.tableWidgetTestPlan.item(n, i).setTextAlignment(QtCore.Qt.AlignCenter)
+                    self.ui.tableWidgetTestPlan.item(n, i+1).setTextAlignment(QtCore.Qt.AlignCenter)
+            # Set column widths
+            self.ui.tableWidgetTestPlan.setColumnWidth(0, 31)
+            self.ui.tableWidgetTestPlan.setColumnWidth(len(paramlist), 43)
                                     
     def update_sections_done(self):
         for n in range(self.ui.tableWidgetTestPlan.rowCount()):
