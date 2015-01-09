@@ -42,7 +42,7 @@ class NiDaqThread(QtCore.QThread):
                      "torque_arm" : np.array([]),
                      "drag_left" : np.array([]),
                      "drag_right" : np.array([]),
-                     "t" : np.array([]),
+                     "time" : np.array([]),
                      "carriage_pos" : np.array([])}
         # Create one analog and one digital task
         # Probably should be a bridge task in there too!
@@ -149,7 +149,7 @@ class NiDaqThread(QtCore.QThread):
                                                 data[:,2], axis=0)
             self.data["drag_right"] = np.append(self.data["drag_right"], 
                                                 data[:,3], axis=0)
-            self.data["t"] = np.arange(len(self.data["torque_trans"]), 
+            self.data["time"] = np.arange(len(self.data["torque_trans"]), 
                                        dtype=float)/self.sr                                                
             carpos, cpoints = daqmx.ReadCounterF64(self.carpostask,
                                                    self.nsamps, 10.0,
@@ -163,7 +163,7 @@ class NiDaqThread(QtCore.QThread):
                                                    turbang)
             self.data["turbine_rpm"] \
                 = ts.smooth(fdiff.second_order_diff(self.data["turbine_angle"], 
-                                          self.data["t"])/6.0, 50)
+                                          self.data["time"])/6.0, 50)
             return 0 # The function should return an integer
             
         # Convert the python callback function to a CFunction
@@ -213,11 +213,12 @@ class AcsDaqThread(QtCore.QThread):
         self.collectdata = True
         self.data = {"carriage_vel" : np.array([]),
                      "turbine_rpm" : np.array([]),
-                     "t" : np.array([])}
+                     "time" : np.array([])}
         self.dblen = bufflen
         self.sr = sample_rate
         self.sleeptime = float(self.dblen)/float(self.sr)/2*1.05
         self.makeprg = makeprg
+
     def run(self):
         if self.makeprg:
             self.makedaqprg()
@@ -232,16 +233,17 @@ class AcsDaqThread(QtCore.QThread):
             t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
             newdata = acsc.readReal(self.hc, acsc.NONE, "data", 0, 2, 0, self.dblen//2-1)
             t = (newdata[0] - t0)/1000.0
-            self.data["t"] = np.append(self.data["t"], t)
+            self.data["time"] = np.append(self.data["time"], t)
             self.data["carriage_vel"] = np.append(self.data["carriage_vel"], newdata[1])
             self.data["turbine_rpm"] = np.append(self.data["turbine_rpm"], newdata[2])
             time.sleep(self.sleeptime)
             newdata = acsc.readReal(self.hc, acsc.NONE, "data", 0, 2, self.dblen//2, self.dblen-1)
             t = (newdata[0] - t0)/1000.0
-            self.data["t"] = np.append(self.data["t"], t)
-            self.data["t"] = self.data["t"] - self.data["t"][0]
+            self.data["time"] = np.append(self.data["time"], t)
+            self.data["time"] = self.data["time"] - self.data["time"][0]
             self.data["carriage_vel"] = np.append(self.data["carriage_vel"], newdata[1])
             self.data["turbine_rpm"] = np.append(self.data["turbine_rpm"], newdata[2])
+
     def makedaqprg(self):
         """Create an ACSPL+ program to load into the controller"""
         self.prg = prgs.ACSPLplusPrg()
@@ -254,6 +256,7 @@ class AcsDaqThread(QtCore.QThread):
         self.prg.addline("TILL collect_data = 0")
         self.prg.addline("STOPDC")
         self.prg.addstopline()
+
     def stop(self):
         self.collectdata = False
         try:
@@ -277,16 +280,17 @@ class FbgDaqThread(QtCore.QThread):
         self.metadata = {}
         self.metadata["Data interleave"] = self.interr.data_interleave
         self.data = self.interr.data
+
     def run(self):
         while self.collectdata:
             self.interr.get_data()
             self.interr.sleep()
         self.interr.disconnect()
+
     def stop(self):
         self.collectdata = False
         self.metadata["Triggering mode"] = self.interr.data_header["Triggering mode"]
 
 
 if __name__ == "__main__":
-    spam = NiDaqThread(False)
-    spam.clear()
+    pass

@@ -859,14 +859,14 @@ class MainWindow(QtGui.QMainWindow):
     
     def update_plots_acs(self):
         """Update the acs plots for carriage speed, rpm, and tsr"""
-        t = self.acsdata["t"]
+        t = self.acsdata["time"]
         self.curve_acs_carvel.set_data(t, self.acsdata["carriage_vel"])
         self.plot_acs_carvel.replot()
         self.curve_acs_rpm.set_data(t, self.acsdata["turbine_rpm"])
         self.plot_acs_rpm.replot()
         
     def update_plots_ni(self):
-        t = self.nidata["t"]
+        t = self.nidata["time"]
         self.curve_drag_left.set_data(t, self.nidata["drag_left"])
         self.plot_drag_left.replot()
         self.curve_torque_trans.set_data(t, self.nidata["torque_trans"])
@@ -883,7 +883,7 @@ class MainWindow(QtGui.QMainWindow):
         
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
-        t = self.vecdata["t"]
+        t = self.vecdata["time"]
         if len(t) > 400 and len(t) < 600 and self.towinprogress:
             if len(np.where(np.abs(self.vecdata["u"][:450]) > 0.5)[0]) > 50:
                 self.badvecdata.emit()
