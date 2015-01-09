@@ -19,8 +19,8 @@ from subprocess import check_output
 class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
     def __init__(self, acs_hcomm, U, tsr, y_R, z_H, 
-                 R=0.5, H=1.0, nidaq=True, vectrino=True, vecsavepath="",
-                 fbg=False, fbg_prop_fpath="./"):
+                 turbine_properties, nidaq=True, vectrino=True, vecsavepath="",
+                 fbg=False, fbg_properties={}):
         """Turbine tow run object."""
         QtCore.QThread.__init__(self)        
         self.hc = acs_hcomm
@@ -28,8 +28,8 @@ class TurbineTow(QtCore.QThread):
         self.tsr = tsr
         self.y_R = y_R
         self.z_H = z_H
-        self.R = R
-        self.H = H
+        self.R = turbine_properties["radius"]
+        self.H = turbine_properties["height"]
         self.vectrino = vectrino
         self.nidaq = nidaq 
         self.fbg = fbg
@@ -62,7 +62,7 @@ class TurbineTow(QtCore.QThread):
             self.metadata["NI metadata"] = self.daqthread.metadata
         
         if self.fbg:
-            self.fbgthread = daqtasks.FbgDaqThread(fbg_prop_fpath, self.usetrigger)
+            self.fbgthread = daqtasks.FbgDaqThread(fbg_properties, self.usetrigger)
             self.metadata["FBG metadata"] = self.fbgthread.metadata
         
     def build_acsprg(self):

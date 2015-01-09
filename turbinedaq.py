@@ -529,14 +529,14 @@ class MainWindow(QtGui.QMainWindow):
         if acsc.getMotorState(self.hc, 5)["enabled"]:
             self.abort = False
             vecsavepath = os.path.join(self.savesubdir, "vecdata")
-            radius = self.turbine_properties[turbine]["radius"]
-            height = self.turbine_properties[turbine]["height"]
+            turbine_properties = self.turbine_properties[turbine]
             self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
                     nidaq=True, vectrino=vectrino, vecsavepath=vecsavepath,
-                    R=radius, H=height, fbg=fbg, fbg_prop_fpath=self.fbg_prop_fpath)
+                    turbine_properties=turbine_properties, fbg=fbg, 
+                    fbg_properties=self.fbg_properties)
             self.turbinetow.towfinished.connect(self.on_tow_finished)
             self.turbinetow.metadata["Name"] = self.currentname
-            self.turbinetow.metadata["Turbine"] = self.turbine_properties[turbine]
+            self.turbinetow.metadata["Turbine"] = turbine_properties
             self.turbinetow.metadata["Turbine"]["Name"] = turbine
             self.acsdata = self.turbinetow.acsdaqthread.data
             self.nidata = self.turbinetow.daqthread.data
