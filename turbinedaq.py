@@ -19,7 +19,6 @@ from modules.mainwindow import *
 import json
 import guiqwt
 import time
-from scipy.io import savemat
 import xlrd
 import os
 import platform
@@ -27,7 +26,7 @@ import subprocess
 from pxl import timeseries as ts
 import shutil
 import pandas as pd
-
+import scipy.interpolate
                   
 fluid_params = {"rho" : 1000.0}
 
@@ -751,21 +750,15 @@ class MainWindow(QtGui.QMainWindow):
                 # Move y and z axes to next location if applicable?
                 if self.turbinetow.autoaborted:
                     idlesec = 5
-                elif self.turbinetow.U <= 0.4:
-                    idlesec = 150
-                elif self.turbinetow.U <= 0.6:
-                    idlesec = 180
-                elif self.turbinetow.U <= 0.8:
-                    idlesec = 210
-                elif self.turbinetow.U <= 1.0:
-                    idlesec = 240
-                elif self.turbinetow.U <= 1.2:
-                    idlesec = 300
-                elif self.turbinetow.U <= 1.4:
-                    idlesec = 360
                 else:
-                    idlesec = 480
-                print("Waiting " + str(idlesec) + " seconds until next run...")
+                    tow_speed = self.turbinetow.U
+                    stpath = os.path.join(self.wdir, "Config", 
+                                          "settling_times.csv")
+                    stdf = pd.read_csv(stpath)
+                    f_interp = scipy.interpolate.interp1d(stdf.tow_speed,
+                                                          stdf.settling_time)
+                    idlesec = f_interp(tow_speed)
+                print("Waiting " + str(idlesec) + " seconds until next run")
                 QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
                 # Scroll test plan so completed run is in view
                 try:
