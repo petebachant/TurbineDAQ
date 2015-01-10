@@ -171,9 +171,9 @@ class TurbineTow(QtCore.QThread):
             self.vec.stop()
             self.vec.disconnect()
         print("Tow finished")
-        if self.vec.state == "Not connected":
-            self.vecstatus = "Vectrino disconnected "
         if self.vectrino:
+            if self.vec.state == "Not connected":
+                self.vecstatus = "Vectrino disconnected "
             print("Resetting Vectrino")
             self.reset_vec()
         self.towfinished.emit()
