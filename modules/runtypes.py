@@ -324,32 +324,6 @@ class TareTorqueRun(QtCore.QThread):
         self.aborted = True
 
 
-## Classes that won't be used for now ##
-class MultiTurbineTow(object):
-    def __init__(self, testplandict):
-        pass
-
-class WakeTraverse(object):
-    def __init__(self, towspeed, tsr, y_H_array, z_H):
-        pass
-    
-class WakeMap(object):
-    """An array of wake traverses."""
-
-class PowerCurve(object):
-    """An array of turbine tows."""
-    def __init__(self, towspeed, tsr_start, tsr_stop, tsr_step):
-        pass
-    
-    def start(self):
-        pass
-    
-    def plot(self):
-        """Plots a power curve."""
-        pass
-## ----------------------------------- ##
-
-
 def main():
     hc = acsc.openCommDirect()
     run = TurbineTow(hc, 1.0, 1.5, 0.0, 0.25, vectrino=False, nidaq=False)
