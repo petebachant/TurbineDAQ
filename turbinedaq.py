@@ -778,10 +778,6 @@ class MainWindow(QtGui.QMainWindow):
         self.nidata = {}
         self.acsdata = {}
         self.fbgdata = {}
-        self.turbinetow.vec.data = {}
-        self.turbinetow.vec = None
-        self.turbinetow.deleteLater()
-        self.turbinetow = None
         
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():
