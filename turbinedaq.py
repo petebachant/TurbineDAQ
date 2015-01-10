@@ -579,7 +579,7 @@ class MainWindow(QtGui.QMainWindow):
         
     def do_turbine_tow(self, U, tsr, y_R, z_H, turbine="RVAT", 
                        vectrino=True, fbg=False, settling=False):
-        """Exectutes a single turbine tow"""
+        """Executes a single turbine tow."""
         if acsc.getMotorState(self.hc, 5)["enabled"]:
             self.abort = False
             vecsavepath = os.path.join(self.savesubdir, "vecdata")
