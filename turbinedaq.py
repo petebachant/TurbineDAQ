@@ -610,6 +610,9 @@ class MainWindow(QtGui.QMainWindow):
             text = str(self.label_runstatus.text()).split()
             text = " ".join(text[:3])
             self.label_runstatus.setText(text + " cannot start ")
+            self.ui.actionStart.trigger()
+            msg = "Run cannot start because the tow axis is disabled."
+            info = QtGui.QMessageBox.information(self, "Cannot Start", msg)
         
     def do_tare_drag_tow(self, U):
         """Executes a single tare drag run"""
@@ -736,7 +739,7 @@ class MainWindow(QtGui.QMainWindow):
                          self.wdir+"/processing.py", section, nrun], shell=True)
         elif self.turbinetow.aborted:
             quit_msg = "Delete files from aborted run?"
-            reply = QtGui.QMessageBox.question(self, 'Run Aborted', 
+            reply = QtGui.QMessageBox.question(self, "Run Aborted", 
                      quit_msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
             if reply == QtGui.QMessageBox.Yes:
                 shutil.rmtree(self.savesubdir)
