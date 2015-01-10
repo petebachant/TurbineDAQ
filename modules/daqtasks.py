@@ -277,7 +277,7 @@ class FbgDaqThread(QtCore.QThread):
         self.interr.zero_strain_sensors()
         self.interr.set_trigger_defaults(usetrigger)
         self.collectdata = True
-        self.metadata = {}
+        self.metadata = fbg_props
         self.metadata["Data interleave"] = self.interr.data_interleave
         self.data = self.interr.data
 
