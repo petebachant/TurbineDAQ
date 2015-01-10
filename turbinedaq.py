@@ -530,7 +530,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorvec = False
         if self.ui.actionStart.isChecked():
             self.ui.actionStart.setChecked(False)
-            print("Aborting current run...")
+            print("Aborting current run")
             text = str(self.label_runstatus.text())
             self.label_runstatus.setText(text[:-13] + " aborted ")
         if self.ui.actionMonitor_ACS.isChecked():
@@ -567,7 +567,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitoracs = False
         self.monitorvec = False
         self.monitorfbg = False
-        print("Automatically aborting current run...")
+        print("Automatically aborting current run")
         text = str(self.label_runstatus.text())
         self.label_runstatus.setText(text[:-13] + " autoaborted ")
         self.turbinetow.autoabort()
@@ -684,7 +684,7 @@ class MainWindow(QtGui.QMainWindow):
                     idlesec = 90
                 else:
                     idlesec = 120
-                print("Waiting " + str(idlesec) + " seconds until next run...")
+                print("Waiting " + str(idlesec) + " seconds until next run")
                 QtCore.QTimer.singleShot(idlesec*1000, self.on_idletimer)
                 # Scroll test plan so completed run is in view
                 try:
@@ -712,7 +712,7 @@ class MainWindow(QtGui.QMainWindow):
         savedir = self.savesubdir
         if not self.turbinetow.aborted and not self.turbinetow.autoaborted:
             # Create directory and save the data inside
-            print("Saving to " + savedir + "...")
+            print("Saving to " + savedir)
             nidata = dict(self.nidata)
             if "turbine_rpm" in nidata:
                 del nidata["turbine_rpm"]
@@ -740,7 +740,7 @@ class MainWindow(QtGui.QMainWindow):
             if reply == QtGui.QMessageBox.Yes:
                 shutil.rmtree(self.savesubdir)
         elif self.turbinetow.autoaborted:
-            print("Deleting files from aborted run...")
+            print("Deleting files from aborted run")
             shutil.rmtree(self.savesubdir)
         # Update test plan table
         self.test_plan_into_table()
