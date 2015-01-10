@@ -20,7 +20,7 @@ class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
     def __init__(self, acs_hcomm, U, tsr, y_R, z_H, 
                  turbine_properties, nidaq=True, vectrino=True, vecsavepath="",
-                 fbg=False, fbg_properties={}):
+                 fbg=False, fbg_properties={}, settling=False):
         """Turbine tow run object."""
         QtCore.QThread.__init__(self)        
         self.hc = acs_hcomm
@@ -42,6 +42,7 @@ class TurbineTow(QtCore.QThread):
         self.vecstatus = "Vectrino disconnected "
         self.autoaborted = False
         self.aborted = False
+        self.settling = settling
         
         commit = check_output(["git", "rev-parse", "--verify", "HEAD"])[:-1]
         
@@ -162,6 +163,9 @@ class TurbineTow(QtCore.QThread):
             self.daqthread.clear()
             print("NI tasks cleared")
         if self.vectrino:
+            if self.settling:
+                # Wait 10 minutes to measure tank settling time
+                self.sleep(600)
             if self.recordvno:
                 self.vec.stop_disk_recording()
             self.vec.stop()
@@ -170,7 +174,7 @@ class TurbineTow(QtCore.QThread):
         if self.vec.state == "Not connected":
             self.vecstatus = "Vectrino disconnected "
         if self.vectrino:
-            print("Resetting Vectrino...")
+            print("Resetting Vectrino")
             self.reset_vec()
         self.towfinished.emit()
         
@@ -203,7 +207,7 @@ class TurbineTow(QtCore.QThread):
         acsc.toPoint(self.hc, None, 4, 0.0)
         acsc.setVelocity(self.hc, 5, 0.5)
         acsc.toPoint(self.hc, None, 5, 0.0)
-    
+
 
 class TareDragRun(QtCore.QThread):
     runfinished = QtCore.pyqtSignal()

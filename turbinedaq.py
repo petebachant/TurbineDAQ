@@ -578,7 +578,7 @@ class MainWindow(QtGui.QMainWindow):
                             vectrino=vectrino, fbg=fbg)
         
     def do_turbine_tow(self, U, tsr, y_R, z_H, turbine="RVAT", 
-                       vectrino=True, fbg=False):
+                       vectrino=True, fbg=False, settling=False):
         """Exectutes a single turbine tow"""
         if acsc.getMotorState(self.hc, 5)["enabled"]:
             self.abort = False
@@ -587,7 +587,8 @@ class MainWindow(QtGui.QMainWindow):
             self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
                     nidaq=True, vectrino=vectrino, vecsavepath=vecsavepath,
                     turbine_properties=turbine_properties, fbg=fbg, 
-                    fbg_properties=self.fbg_properties)
+                    fbg_properties=self.fbg_properties,
+                    settling=settling)
             self.turbinetow.towfinished.connect(self.on_tow_finished)
             self.turbinetow.metadata["Name"] = self.currentname
             self.turbinetow.metadata["Turbine"] = turbine_properties
@@ -831,7 +832,9 @@ class MainWindow(QtGui.QMainWindow):
                     fbg = run_df["fbg"]
                 except KeyError:
                     fbg = False
-                self.do_turbine_tow(U, tsr, vectrino, y_R, z_H, fbg)
+                settling = "settling" in section.lower()
+                self.do_turbine_tow(U, tsr, vectrino, y_R, z_H, fbg, 
+                                    settling=settling)
         else:
             print("'{}' is done".format(section))
             self.ui.actionStart.trigger()
