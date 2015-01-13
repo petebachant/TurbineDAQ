@@ -47,5 +47,33 @@ def test_is_section_done():
     print("PASS")
     sys.exit(app.exec_())
     
+def test_autoprocess():
+    print("Testing autoprocessing functionality")
+    app = QtGui.QApplication(sys.argv)
+    w = MainWindow()
+    w.wdir = os.path.join(os.getcwd(), "test")
+    print(w.wdir)
+    w.turbinetow = pd.DataFrame()
+    w.turbinetow.metadata = {"test" : [1]}
+    w.turbinetow.vectrino = False
+    w.turbinetow.fbg = False
+    w.turbinetow.aborted = False
+    w.turbinetow.autoaborted = False
+    w.savesubdir = "test/Data/Raw/test/0"
+    w.nidata = {"test" : np.zeros(10)}
+    w.acsdata = {"test" : np.zeros(10)}
+    w.currentrun = 0
+    if os.path.isfile("test/Data/Raw/test/0/acsdata.h5"):
+        os.remove("test/Data/Raw/test/0/acsdata.h5")
+    if os.path.isfile("test/Data/Raw/test/0/nidata.h5"):
+        os.remove("test/Data/Raw/test/0/nidata.h5")
+    w.on_tow_finished()
+    if os.path.isfile("test/Data/Raw/test/0/acsdata.h5"):
+        os.remove("test/Data/Raw/test/0/acsdata.h5")
+    if os.path.isfile("test/Data/Raw/test/0/nidata.h5"):
+        os.remove("test/Data/Raw/test/0/nidata.h5")
+    print("PASS")
+    sys.exit(app.exec_())
+    
 if __name__ == "__main__":
-    test_is_section_done()
+    test_autoprocess()

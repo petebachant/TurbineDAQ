@@ -54,6 +54,7 @@ class MainWindow(QtGui.QMainWindow):
         self.autoprocess = True
         self.enabled_axes = {}
         self.test_plan = {}
+        self.turbinetow = None
         
         # Add file path combobox to toolbar
         self.line_edit_wdir = QtGui.QLineEdit()
@@ -736,7 +737,7 @@ class MainWindow(QtGui.QMainWindow):
                 section = str(self.ui.comboBox_testPlanSection.currentText())
                 nrun = str(self.currentrun)
                 subprocess.call(["cd", self.wdir, "&", "python", 
-                         self.wdir+"/processing.py", section, nrun], shell=True)
+                                 "run.py", "process", section, nrun], shell=True)
         elif self.turbinetow.aborted:
             quit_msg = "Delete files from aborted run?"
             reply = QtGui.QMessageBox.question(self, "Run Aborted", 
@@ -1059,6 +1060,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-#    test_read_turbine_properties()
-#    test_save_raw_data()
-#    test_import_test_plan()

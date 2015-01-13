@@ -2,3 +2,4 @@ settings/settings.json
 sync.ffs_db
 *.pyc
 *.vno
+*.h5
