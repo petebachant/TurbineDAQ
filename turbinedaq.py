@@ -772,8 +772,7 @@ class MainWindow(QtGui.QMainWindow):
                 except:
                     pass
         else: 
-            self.ui.actionStart.setChecked(False)
-            self.on_start()
+            self.ui.actionStart.trigger()
         self.vecdata = {}
         self.nidata = {}
         self.acsdata = {}
