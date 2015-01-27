@@ -736,8 +736,11 @@ class MainWindow(QtGui.QMainWindow):
             if self.autoprocess:
                 section = str(self.ui.comboBox_testPlanSection.currentText())
                 nrun = str(self.currentrun)
-                subprocess.call(["cd", self.wdir, "&", "python", 
-                                 "run.py", "process", section, nrun], shell=True)
+                print("Autoprocessing", section, "run", nrun)
+                pycmd = "from Modules import processing; " + \
+                        "print(processing.process_run('{}',{}))".format(section, nrun)
+                cmdlist = ["cd", self.wdir, "&", "python", "-c", pycmd]
+                subprocess.call(cmdlist, shell=True)
         elif self.turbinetow.aborted:
             quit_msg = "Delete files from aborted run?"
             reply = QtGui.QMessageBox.question(self, "Run Aborted", 
