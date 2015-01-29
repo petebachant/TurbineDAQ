@@ -604,26 +604,28 @@ class MainWindow(QtGui.QMainWindow):
             except WindowsError:
                 print("Save subdirectory already exists")
                 print("Files will be overwritten")
+            # Get parameters from test plan
+            run_props = self.test_plan[section]
+            run_props = run_props[run_props.run == nextrun].iloc[0]
             if section.lower() == "tare drag":
-                U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
-                self.do_tare_drag_tow(U)
+                self.do_tare_drag_tow(run_props.tow_speed)
             elif section.lower() == "tare torque":
-                rpm = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
-                dur = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
+                rpm = run_props.rpm
+                dur = run_props.dur
                 self.do_tare_torque_run(rpm, dur)
             else:
-                run_df = self.test_plan[section]
-                run_df = run_df[run_df.run == nextrun].iloc[0]
-                U = run_df.tow_speed
-                tsr = run_df.tsr
-                vectrino = run_df.vectrino
-                if vectrino:
-                    y_R = run_df.y_R
-                    z_H = run_df.z_H
+                # Do turbine tow
+                U = run_props.tow_speed
+                tsr = run_props.tsr
+                if "vectrino" in run_props:
+                    vectrino = run_props.vectrino
+                    y_R = run_props.y_R
+                    z_H = run_props.z_H
                 else:
                     y_R = z_H = None
+                    vectrino = True
                 try: 
-                    fbg = run_df["fbg"]
+                    fbg = run_props["fbg"]
                 except KeyError:
                     fbg = False
                 settling = "settling" in section.lower()
