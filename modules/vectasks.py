@@ -14,7 +14,7 @@ class VectrinoThread(QtCore.QThread):
     """Thread for running Vectrino"""
     collecting = QtCore.pyqtSignal()
     connectsignal = QtCore.pyqtSignal(bool)
-    def __init__(self, maxvel=2.5, usetrigger=True, record=False):
+    def __init__(self, maxvel=2.5, usetrigger=True, record=False, salinity=0.0):
         QtCore.QThread.__init__(self)
         print("Vectrino thread initialized")
         self.vec = PdControl()
@@ -27,6 +27,7 @@ class VectrinoThread(QtCore.QThread):
         self.savepath = ""
         self.vecstatus = "Vectrino disconnected "
         self.enable = True
+        self.salinity = salinity
         print("Vectrino thread init done")
         
     def setconfig(self):
@@ -36,7 +37,7 @@ class VectrinoThread(QtCore.QThread):
         self.vec.sample_rate = 200 
         self.vec.transmit_length = 3
         self.vec.sampling_volume = 3
-        self.vec.salinity = 0.0
+        self.vec.salinity = self.salinity
         self.vec.power_level = "High"
         if self.maxvel <= 4.0 and self.maxvel > 2.5:
             self.vec.vel_range = 0

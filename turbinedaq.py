@@ -78,8 +78,9 @@ class MainWindow(QtGui.QMainWindow):
         self.initialize_plots()
         # Import test plan
         self.import_test_plan()
-        # Read turbine and fbg properties
+        # Read turbine, vectrino, and fbg properties
         self.read_turbine_properties()
+        self.read_vectrino_properties()
         self.read_fbg_properties()
         # Add checkboxes to ACS table widget
         self.add_acs_checkboxes()
@@ -138,7 +139,17 @@ class MainWindow(QtGui.QMainWindow):
             print("No turbine properties file found")
             self.turbine_properties = {"RVAT" : {"radius" : 0.5,
                                                  "height" : 1.0}}
-                                                 
+
+    def read_vectrino_properties(self):
+        fpath = os.path.join(self.wdir, "Config", "vectrino_properties.json")
+        try:
+            with open(fpath) as f:
+                vecprops = json.load(f)
+                self.vec_salinity = vecprops["salinity"]
+            print("Vectrino properties loaded")
+        except IOError:
+            self.vec_salinity = 0.0
+
     def read_fbg_properties(self):
         fpath = os.path.join(self.wdir, "Config", "fbg_properties.json")
         try:
@@ -646,7 +657,7 @@ class MainWindow(QtGui.QMainWindow):
                     nidaq=True, vectrino=vectrino, vecsavepath=vecsavepath,
                     turbine_properties=turbine_properties, fbg=fbg, 
                     fbg_properties=self.fbg_properties,
-                    settling=settling)
+                    settling=settling, vec_salinity=self.vec_salinity)
             self.turbinetow.towfinished.connect(self.on_tow_finished)
             self.turbinetow.metadata["Name"] = self.currentname
             self.turbinetow.metadata["Turbine"] = turbine_properties
@@ -867,8 +878,7 @@ class MainWindow(QtGui.QMainWindow):
     def on_monitor_vec(self):
         if self.ui.actionMonitor_Vectrino.isChecked():
             self.vecthread = vectasks.VectrinoThread(usetrigger=False, 
-                                                     maxvel=0.5,
-                                                     record=False)
+                    maxvel=0.5, record=False, salinity=self.vec_salinity)
             self.vecdata = self.vecthread.vecdata
             self.vecthread.start()
             self.monitorvec = True

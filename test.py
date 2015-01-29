@@ -11,6 +11,7 @@ import sys
 def test_read_turbine_properties():
     app = QtGui.QApplication(sys.argv)
     w = MainWindow()
+    w.wdir = os.path.join(os.getcwd(), "test")
     w.read_turbine_properties()
     print(w.turbine_properties)
     sys.exit(app.exec_())
@@ -75,5 +76,19 @@ def test_autoprocess():
     print("PASS")
     sys.exit(app.exec_())
     
+def test_read_vec_salinity():
+    """
+    Tests if the salinity for the Vectrino can be read and set from
+    `Config/vectrino_properties.json`.
+    """
+    print("Testing the ability to read vectrino salinity")
+    app = QtGui.QApplication(sys.argv)
+    w = MainWindow()
+    w.wdir = os.path.join(os.getcwd(), "test")
+    assert(w.vec_salinity==6.6)
+    print("PASS")
+    sys.exit(app.exec_())
+    
 if __name__ == "__main__":
-    test_autoprocess()
+#    test_autoprocess()
+    test_read_vec_salinity()

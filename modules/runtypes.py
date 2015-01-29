@@ -20,7 +20,7 @@ class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
     def __init__(self, acs_hcomm, U, tsr, y_R, z_H, 
                  turbine_properties, nidaq=True, vectrino=True, vecsavepath="",
-                 fbg=False, fbg_properties={}, settling=False):
+                 fbg=False, fbg_properties={}, settling=False, vec_salinity=0.0):
         """Turbine tow run object."""
         QtCore.QThread.__init__(self)        
         self.hc = acs_hcomm
@@ -43,6 +43,7 @@ class TurbineTow(QtCore.QThread):
         self.autoaborted = False
         self.aborted = False
         self.settling = settling
+        self.vec_salinity = vec_salinity
         
         commit = check_output(["git", "rev-parse", "--verify", "HEAD"])[:-1]
         
@@ -80,7 +81,7 @@ class TurbineTow(QtCore.QThread):
         self.vec.power_level = "High"
         self.vec.transmit_length = 3
         self.vec.sampling_volume = 3
-        self.vec.salinity = 0.0
+        self.vec.salinity = self.vec_salinity
         
         if self.maxvel <= 4.0 and self.maxvel > 2.5:
             self.vec.vel_range = 0
@@ -95,6 +96,8 @@ class TurbineTow(QtCore.QThread):
                 self.vec.sample_rate
         self.metadata["Vectrino metadata"]["Coordinate system"] = \
                 self.vec.coordinate_system
+        self.metadata["Vectrino metadata"]["Salinity (ppt)"] = \
+                self.vec.salinity
         print("Vectrino configuration set")
 
     def run(self):
