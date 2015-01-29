@@ -37,6 +37,7 @@ class VectrinoThread(QtCore.QThread):
         self.vec.sample_rate = 200 
         self.vec.transmit_length = 3
         self.vec.sampling_volume = 3
+        self.vec.sound_speed_mode = "measured"
         self.vec.salinity = self.salinity
         self.vec.power_level = "High"
         if self.maxvel <= 4.0 and self.maxvel > 2.5:

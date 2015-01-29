@@ -81,6 +81,7 @@ class TurbineTow(QtCore.QThread):
         self.vec.power_level = "High"
         self.vec.transmit_length = 3
         self.vec.sampling_volume = 3
+        self.vec.sound_speed_mode = "measured"
         self.vec.salinity = self.vec_salinity
         
         if self.maxvel <= 4.0 and self.maxvel > 2.5:
