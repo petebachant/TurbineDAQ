@@ -577,6 +577,61 @@ class MainWindow(QtGui.QMainWindow):
         os.mkdir(self.savesubdir)
         self.do_turbine_tow(U, tsr, y_R, z_H, turbine="shakedown",
                             vectrino=vectrino, fbg=fbg)
+                            
+    def do_test_plan(self):
+        """Continue test plan"""
+        section = str(self.ui.comboBox_testPlanSection.currentText())
+        if not self.is_section_done(section):
+            print("Continuing", section)
+            # Find next run to do by looking in the Done? column
+            nruns = self.ui.tableWidgetTestPlan.rowCount()
+            donecol = self.ui.tableWidgetTestPlan.columnCount()-1
+            for n in range(nruns):
+                doneval = self.ui.tableWidgetTestPlan.item(n, donecol).text()
+                if doneval == "No":
+                    nextrun = int(float(self.ui.tableWidgetTestPlan.item(n, 0).text()))
+                    break
+            print("Starting run", str(nextrun))
+            self.savedir = os.path.join(self.wdir, "Data", "Raw", section)
+            self.currentrun = nextrun
+            self.currentname = section + " run " + str(nextrun)
+            self.label_runstatus.setText(self.currentname + " in progress ")
+            if not os.path.isdir(self.savedir):
+                os.makedirs(self.savedir)
+            self.savesubdir = os.path.join(self.savedir, str(nextrun))
+            try:
+                os.mkdir(self.savesubdir)
+            except WindowsError:
+                print("Save subdirectory already exists")
+                print("Files will be overwritten")
+            if section.lower() == "tare drag":
+                U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
+                self.do_tare_drag_tow(U)
+            elif section.lower() == "tare torque":
+                rpm = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
+                dur = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
+                self.do_tare_torque_run(rpm, dur)
+            else:
+                run_df = self.test_plan[section]
+                run_df = run_df[run_df.run == nextrun].iloc[0]
+                U = run_df.tow_speed
+                tsr = run_df.tsr
+                vectrino = run_df.vectrino
+                if vectrino:
+                    y_R = run_df.y_R
+                    z_H = run_df.z_H
+                else:
+                    y_R = z_H = None
+                try: 
+                    fbg = run_df["fbg"]
+                except KeyError:
+                    fbg = False
+                settling = "settling" in section.lower()
+                self.do_turbine_tow(U, tsr, vectrino, y_R, z_H, fbg, 
+                                    settling=settling)
+        else:
+            print("'{}' is done".format(section))
+            self.ui.actionStart.trigger()
         
     def do_turbine_tow(self, U, tsr, y_R, z_H, turbine="RVAT", 
                        vectrino=True, fbg=False, settling=False):
@@ -785,61 +840,6 @@ class MainWindow(QtGui.QMainWindow):
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():
             self.do_test_plan()
-        
-    def do_test_plan(self):
-        """Continue test plan"""
-        section = str(self.ui.comboBox_testPlanSection.currentText())
-        if not self.is_section_done(section):
-            print("Continuing", section)
-            # Find next run to do by looking in the Done? column
-            nruns = self.ui.tableWidgetTestPlan.rowCount()
-            donecol = self.ui.tableWidgetTestPlan.columnCount()-1
-            for n in range(nruns):
-                doneval = self.ui.tableWidgetTestPlan.item(n, donecol).text()
-                if doneval == "No":
-                    nextrun = int(float(self.ui.tableWidgetTestPlan.item(n, 0).text()))
-                    break
-            print("Starting run", str(nextrun))
-            self.savedir = os.path.join(self.wdir, "Data", "Raw", section)
-            self.currentrun = nextrun
-            self.currentname = section + " run " + str(nextrun)
-            self.label_runstatus.setText(self.currentname + " in progress ")
-            if not os.path.isdir(self.savedir):
-                os.makedirs(self.savedir)
-            self.savesubdir = os.path.join(self.savedir, str(nextrun))
-            try:
-                os.mkdir(self.savesubdir)
-            except WindowsError:
-                print("Save subdirectory already exists")
-                print("Files will be overwritten")
-            if section.lower() == "tare drag":
-                U = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
-                self.do_tare_drag_tow(U)
-            elif section.lower() == "tare torque":
-                rpm = float(self.ui.tableWidgetTestPlan.item(nextrun, 1).text())
-                dur = float(self.ui.tableWidgetTestPlan.item(nextrun, 2).text())
-                self.do_tare_torque_run(rpm, dur)
-            else:
-                run_df = self.test_plan[section]
-                run_df = run_df[run_df.run == nextrun].iloc[0]
-                U = run_df.tow_speed
-                tsr = run_df.tsr
-                vectrino = run_df.vectrino
-                if vectrino:
-                    y_R = run_df.y_R
-                    z_H = run_df.z_H
-                else:
-                    y_R = z_H = None
-                try: 
-                    fbg = run_df["fbg"]
-                except KeyError:
-                    fbg = False
-                settling = "settling" in section.lower()
-                self.do_turbine_tow(U, tsr, vectrino, y_R, z_H, fbg, 
-                                    settling=settling)
-        else:
-            print("'{}' is done".format(section))
-            self.ui.actionStart.trigger()
         
     def on_monitor_acs(self):
         if self.ui.actionMonitor_ACS.isChecked():
