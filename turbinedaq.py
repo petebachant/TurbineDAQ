@@ -681,7 +681,7 @@ class MainWindow(QtGui.QMainWindow):
             self.label_runstatus.setText(text + " cannot start ")
             self.ui.actionStart.trigger()
             msg = "Run cannot start because the tow axis is disabled."
-            info = QtGui.QMessageBox.information(self, "Cannot Start", msg)
+            QtGui.QMessageBox.information(self, "Cannot Start", msg)
         
     def do_tare_drag_tow(self, U):
         """Executes a single tare drag run"""
