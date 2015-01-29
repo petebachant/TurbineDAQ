@@ -628,6 +628,10 @@ class MainWindow(QtGui.QMainWindow):
                 # Do turbine tow
                 U = run_props.tow_speed
                 tsr = run_props.tsr
+                try:
+                    turbine = run_props["turbine"]
+                except KeyError:
+                    turbine = self.turbine_properties.keys()[0]
                 if "vectrino" in run_props:
                     vectrino = run_props.vectrino
                     y_R = run_props.y_R
@@ -640,7 +644,7 @@ class MainWindow(QtGui.QMainWindow):
                 except KeyError:
                     fbg = False
                 settling = "settling" in section.lower()
-                self.do_turbine_tow(U, tsr, vectrino, y_R, z_H, fbg, 
+                self.do_turbine_tow(U, tsr, vectrino, y_R, z_H, turbine, fbg, 
                                     settling=settling)
         else:
             print("'{}' is done".format(section))
