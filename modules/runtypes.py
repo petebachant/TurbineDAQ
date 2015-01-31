@@ -365,4 +365,7 @@ class StrutTorqueRun(TareTorqueRun):
         self.tsr = tsr
         self.radius = radius
         self.dur = dur
+        self.metadata = {"Reference speed (m/s)" : ref_speed,
+                         "Tip speed ratio" : tsr,
+                         "Turbine radius (m)" : radius}
         TareTorqueRun.__init__(self, self.hc, self.rpm, dur)
