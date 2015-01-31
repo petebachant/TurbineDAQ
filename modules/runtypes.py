@@ -99,6 +99,10 @@ class TurbineTow(QtCore.QThread):
                 self.vec.coordinate_system
         self.metadata["Vectrino metadata"]["Salinity (ppt)"] = \
                 self.vec.salinity
+        self.metadata["Vectrino metadata"]["Transmit length"] = \
+                self.vec.transmit_length
+        self.metadata["Vectrino metadata"]["Sampling volume"] = \
+                self.vec.sampling_volume
         print("Vectrino configuration set")
 
     def run(self):

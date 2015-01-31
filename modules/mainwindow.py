@@ -857,4 +857,4 @@ class Ui_MainWindow(object):
         self.actionFBG.setText(_translate("MainWindow", "FBG", None))
 
 from guiqwt.plot import CurveWidget
-import resources_rc
+from . import resources_rc
