@@ -89,6 +89,19 @@ def test_read_vec_salinity():
     print("PASS")
     sys.exit(app.exec_())
     
+def test_strut_torque_run():
+    """Tests the `StrutTorqueRun` object."""
+    print("Testing runtypes.StrutTorqueRun")
+    ref_speed = 1.0
+    tsr = 2.0
+    radius = 0.5
+    rpm = tsr/radius*ref_speed*60.0/(2*np.pi)
+    run = runtypes.StrutTorqueRun(1, ref_speed, tsr, radius, 10)
+    print(run.rpm, "==", rpm)
+    assert(run.rpm == rpm)
+    print("PASS")
+    
 if __name__ == "__main__":
 #    test_autoprocess()
-    test_read_vec_salinity()
+#    test_read_vec_salinity()
+    test_strut_torque_run()

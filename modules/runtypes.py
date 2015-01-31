@@ -15,6 +15,7 @@ import time
 from PyQt4 import QtCore
 from pdcommpy import PdControl
 from subprocess import check_output
+import numpy as np
 
 class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
@@ -334,13 +335,34 @@ class TareTorqueRun(QtCore.QThread):
         self.acsdaqthread.stop()
         self.daqthread.clear()
         self.aborted = True
-
-
-def main():
-    hc = acsc.openCommDirect()
-    run = TurbineTow(hc, 1.0, 1.5, 0.0, 0.25, vectrino=False, nidaq=False)
-    run.start_motion()
-    acsc.closeComm(hc)
+        
+        
+class StrutTorqueRun(TareTorqueRun):
+    """
+    A strut torque run measures the parasitic torque on the shaft caused by
+    the blade support struts.
     
-if __name__ == "__main__":
-    main()
+    Parameters
+    ----------
+    acs_hcomm : int
+        ACS controller communication handle
+    ref_speed : float
+        Reference tow speed (m/s) for calculating RPM
+    tsr : float
+        Reference tip speed ratio for calculating RPM
+    radius : float
+        Turbine radius (m) for calculating RPM
+    dur : float
+        Test duration in seconds
+    
+    """
+    def __init__(self, acs_hcomm, ref_speed, tsr, radius, dur):
+        # Convert ref_speed and tsr into RPM
+        omega = tsr/radius*ref_speed
+        self.rpm = omega/(2*np.pi)*60.0
+        self.hc = acs_hcomm
+        self.ref_speed = ref_speed
+        self.tsr = tsr
+        self.radius = radius
+        self.dur = dur
+        TareTorqueRun.__init__(self, self.hc, self.rpm, dur)
