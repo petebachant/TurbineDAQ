@@ -48,7 +48,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorvec = False
         self.monitorfbg = False
         self.exp_running = False
-        self.towinprogress = False
+        self.run_in_progress = False
         self.test_plan_loaded = False
         self.autoprocess = True
         self.enabled_axes = {}
@@ -547,7 +547,7 @@ class MainWindow(QtGui.QMainWindow):
                 self.tarerun.abort()
         except AttributeError:
             pass
-        self.towinprogress = False
+        self.run_in_progress = False
         
     def auto_abort(self):
         """Abort run, don't save data, and automatically delete any files
@@ -562,7 +562,7 @@ class MainWindow(QtGui.QMainWindow):
         text = str(self.label_runstatus.text())
         self.label_runstatus.setText(text[:-13] + " autoaborted ")
         self.turbinetow.autoabort()
-        self.towinprogress = False
+        self.run_in_progress = False
 
     def on_badvecdata(self):
         print("Bad Vectrino data detected")
@@ -689,7 +689,7 @@ class MainWindow(QtGui.QMainWindow):
                 self.vecdata = self.turbinetow.vec.data
             if fbg:
                 self.fbgdata = self.turbinetow.fbgdata
-            self.towinprogress = True
+            self.run_in_progress = True
             self.monitoracs = True
             self.monitorni = True
             self.monitorvec = vectrino
@@ -714,7 +714,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorni = True
         self.monitoracs = True
         self.monitorvec = False
-        self.towinprogress = True
+        self.run_in_progress = True
         self.tarerun.start()
         
     def do_tare_torque_run(self, rpm, dur):
@@ -727,7 +727,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorni = True
         self.monitoracs = True
         self.monitorvec = False
-        self.towinprogress = True
+        self.run_in_progress = True
         self.tarerun.start()
         
     def do_strut_torque_run(self, ref_speed, tsr, radius, dur):
@@ -741,7 +741,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorni = True
         self.monitoracs = True
         self.monitorvec = False
-        self.towinprogress = True
+        self.run_in_progress = True
         self.tarerun.start()
         
     def on_tare_run_finished(self):
@@ -750,7 +750,7 @@ class MainWindow(QtGui.QMainWindow):
         the test plan table widget.
         """
         # Reset time of last run
-        self.towinprogress = False
+        self.run_in_progress = False
         self.monitoracs = False
         self.monitorni = False
         self.monitorfbg = False
@@ -813,7 +813,7 @@ class MainWindow(QtGui.QMainWindow):
     def on_tow_finished(self):
         """Current tow complete."""
         # Reset time of last run
-        self.towinprogress = False
+        self.run_in_progress = False
         self.monitoracs = False
         self.monitorni = False
         self.monitorvec = False
@@ -972,7 +972,7 @@ class MainWindow(QtGui.QMainWindow):
         if self.monitorvec:
             self.update_plots_vec()
             try:
-                if not self.towinprogress:
+                if not self.run_in_progress:
                     self.label_vecstatus.setText(self.vecthread.vecstatus)
                 else:
                     self.label_vecstatus.setText(self.turbinetow.vecstatus)
@@ -1016,7 +1016,7 @@ class MainWindow(QtGui.QMainWindow):
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
         t = self.vecdata["time"]
-        if len(t) > 400 and len(t) < 600 and self.towinprogress:
+        if len(t) > 400 and len(t) < 600 and self.run_in_progress:
             if len(np.where(np.abs(self.vecdata["u"][:450]) > 0.5)[0]) > 50:
                 self.badvecdata.emit()
         meancorr = self.vecdata["corr_u"]
@@ -1097,11 +1097,11 @@ class MainWindow(QtGui.QMainWindow):
         with open("settings/settings.json", "w") as fn:
             json.dump(self.settings, fn, indent=4)
         acsc.closeComm(self.hc)
-        if self.monitorni and not self.towinprogress:
+        if self.monitorni and not self.run_in_progress:
             self.daqthread.clear()
-        if self.monitorvec and not self.towinprogress:
+        if self.monitorvec and not self.run_in_progress:
             self.vecthread.stop()
-        if self.monitorfbg and not self.towinprogress:
+        if self.monitorfbg and not self.run_in_progress:
             self.fbgthread.stop()
 
 def main():
