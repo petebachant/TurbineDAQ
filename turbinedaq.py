@@ -84,10 +84,13 @@ class MainWindow(QtGui.QMainWindow):
         self.add_acs_checkboxes()
         # Connect signals and slots
         self.connect_sigs_slots()
-        # Set test plan visible in tab widget
-        self.ui.tabWidgetMode.setCurrentWidget(self.ui.tabTestPlan)
-        if "Last section" in self.settings:
-            self.ui.comboBox_testPlanSection.setCurrentIndex(self.settings["Last section"])
+        # Return to last section in test plan if possible
+        if "Last section index" in self.settings:
+            try:
+                self.ui.comboBox_testPlanSection.setCurrentIndex(self.settings["Last section index"])
+            except:
+                print("Previous test plan section index does not exist")
+                pass
         # Start timers
         self.timer.start(200)
         self.plot_timer.start(100)
@@ -104,7 +107,7 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.actionVectrino_View.setChecked(self.settings["Vectrino visible"])
         
     def load_settings(self):
-        """Loads settings"""
+        """Loads settings from JSON file."""
         self.pcid = platform.node()
         try:
             with open("settings/settings.json", "r") as fn:
@@ -124,6 +127,32 @@ class MainWindow(QtGui.QMainWindow):
             oldheight = self.settings["Last size"][0]
             oldwidth = self.settings["Last size"][1]
             self.resize(oldwidth, oldheight)
+        if "Last tab index" in self.settings:
+            self.ui.tabWidgetMode.setCurrentIndex(self.settings["Last tab index"])
+        if "Shakedown tow speed" in self.settings:
+            val = self.settings["Shakedown tow speed"]
+            self.ui.doubleSpinBox_singleRun_U.setValue(val)
+        if "Shakedown radius" in self.settings:
+            val = self.settings["Shakedown radius"]
+            self.ui.doubleSpinBox_turbineRadius.setValue(val)
+        if "Shakedown height" in self.settings:
+            val = self.settings["Shakedown height"]
+            self.ui.doubleSpinBox_turbineHeight.setValue(val)
+        if "Shakedown TSR" in self.settings:
+            val = self.settings["Shakedown TSR"]
+            self.ui.doubleSpinBox_singleRun_tsr.setValue(val)
+        if "Shakedown y/R" in self.settings:
+            val = self.settings["Shakedown y/R"]
+            self.ui.doubleSpinBox_singleRun_y_R.setValue(val)
+        if "Shakedown z/H" in self.settings:
+            val = self.settings["Shakedown z/H"]
+            self.ui.doubleSpinBox_singleRun_z_H.setValue(val)
+        if "Shakedown Vectrino" in self.settings:
+            val = self.settings["Shakedown Vectrino"]
+            self.ui.checkBox_singleRunVectrino.setChecked(val)
+        if "Shakedown FBG" in self.settings:
+            val = self.settings["Shakedown FBG"]
+            self.ui.checkBox_singleRunFBG.setChecked(val)
             
     def read_turbine_properties(self):
         """Reads turbine properties from `Config/turbine_properties.json` in 
@@ -1084,13 +1113,22 @@ class MainWindow(QtGui.QMainWindow):
     def closeEvent(self, event):
         self.settings["Last window location"] = [self.pos().x(), 
                                                  self.pos().y()]
-        self.settings["Last section"] = \
+        self.settings["Last section index"] = \
                 self.ui.comboBox_testPlanSection.currentIndex()
+        self.settings["Last tab index"] = self.ui.tabWidgetMode.currentIndex()
         self.settings["Last PC name"] = self.pcid
         self.settings["Last size"] = (self.size().height(), 
                                       self.size().width())
         self.settings["FBG visible"] = self.ui.dockWidget_FBG.isVisible()
         self.settings["Vectrino visible"] = self.ui.dockWidgetVectrino.isVisible()
+        self.settings["Shakedown tow speed"] = self.ui.doubleSpinBox_singleRun_U.value()
+        self.settings["Shakedown radius"] = self.ui.doubleSpinBox_turbineRadius.value()
+        self.settings["Shakedown height"] = self.ui.doubleSpinBox_turbineHeight.value()
+        self.settings["Shakedown TSR"] = self.ui.doubleSpinBox_singleRun_tsr.value()
+        self.settings["Shakedown y/R"] = self.ui.doubleSpinBox_singleRun_y_R.value()
+        self.settings["Shakedown z/H"] = self.ui.doubleSpinBox_singleRun_z_H.value()
+        self.settings["Shakedown Vectrino"] = self.ui.checkBox_singleRunVectrino.isChecked()
+        self.settings["Shakedown FBG"] = self.ui.checkBox_singleRunFBG.isChecked()
         if not os.path.isdir("settings"):
             os.mkdir("settings")
         with open("settings/settings.json", "w") as fn:
