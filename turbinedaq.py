@@ -19,7 +19,6 @@ from modules.mainwindow import *
 import json
 import guiqwt
 import time
-import xlrd
 import os
 import platform
 import subprocess
