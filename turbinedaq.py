@@ -47,7 +47,6 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorni = False
         self.monitorvec = False
         self.monitorfbg = False
-        self.exp_running = False
         self.run_in_progress = False
         self.test_plan_loaded = False
         self.autoprocess = True
