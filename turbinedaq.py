@@ -138,6 +138,14 @@ class MainWindow(QtGui.QMainWindow):
             print("No turbine properties file found")
             self.turbine_properties = {"RVAT" : {"radius" : 0.5,
                                                  "height" : 1.0}}
+        # Calculate radius if only diameter supplied and vice versa
+        for turbine in self.turbine_properties:
+            if not "radius" in self.turbine_properties[turbine]:
+                self.turbine_properties[turbine]["radius"] = \
+                        self.turbine_properties[turbine]["diameter"]/2
+            if not "diameter" in self.turbine_properties[turbine]:
+                self.turbine_properties[turbine]["diameter"] = \
+                        self.turbine_properties[turbine]["radius"]*2
 
     def read_vectrino_properties(self):
         fpath = os.path.join(self.wdir, "Config", "vectrino_properties.json")
@@ -623,6 +631,16 @@ class MainWindow(QtGui.QMainWindow):
                 rpm = run_props.rpm
                 dur = run_props.dur
                 self.do_tare_torque_run(rpm, dur)
+            elif "strut" and "torque" in section.lower():
+                if "turbine" in run_props:
+                    turbine = run_props.turbine
+                else:
+                    turbine = self.turbine_properties.keys()[0]
+                ref_speed = run_props.ref_speed
+                tsr = run_props.tsr
+                radius = self.turbine_properties[turbine]["radius"]
+                dur = run_props.dur
+                self.do_strut_torque_run(ref_speed, tsr, radius, dur)
             else:
                 # Do turbine tow
                 U = run_props.tow_speed
@@ -712,8 +730,25 @@ class MainWindow(QtGui.QMainWindow):
         self.towinprogress = True
         self.tarerun.start()
         
+    def do_strut_torque_run(self, ref_speed, tsr, radius, dur):
+        """Executes a single strut torque run."""
+        self.tarerun = runtypes.StrutTorqueRun(self.hc, ref_speed, 
+                                               tsr, radius, dur)
+        self.tarerun.runfinished.connect(self.on_tare_run_finished)
+        self.tarerun.metadata["Name"] = self.currentname
+        self.acsdata = self.tarerun.acsdata
+        self.nidata = self.tarerun.nidata
+        self.monitorni = True
+        self.monitoracs = True
+        self.monitorvec = False
+        self.towinprogress = True
+        self.tarerun.start()
+        
     def on_tare_run_finished(self):
-        """Current tow complete."""
+        """
+        Once a tare run is complete, saves data if necessary and updates
+        the test plan table widget.
+        """
         # Reset time of last run
         self.towinprogress = False
         self.monitoracs = False

@@ -9,6 +9,7 @@ from turbinedaq import *
 import sys
 
 def test_read_turbine_properties():
+    print("Testing read_turbine_properties")
     app = QtGui.QApplication(sys.argv)
     w = MainWindow()
     w.wdir = os.path.join(os.getcwd(), "test")
@@ -105,3 +106,4 @@ if __name__ == "__main__":
 #    test_autoprocess()
 #    test_read_vec_salinity()
     test_strut_torque_run()
+    test_read_turbine_properties()
