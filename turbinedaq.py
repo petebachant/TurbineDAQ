@@ -653,9 +653,9 @@ class MainWindow(QtGui.QMainWindow):
             # Get parameters from test plan
             run_props = self.test_plan[section]
             run_props = run_props[run_props.run == nextrun].iloc[0]
-            if section.lower() == "tare drag":
+            if "tare" and "drag" in section.lower():
                 self.do_tare_drag_tow(run_props.tow_speed)
-            elif section.lower() == "tare torque":
+            elif "tare" and "torque" in section.lower():
                 rpm = run_props.rpm
                 dur = run_props.dur
                 self.do_tare_torque_run(rpm, dur)
