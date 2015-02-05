@@ -912,6 +912,7 @@ class MainWindow(QtGui.QMainWindow):
                     pass
         else: 
             self.ui.actionStart.setChecked(False)
+            self.ui.actionStart.setIcon(QIcon(":icons/play.png"))
         self.vecdata = {}
         self.nidata = {}
         self.acsdata = {}
