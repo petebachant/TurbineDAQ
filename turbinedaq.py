@@ -547,6 +547,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorni = False
         self.monitoracs = False
         self.monitorvec = False
+        self.monitorfbg = False
         if self.ui.actionStart.isChecked():
             self.ui.actionStart.setChecked(False)
             print("Aborting current run")
@@ -873,7 +874,7 @@ class MainWindow(QtGui.QMainWindow):
                 print("Autoprocessing", section, "run", nrun)
                 pycmd = "from Modules import processing; " + \
                         "print(processing.process_run('{}',{}))".format(section, nrun)
-                cmdlist = ["cd", self.wdir, "&", "python", "-c", pycmd]
+                cmdlist = ["cd", "/D", self.wdir, "&", "python", "-c", pycmd]
                 subprocess.call(cmdlist, shell=True)
         elif self.turbinetow.aborted:
             quit_msg = "Delete files from aborted run?"

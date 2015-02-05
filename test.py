@@ -103,7 +103,7 @@ def test_strut_torque_run():
     print("PASS")
     
 if __name__ == "__main__":
-#    test_autoprocess()
+    test_autoprocess()
 #    test_read_vec_salinity()
-    test_strut_torque_run()
-    test_read_turbine_properties()
+#    test_strut_torque_run()
+#    test_read_turbine_properties()
