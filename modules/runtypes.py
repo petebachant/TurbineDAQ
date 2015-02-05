@@ -145,7 +145,7 @@ class TurbineTow(QtCore.QThread):
                 while self.vec.state != "Confirmation mode":
                     self.msleep(100)
                 print("Vectrino in data collection mode")
-                print("Waiting 6 seconds...")
+                print("Waiting 6 seconds")
                 self.sleep(6)
                 self.daqthread.start()
                 self.start_motion()
