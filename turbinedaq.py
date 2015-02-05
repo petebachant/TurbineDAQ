@@ -28,7 +28,7 @@ import pandas as pd
 import scipy.interpolate
                   
 fluid_params = {"rho" : 1000.0}
-
+abort_on_bad_vecdata = False
 
 class MainWindow(QtGui.QMainWindow):
     badvecdata = QtCore.pyqtSignal()
@@ -527,9 +527,11 @@ class MainWindow(QtGui.QMainWindow):
             if self.ui.tabTestPlan.isVisible():
                 """Continue working on test plan"""
                 section = self.ui.comboBox_testPlanSection.currentText()
+                self.section = section
                 if section.lower() != "top level":
                     self.do_test_plan()
             elif self.ui.tabSingleRun.isVisible():
+                self.section = "Shakedown"
                 self.do_shakedown()
             elif self.ui.tabProcessing.isVisible():
                 """Process a run"""
@@ -595,7 +597,8 @@ class MainWindow(QtGui.QMainWindow):
 
     def on_badvecdata(self):
         print("Bad Vectrino data detected")
-        self.auto_abort()
+        if abort_on_bad_vecdata:
+            self.auto_abort()
         
     def do_shakedown(self):
         """Executes a single shakedown run."""
@@ -628,6 +631,7 @@ class MainWindow(QtGui.QMainWindow):
     def do_test_plan(self):
         """Continue test plan"""
         section = str(self.ui.comboBox_testPlanSection.currentText())
+        self.section = section
         if not self.is_section_done(section):
             print("Continuing", section)
             # Find next run to do by looking in the Done? column
@@ -869,7 +873,7 @@ class MainWindow(QtGui.QMainWindow):
                 self.label_runstatus.setText(text[:-13] + " saved ")
             print("Saved")
             if self.autoprocess:
-                section = str(self.ui.comboBox_testPlanSection.currentText())
+                section = self.section
                 nrun = str(self.currentrun)
                 print("Autoprocessing", section, "run", nrun)
                 pycmd = "from Modules import processing; " + \
