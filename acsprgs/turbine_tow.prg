@@ -37,8 +37,10 @@ JERK(4)= ACC(4)*10
 
 ! Move turbine to zero if necessary
 if RPOS(4) <> 60 & RPOS(4) <> 0
-    ptp 4, 0
+    ptp/e 4, 0
 end
+
+! Wait
 
 ! Allow oscillations in shaft to damp out
 wait 3000
