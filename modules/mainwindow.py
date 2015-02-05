@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'gui\mainwindow.ui'
 #
-# Created: Fri Jan 09 01:51:30 2015
-#      by: PyQt4 UI code generator 4.11.3
+# Created: Thu Feb 05 17:41:48 2015
+#      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -419,6 +419,7 @@ class Ui_MainWindow(object):
         self.toolButtonOpenShakedown.setObjectName(_fromUtf8("toolButtonOpenShakedown"))
         self.gridLayout_singleRun.addWidget(self.toolButtonOpenShakedown, 0, 2, 1, 1)
         self.doubleSpinBox_turbineRadius = QtGui.QDoubleSpinBox(self.gridLayoutWidget_4)
+        self.doubleSpinBox_turbineRadius.setDecimals(3)
         self.doubleSpinBox_turbineRadius.setSingleStep(0.01)
         self.doubleSpinBox_turbineRadius.setProperty("value", 0.5)
         self.doubleSpinBox_turbineRadius.setObjectName(_fromUtf8("doubleSpinBox_turbineRadius"))
@@ -428,6 +429,7 @@ class Ui_MainWindow(object):
         self.label_35.setObjectName(_fromUtf8("label_35"))
         self.gridLayout_singleRun.addWidget(self.label_35, 2, 0, 1, 1)
         self.doubleSpinBox_turbineHeight = QtGui.QDoubleSpinBox(self.gridLayoutWidget_4)
+        self.doubleSpinBox_turbineHeight.setDecimals(3)
         self.doubleSpinBox_turbineHeight.setSingleStep(0.1)
         self.doubleSpinBox_turbineHeight.setProperty("value", 1.0)
         self.doubleSpinBox_turbineHeight.setObjectName(_fromUtf8("doubleSpinBox_turbineHeight"))
@@ -719,7 +721,7 @@ class Ui_MainWindow(object):
         self.toolBar_DAQ.addAction(self.actionMonitor_FBG)
 
         self.retranslateUi(MainWindow)
-        self.tabWidgetMode.setCurrentIndex(1)
+        self.tabWidgetMode.setCurrentIndex(0)
         QtCore.QObject.connect(self.actionNI_Signals, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.dockWidgetNISignals.setVisible)
         QtCore.QObject.connect(self.actionVectrino_View, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.dockWidgetVectrino.setVisible)
         QtCore.QObject.connect(self.dockWidgetNISignals, QtCore.SIGNAL(_fromUtf8("visibilityChanged(bool)")), self.actionNI_Signals.setChecked)
@@ -857,4 +859,4 @@ class Ui_MainWindow(object):
         self.actionFBG.setText(_translate("MainWindow", "FBG", None))
 
 from guiqwt.plot import CurveWidget
-from . import resources_rc
+import resources_rc

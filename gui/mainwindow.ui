@@ -770,7 +770,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabSingleRun">
        <attribute name="title">
@@ -894,6 +894,9 @@
          </item>
          <item row="1" column="1">
           <widget class="QDoubleSpinBox" name="doubleSpinBox_turbineRadius">
+           <property name="decimals">
+            <number>3</number>
+           </property>
            <property name="singleStep">
             <double>0.010000000000000</double>
            </property>
@@ -914,6 +917,9 @@
          </item>
          <item row="2" column="1">
           <widget class="QDoubleSpinBox" name="doubleSpinBox_turbineHeight">
+           <property name="decimals">
+            <number>3</number>
+           </property>
            <property name="singleStep">
             <double>0.100000000000000</double>
            </property>
