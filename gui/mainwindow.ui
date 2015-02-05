@@ -895,7 +895,7 @@
          <item row="1" column="1">
           <widget class="QDoubleSpinBox" name="doubleSpinBox_turbineRadius">
            <property name="decimals">
-            <number>3</number>
+            <number>4</number>
            </property>
            <property name="singleStep">
             <double>0.010000000000000</double>
@@ -918,7 +918,7 @@
          <item row="2" column="1">
           <widget class="QDoubleSpinBox" name="doubleSpinBox_turbineHeight">
            <property name="decimals">
-            <number>3</number>
+            <number>4</number>
            </property>
            <property name="singleStep">
             <double>0.100000000000000</double>

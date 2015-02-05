@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui\mainwindow.ui'
 #
-# Created: Thu Feb 05 17:41:48 2015
+# Created: Thu Feb 05 17:46:10 2015
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -419,7 +419,7 @@ class Ui_MainWindow(object):
         self.toolButtonOpenShakedown.setObjectName(_fromUtf8("toolButtonOpenShakedown"))
         self.gridLayout_singleRun.addWidget(self.toolButtonOpenShakedown, 0, 2, 1, 1)
         self.doubleSpinBox_turbineRadius = QtGui.QDoubleSpinBox(self.gridLayoutWidget_4)
-        self.doubleSpinBox_turbineRadius.setDecimals(3)
+        self.doubleSpinBox_turbineRadius.setDecimals(4)
         self.doubleSpinBox_turbineRadius.setSingleStep(0.01)
         self.doubleSpinBox_turbineRadius.setProperty("value", 0.5)
         self.doubleSpinBox_turbineRadius.setObjectName(_fromUtf8("doubleSpinBox_turbineRadius"))
@@ -429,7 +429,7 @@ class Ui_MainWindow(object):
         self.label_35.setObjectName(_fromUtf8("label_35"))
         self.gridLayout_singleRun.addWidget(self.label_35, 2, 0, 1, 1)
         self.doubleSpinBox_turbineHeight = QtGui.QDoubleSpinBox(self.gridLayoutWidget_4)
-        self.doubleSpinBox_turbineHeight.setDecimals(3)
+        self.doubleSpinBox_turbineHeight.setDecimals(4)
         self.doubleSpinBox_turbineHeight.setSingleStep(0.1)
         self.doubleSpinBox_turbineHeight.setProperty("value", 1.0)
         self.doubleSpinBox_turbineHeight.setObjectName(_fromUtf8("doubleSpinBox_turbineHeight"))
