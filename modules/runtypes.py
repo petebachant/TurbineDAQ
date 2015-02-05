@@ -13,7 +13,7 @@ from acspy import acsc
 from . import daqtasks
 import time
 from PyQt4 import QtCore
-from pdcommpy import PdControl
+from nortek.controls import PdControl
 from subprocess import check_output
 import numpy as np
 
