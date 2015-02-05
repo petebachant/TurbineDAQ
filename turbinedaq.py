@@ -910,9 +910,9 @@ class MainWindow(QtGui.QMainWindow):
                     self.ui.tableWidgetTestPlan.scrollToItem(cr)
                 except:
                     pass
-        else: 
-            self.ui.actionStart.setChecked(False)
-            self.ui.actionStart.setIcon(QIcon(":icons/play.png"))
+        else:
+            if not self.abort:
+                self.ui.actionStart.trigger()
         self.vecdata = {}
         self.nidata = {}
         self.acsdata = {}
