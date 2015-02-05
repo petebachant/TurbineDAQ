@@ -112,7 +112,7 @@ class MainWindow(QtGui.QMainWindow):
         try:
             with open("settings/settings.json", "r") as fn:
                 self.settings = json.load(fn)
-        except FileNotFoundError:
+        except IOError:
             self.settings = {}
         if "Last PC name" in self.settings:
             if self.settings["Last PC name"] == self.pcid:
