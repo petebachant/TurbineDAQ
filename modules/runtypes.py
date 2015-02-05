@@ -197,6 +197,7 @@ class TurbineTow(QtCore.QThread):
 
     def abort(self):
         """This should stop everything."""
+        print("Aborting turbine tow")
         self.aborted = True
         acsc.stopBuffer(self.hc, 19)
         acsc.halt(self.hc, 0)
