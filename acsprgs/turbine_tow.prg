@@ -60,6 +60,7 @@ jog/v 4, rpm
 wait tacc*1000
 ptp/e 5, target
 HALT(4)
+ACC(5) = 0.3
 VEL(5) = 0.5
 VEL(4) = 10
 ptp 4, 0
