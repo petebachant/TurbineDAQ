@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui\mainwindow.ui'
 #
-# Created: Thu Feb 05 17:46:10 2015
+# Created: Thu Feb 05 21:23:13 2015
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -397,7 +397,7 @@ class Ui_MainWindow(object):
         self.label_6.setObjectName(_fromUtf8("label_6"))
         self.gridLayout_singleRun.addWidget(self.label_6, 3, 0, 1, 1)
         self.doubleSpinBox_singleRun_tsr = QtGui.QDoubleSpinBox(self.gridLayoutWidget_4)
-        self.doubleSpinBox_singleRun_tsr.setMaximum(5.0)
+        self.doubleSpinBox_singleRun_tsr.setMaximum(7.0)
         self.doubleSpinBox_singleRun_tsr.setSingleStep(0.1)
         self.doubleSpinBox_singleRun_tsr.setProperty("value", 1.9)
         self.doubleSpinBox_singleRun_tsr.setObjectName(_fromUtf8("doubleSpinBox_singleRun_tsr"))
