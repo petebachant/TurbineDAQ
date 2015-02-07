@@ -28,7 +28,7 @@ import pandas as pd
 import scipy.interpolate
                   
 fluid_params = {"rho" : 1000.0}
-abort_on_bad_vecdata = False
+abort_on_bad_vecdata = True
 
 class MainWindow(QtGui.QMainWindow):
     badvecdata = QtCore.pyqtSignal()
