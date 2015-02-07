@@ -11,10 +11,10 @@ R = {turbine_radius}
 
 rpm = tsr*U/R*60/6.28318530718
 
-target = 24.5   ! Do not exceed 24.9 for traverse at x/D = 1
-endpos = 0      ! Where to move carriage at end of tow
-tacc = 5        ! Time (in seconds) for turbine angular acceleration
-tzero = 2.5     ! Time (in seconds) to wait before starting
+target = 24.5       ! Do not exceed 24.9 for traverse at x/D = 1
+endpos = {endpos}   ! Where to move carriage at end of tow
+tacc = 5            ! Time (in seconds) for turbine angular acceleration
+tzero = 2.5         ! Time (in seconds) to wait before starting
 
 VEL(5) = 0.5
 ptp/e 5, 0

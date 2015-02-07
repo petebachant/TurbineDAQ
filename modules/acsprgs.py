@@ -7,11 +7,12 @@ Created on Sun Sep 08 12:20:14 2013
 from __future__ import division, print_function
 import os
 
-def turbine_tow_prg(tow_speed, tsr, turbine_radius, prgdir="./acsprgs"):
+def turbine_tow_prg(tow_speed, tsr, turbine_radius, endpos=0.0, 
+                    prgdir="./acsprgs"):
     """This function builds an ACSPL+ program for turbine towing."""
     with open(os.path.join(prgdir, "turbine_tow.prg")) as f:
         prg = f.read().format(tow_speed=tow_speed, tsr=tsr, 
-                              turbine_radius=turbine_radius)
+                              turbine_radius=turbine_radius, endpos=endpos)
     return prg
 
 def tare_torque_prg(rpm, dur, prgdir="./acsprgs"):
