@@ -678,24 +678,26 @@ class MainWindow(QtGui.QMainWindow):
                 # Do turbine tow
                 U = run_props.tow_speed
                 tsr = run_props.tsr
-                try:
+                if "turbine" in run_props:
                     turbine = run_props["turbine"]
-                except KeyError:
+                else:
                     turbine = self.turbine_properties.keys()[0]
                 if "vectrino" in run_props:
                     vectrino = run_props.vectrino
-                    y_R = run_props.y_R
-                    z_H = run_props.z_H
+                else: 
+                    vectrino = True
+                if vectrino:
+                    y_R = run_props["y/R"]
+                    z_H = run_props["z/H"]
                 else:
                     y_R = z_H = None
-                    vectrino = True
                 try: 
                     fbg = run_props["fbg"]
                 except KeyError:
                     fbg = False
                 settling = "settling" in section.lower()
-                self.do_turbine_tow(U, tsr, vectrino, y_R, z_H, turbine, fbg, 
-                                    settling=settling)
+                self.do_turbine_tow(U, tsr, y_R, z_H, vectrino=vectrino,
+                                    turbine=turbine, fbg=fbg, settling=settling)
         else:
             print("'{}' is done".format(section))
             self.ui.actionStart.trigger()
@@ -715,7 +717,7 @@ class MainWindow(QtGui.QMainWindow):
             self.turbinetow.towfinished.connect(self.on_tow_finished)
             self.turbinetow.metadata["Name"] = self.currentname
             self.turbinetow.metadata["Turbine"] = turbine_properties
-            self.turbinetow.metadata["Turbine"]["Name"] = turbine
+            self.turbinetow.metadata["Turbine"]["name"] = turbine
             self.acsdata = self.turbinetow.acsdaqthread.data
             self.nidata = self.turbinetow.daqthread.data
             if vectrino:

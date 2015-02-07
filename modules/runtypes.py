@@ -34,6 +34,7 @@ class TurbineTow(QtCore.QThread):
         self.vectrino = vectrino
         self.nidaq = nidaq 
         self.fbg = fbg
+        self.settling = settling
         self.build_acsprg()
         self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
         self.maxvel = U*1.3
@@ -43,7 +44,6 @@ class TurbineTow(QtCore.QThread):
         self.vecstatus = "Vectrino disconnected "
         self.autoaborted = False
         self.aborted = False
-        self.settling = settling
         self.vec_salinity = vec_salinity
         
         commit = check_output(["git", "rev-parse", "--verify", "HEAD"])[:-1]
@@ -120,8 +120,10 @@ class TurbineTow(QtCore.QThread):
         while not acsc.getMotorState(self.hc, 0)["enabled"] or not \
         acsc.getMotorState(self.hc, 1)["enabled"]:
             self.msleep(100)
-        acsc.toPoint(self.hc, None, 0, self.y_R*self.R)
-        acsc.toPoint(self.hc, None, 1, self.z_H*self.H)
+        if self.y_R:
+            acsc.toPoint(self.hc, None, 0, self.y_R*self.R)
+        if self.z_H:
+            acsc.toPoint(self.hc, None, 1, self.z_H*self.H)
         while not acsc.getMotorState(self.hc, 0)["in position"] or not \
         acsc.getMotorState(self.hc, 1)["in position"]:
             self.msleep(300)
@@ -179,7 +181,12 @@ class TurbineTow(QtCore.QThread):
         if self.vectrino:
             if self.settling:
                 # Wait 10 minutes to measure tank settling time
-                self.sleep(600)
+                print("Waiting 10 minutes")
+                t0 = time.time()
+                dt = 0.0
+                while not self.aborted and dt < 600:
+                    time.sleep(0.5)
+                    dt = time.time() - t0
             if self.recordvno:
                 self.vec.stop_disk_recording()
             self.vec.stop()

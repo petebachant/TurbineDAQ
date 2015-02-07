@@ -64,7 +64,7 @@ ACC(5) = 0.3
 VEL(5) = 0.5
 VEL(4) = 10
 ptp 4, 0
-ptp/e 5, 0
+ptp/e 5, endpos
 STOPDC
 collect_data = 0
 OUT1.16 = 1
