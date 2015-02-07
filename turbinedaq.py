@@ -896,8 +896,7 @@ class MainWindow(QtGui.QMainWindow):
         # If executing a test plan start a single shot timer for next run
         if self.ui.tabTestPlan.isVisible():
             if self.ui.actionStart.isChecked():
-                # Move y and z axes to next location if applicable?
-                if self.turbinetow.autoaborted:
+                if self.turbinetow.autoaborted or self.turbinetow.settling:
                     idlesec = 5
                 else:
                     tow_speed = self.turbinetow.U
