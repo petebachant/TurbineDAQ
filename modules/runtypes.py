@@ -96,6 +96,8 @@ class TurbineTow(QtCore.QThread):
             self.vec.vel_range = 1
         elif self.maxvel <= 1.0 and self.maxvel > 0.3:
             self.vec.vel_range = 2
+        elif self.maxvel <= 0.3 or self.settling:
+            self.vec.vel_range = 3
         self.vec.set_config()
         self.metadata["Vectrino metadata"]["Velocity range (index)"] = \
                 self.vec.vel_range
