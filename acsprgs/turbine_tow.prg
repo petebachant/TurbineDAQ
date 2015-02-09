@@ -12,14 +12,14 @@ R = {turbine_radius}
 rpm = tsr*U/R*60/6.28318530718
 
 target = 24.5       ! Do not exceed 24.9 for traverse at x/D = 1
-endpos = {endpos}   ! Where to move carriage at end of tow
+endpos = {endpos}        ! Where to move carriage at end of tow
 tacc = 5            ! Time (in seconds) for turbine angular acceleration
 tzero = 2.5         ! Time (in seconds) to wait before starting
 
 VEL(5) = 0.5
 ptp/e 5, 0
 
-ACC(5) = 1
+ACC(5) = 1.0
 DEC(5) = 0.5
 VEL(5) = U
 JERK(5)= ACC(5)*10
@@ -39,8 +39,6 @@ JERK(4)= ACC(4)*10
 if RPOS(4) <> 60 & RPOS(4) <> 0
     ptp/e 4, 0
 end
-
-! Wait
 
 ! Allow oscillations in shaft to damp out
 wait 3000
