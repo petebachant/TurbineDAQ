@@ -662,7 +662,8 @@ class MainWindow(QtGui.QMainWindow):
                 self.do_tare_drag_tow(run_props.tow_speed)
             elif "tare" and "torque" in section.lower():
                 rpm = run_props.rpm
-                dur = run_props.dur
+                revs = run_props.revs
+                dur = revs/rpm*60
                 self.do_tare_torque_run(rpm, dur)
             elif "strut" and "torque" in section.lower():
                 if "turbine" in run_props:
@@ -672,8 +673,8 @@ class MainWindow(QtGui.QMainWindow):
                 ref_speed = run_props.ref_speed
                 tsr = run_props.tsr
                 radius = self.turbine_properties[turbine]["radius"]
-                dur = run_props.dur
-                self.do_strut_torque_run(ref_speed, tsr, radius, dur)
+                revs = run_props.revs
+                self.do_strut_torque_run(ref_speed, tsr, radius, revs)
             else:
                 # Do turbine tow
                 U = run_props.tow_speed
@@ -765,10 +766,10 @@ class MainWindow(QtGui.QMainWindow):
         self.run_in_progress = True
         self.tarerun.start()
         
-    def do_strut_torque_run(self, ref_speed, tsr, radius, dur):
+    def do_strut_torque_run(self, ref_speed, tsr, radius, revs):
         """Executes a single strut torque run."""
         self.tarerun = runtypes.StrutTorqueRun(self.hc, ref_speed, 
-                                               tsr, radius, dur)
+                                               tsr, radius, revs)
         self.tarerun.runfinished.connect(self.on_tare_run_finished)
         self.tarerun.metadata["Name"] = self.currentname
         self.acsdata = self.tarerun.acsdata

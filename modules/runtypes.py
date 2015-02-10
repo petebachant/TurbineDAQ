@@ -367,11 +367,11 @@ class StrutTorqueRun(TareTorqueRun):
         Reference tip speed ratio for calculating RPM
     radius : float
         Turbine radius (m) for calculating RPM
-    dur : float
-        Test duration in seconds
+    revs : float
+        Test duration in revolutions
     
     """
-    def __init__(self, acs_hcomm, ref_speed, tsr, radius, dur):
+    def __init__(self, acs_hcomm, ref_speed, tsr, radius, revs):
         # Convert ref_speed and tsr into RPM
         omega = tsr/radius*ref_speed
         self.rpm = omega/(2*np.pi)*60.0
@@ -379,6 +379,7 @@ class StrutTorqueRun(TareTorqueRun):
         self.ref_speed = ref_speed
         self.tsr = tsr
         self.radius = radius
+        dur = revs/self.rpm*60
         self.dur = dur
         self.metadata = {"Reference speed (m/s)" : ref_speed,
                          "Tip speed ratio" : tsr,
