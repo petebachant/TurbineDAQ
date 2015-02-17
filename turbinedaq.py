@@ -366,6 +366,9 @@ class MainWindow(QtGui.QMainWindow):
         self.wdir = str(self.line_edit_wdir.text())
         self.settings["Last working directory"] = self.wdir
         self.import_test_plan()
+        self.read_turbine_properties()
+        self.read_vectrino_properties()
+        self.read_fbg_properties()
     
     def on_tab_change(self):
         tabindex = self.ui.tabWidgetMode.currentIndex()
