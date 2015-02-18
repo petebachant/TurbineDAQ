@@ -825,7 +825,11 @@ class MainWindow(QtGui.QMainWindow):
                 except AttributeError:
                     U = None
                 if U == None:
-                    idlesec = 5
+                    if "strut" in self.section.lower() and "torque" in \
+                            self.section.lower():
+                        idlesec = 30
+                    else:
+                        idlesec = 5
                 elif U <= 0.6:
                     idlesec = 30
                 elif U <= 1.0:
