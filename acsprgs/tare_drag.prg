@@ -6,7 +6,7 @@ tzero = 2.5
 
 VEL(5) = {tow_speed}
 ACC(5) = 1
-DEC(5) = 1
+DEC(5) = 0.5
 
 ! Start controller data acquisition and send trigger pulse in same cycle
 BLOCK
@@ -21,6 +21,7 @@ WAIT tzero*1000
 
 PTP/e 5, 24.5
 VEL(5) = 0.6
+ACC(5) = 0.5
 PTP/e 5, 0
 STOPDC
 collect_data = 0
