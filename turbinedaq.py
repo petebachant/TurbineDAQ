@@ -72,14 +72,14 @@ class MainWindow(QtGui.QMainWindow):
         self.plot_timer = QtCore.QTimer()
         # Connect to controller
         self.connect_to_controller()
-        # Initialize plots
-        self.initialize_plots()
         # Import test plan
         self.import_test_plan()
         # Read turbine, vectrino, and fbg properties
         self.read_turbine_properties()
         self.read_vectrino_properties()
         self.read_fbg_properties()
+        # Initialize plots
+        self.initialize_plots()
         # Add checkboxes to ACS table widget
         self.add_acs_checkboxes()
         # Connect signals and slots
@@ -507,14 +507,22 @@ class MainWindow(QtGui.QMainWindow):
         self.curve_acs_rpm = guiqwt.curve.CurveItem()
         self.plot_acs_rpm = self.ui.plotRPM_acs.get_plot()
         self.plot_acs_rpm.add_item(self.curve_acs_rpm)
-        # FBG plot 1
-        self.curve_fbg_1 = guiqwt.curve.CurveItem()
-        self.plot_fbg_1 = self.ui.plot_FBG_1.get_plot()
-        self.plot_fbg_1.add_item(self.curve_fbg_1)
-        # FBG plot 2
-        self.curve_fbg_2 = guiqwt.curve.CurveItem()
-        self.plot_fbg_2 = self.ui.plot_FBG_2.get_plot()
-        self.plot_fbg_2.add_item(self.curve_fbg_2)
+        # Make list of FBG plots
+        self.fbg_plot_list = [self.ui.plot_FBG_1.get_plot(),
+                              self.ui.plot_FBG_2.get_plot(),
+                              self.ui.plot_FBG_3.get_plot(),
+                              self.ui.plot_FBG_4.get_plot(),
+                              self.ui.plot_FBG_5.get_plot()]
+        # Create list of FBG curves
+        self.fbg_curves = []
+        for n in range(len(self.fbg_properties)):
+            self.fbg_curves.append(guiqwt.curve.CurveItem())
+            if n > 4:
+                self.fbg_curves[n].setPen(QtGui.QPen(QtCore.Qt.blue, 1))
+        # Iterate through FBG curves list and add curves to plots
+        for n, curve in enumerate(self.fbg_curves):
+            n = n%5
+            self.fbg_plot_list[n].add_item(curve)
         
     def on_start(self):
         """Start whatever is visible in the tab widget."""
@@ -1079,10 +1087,10 @@ class MainWindow(QtGui.QMainWindow):
         """This function updates the FBG plots."""
         t = self.fbgdata["time"]
         fbgs = self.fbgthread.interr.sensors
-        self.curve_fbg_1.set_data(t, self.fbgdata[fbgs[0].name + "_wavelength"])
-        self.plot_fbg_1.replot()
-        self.curve_fbg_2.set_data(t, self.fbgdata[fbgs[1].name + "_wavelength"])
-        self.plot_fbg_2.replot()
+        for fbg, curve in zip(fbgs, self.fbg_curves):
+            curve.set_data(t, self.fbgdata[fbg.name + "_wavelength"])
+        for plot in self.fbg_plot_list:
+            plot.replot()
     
     def update_acs(self):
         """This function updates all the non-time-critical 
