@@ -65,8 +65,10 @@ class TurbineTow(QtCore.QThread):
             self.metadata["NI metadata"] = self.daqthread.metadata
         
         if self.fbg:
-            self.fbgthread = daqtasks.FbgDaqThread(fbg_properties, self.usetrigger)
+            self.fbgthread = daqtasks.FbgDaqThread(fbg_properties, 
+                                                   self.usetrigger)
             self.metadata["FBG metadata"] = self.fbgthread.metadata
+            self.fbgdata = self.fbgthread.data
         
     def build_acsprg(self):
         """Create the ACSPL+ program for running the run.

@@ -736,6 +736,7 @@ class MainWindow(QtGui.QMainWindow):
                 self.vecdata = self.turbinetow.vec.data
             if fbg:
                 self.fbgdata = self.turbinetow.fbgdata
+                self.fbgs = self.turbinetow.fbgthread.interr.sensors
             self.run_in_progress = True
             self.monitoracs = True
             self.monitorni = True
@@ -981,6 +982,7 @@ class MainWindow(QtGui.QMainWindow):
             fbg_props = self.fbg_properties
             self.fbgthread = daqtasks.FbgDaqThread(fbg_props, usetrigger=False)
             self.fbgdata = self.fbgthread.data
+            self.fbgs = self.fbgthread.interr.sensors
             self.fbgthread.start()
             self.monitorfbg = True
         else:
@@ -1086,8 +1088,7 @@ class MainWindow(QtGui.QMainWindow):
     def update_plots_fbg(self):
         """This function updates the FBG plots."""
         t = self.fbgdata["time"]
-        fbgs = self.fbgthread.interr.sensors
-        for fbg, curve in zip(fbgs, self.fbg_curves):
+        for fbg, curve in zip(self.fbgs, self.fbg_curves):
             curve.set_data(t, self.fbgdata[fbg.name + "_wavelength"])
         for plot in self.fbg_plot_list:
             plot.replot()
