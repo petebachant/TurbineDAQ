@@ -43,7 +43,7 @@
        <set>Qt::AllDockWidgetAreas</set>
       </property>
       <property name="windowTitle">
-       <string>NI Signals</string>
+       <string>NI-DAQ</string>
       </property>
       <widget class="QWidget" name="dockWidgetContents_2">
        <layout class="QGridLayout" name="gridLayout_8">
@@ -253,7 +253,7 @@
      <widget class="QDockWidget" name="dockWidget_FBG">
       <property name="minimumSize">
        <size>
-        <width>198</width>
+        <width>212</width>
         <height>601</height>
        </size>
       </property>
@@ -270,7 +270,7 @@
           <item>
            <widget class="QLabel" name="label_FBG_1">
             <property name="text">
-             <string>             Sensor 1</string>
+             <string>             Sensors 1 &amp; 6 Wavelength (nm)</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -287,7 +287,7 @@
           <item>
            <widget class="QLabel" name="label_FBG_2">
             <property name="text">
-             <string>            Sensor 2</string>
+             <string>            Sensors 2 &amp; 7 Wavelength (nm)</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -304,7 +304,7 @@
           <item>
            <widget class="QLabel" name="label_FBG_3">
             <property name="text">
-             <string>            Sensor 3</string>
+             <string>            Sensors 3 &amp; 8 Wavelength (nm)</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -321,7 +321,7 @@
           <item>
            <widget class="QLabel" name="label_FBG_4">
             <property name="text">
-             <string>            Sensor 4</string>
+             <string>            Sensors 4 &amp; 9 Wavelength (nm)</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -338,7 +338,7 @@
           <item>
            <widget class="QLabel" name="label_FBG_5">
             <property name="text">
-             <string>           Sensor 5</string>
+             <string>           Sensors 5 &amp; 10 Wavelength (nm)</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -1560,7 +1560,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>NI Signals</string>
+    <string>NI-DAQ</string>
    </property>
   </action>
   <action name="actionVectrino_View">

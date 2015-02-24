@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui\mainwindow.ui'
 #
-# Created: Thu Feb 05 21:23:13 2015
+# Created: Tue Feb 24 13:32:20 2015
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -152,7 +152,7 @@ class Ui_MainWindow(object):
         self.dockWidgetVectrino.setWidget(self.dockWidgetContents)
         self.gridLayout_4.addWidget(self.dockWidgetVectrino, 0, 2, 2, 1)
         self.dockWidget_FBG = QtGui.QDockWidget(self.centralwidget)
-        self.dockWidget_FBG.setMinimumSize(QtCore.QSize(198, 601))
+        self.dockWidget_FBG.setMinimumSize(QtCore.QSize(212, 601))
         self.dockWidget_FBG.setFeatures(QtGui.QDockWidget.AllDockWidgetFeatures)
         self.dockWidget_FBG.setObjectName(_fromUtf8("dockWidget_FBG"))
         self.dockWidgetContents_4 = QtGui.QWidget()
@@ -732,7 +732,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "TurbineDAQ", None))
-        self.dockWidgetNISignals.setWindowTitle(_translate("MainWindow", "NI Signals", None))
+        self.dockWidgetNISignals.setWindowTitle(_translate("MainWindow", "NI-DAQ", None))
         self.label.setText(_translate("MainWindow", "            Torque (Nm)", None))
         self.label_2.setText(_translate("MainWindow", "            Drag (N)", None))
         self.label_12.setText(_translate("MainWindow", "             Drag Left (N)", None))
@@ -745,11 +745,11 @@ class Ui_MainWindow(object):
         self.label_15.setText(_translate("MainWindow", "            Correlation (%)", None))
         self.label_5.setText(_translate("MainWindow", "            SNR (dB)", None))
         self.dockWidget_FBG.setWindowTitle(_translate("MainWindow", "FBG", None))
-        self.label_FBG_1.setText(_translate("MainWindow", "             Sensor 1", None))
-        self.label_FBG_2.setText(_translate("MainWindow", "            Sensor 2", None))
-        self.label_FBG_3.setText(_translate("MainWindow", "            Sensor 3", None))
-        self.label_FBG_4.setText(_translate("MainWindow", "            Sensor 4", None))
-        self.label_FBG_5.setText(_translate("MainWindow", "           Sensor 5", None))
+        self.label_FBG_1.setText(_translate("MainWindow", "             Sensors 1 & 6 Wavelength (nm)", None))
+        self.label_FBG_2.setText(_translate("MainWindow", "            Sensors 2 & 7 Wavelength (nm)", None))
+        self.label_FBG_3.setText(_translate("MainWindow", "            Sensors 3 & 8 Wavelength (nm)", None))
+        self.label_FBG_4.setText(_translate("MainWindow", "            Sensors 4 & 9 Wavelength (nm)", None))
+        self.label_FBG_5.setText(_translate("MainWindow", "           Sensors 5 & 10 Wavelength (nm)", None))
         self.dockWidget_acscontrol.setWindowTitle(_translate("MainWindow", "ACS Controller", None))
         item = self.tableWidget_acs.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Axis", None))
@@ -854,7 +854,7 @@ class Ui_MainWindow(object):
         self.actionAbout.setText(_translate("MainWindow", "About", None))
         self.actionMonitor_FBG.setText(_translate("MainWindow", "Monitor FBG", None))
         self.actionMonitor_FBG.setToolTip(_translate("MainWindow", "Monitor FBG...", None))
-        self.actionNI_Signals.setText(_translate("MainWindow", "NI Signals", None))
+        self.actionNI_Signals.setText(_translate("MainWindow", "NI-DAQ", None))
         self.actionVectrino_View.setText(_translate("MainWindow", "Vectrino", None))
         self.actionFBG.setText(_translate("MainWindow", "FBG", None))
 
