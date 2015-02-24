@@ -277,7 +277,7 @@ class FbgDaqThread(QtCore.QThread):
         self.interr.zero_strain_sensors()
         self.interr.set_trigger_defaults(usetrigger)
         self.collectdata = True
-        self.metadata = fbg_props
+        self.metadata = fbg_props.copy()
         self.metadata["Data interleave"] = self.interr.data_interleave
         self.data = self.interr.data
 
@@ -285,12 +285,11 @@ class FbgDaqThread(QtCore.QThread):
         while self.collectdata:
             self.interr.get_data()
             self.interr.sleep()
-        self.interr.disconnect()
 
     def stop(self):
         self.collectdata = False
         self.metadata["Triggering mode"] = self.interr.data_header["Triggering mode"]
-
+        self.interr.disconnect()
 
 if __name__ == "__main__":
     pass
