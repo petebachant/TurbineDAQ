@@ -25,7 +25,7 @@ class TurbineTow(QtCore.QThread):
         """Turbine tow run object."""
         QtCore.QThread.__init__(self)        
         self.hc = acs_hcomm
-        self.U = U
+        self.U = float(U)
         self.tsr = tsr
         self.y_R = y_R
         self.z_H = z_H
@@ -48,7 +48,7 @@ class TurbineTow(QtCore.QThread):
         
         commit = check_output(["git", "rev-parse", "--verify", "HEAD"])[:-1]
         
-        self.metadata = {"Tow speed (m/s)" : U,
+        self.metadata = {"Tow speed (m/s)" : float(U),
                          "Tip speed ratio" : tsr, 
                          "Time created" : time.asctime(),
                          "TurbineDAQ version" : commit}
