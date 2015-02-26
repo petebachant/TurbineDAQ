@@ -49,15 +49,13 @@ class TurbineTow(QtCore.QThread):
         commit = check_output(["git", "rev-parse", "--verify", "HEAD"])[:-1]
         
         self.metadata = {"Tow speed (m/s)" : U,
-                         "Tip speed ratio" : tsr,
-                         "Vectrino y/R" : y_R,
-                         "Vectrino z/H" : z_H, 
+                         "Tip speed ratio" : tsr, 
                          "Time created" : time.asctime(),
                          "TurbineDAQ version" : commit}
         
         if self.vectrino:
             self.vec = PdControl()
-            self.metadata["Vectrino metadata"] = {}
+            self.metadata["Vectrino metadata"] = {"y/R": y_R, "z/H": z_H}
             
         if self.nidaq:
             self.daqthread = daqtasks.NiDaqThread(usetrigger=self.usetrigger)
