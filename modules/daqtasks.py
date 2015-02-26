@@ -270,17 +270,16 @@ class FbgDaqThread(QtCore.QThread):
         QtCore.QThread.__init__(self)
         self.interr = micronopt.Interrogator(fbg_props=fbg_props)
         self.interr.connect()
+        self.interr.set_trigger_defaults(usetrigger)
         self.interr.create_sensors()
         self.interr.data_interleave = 1
         self.interr.num_averages = 1
-        self.interr.setup_append_data()
         self.interr.zero_strain_sensors()
-        self.interr.set_trigger_defaults(usetrigger)
-        self.interr.trig_start_edge = 1
-        self.interr.trig_stop_edge = 0
+        self.interr.setup_append_data()
         self.collectdata = True
         self.metadata = fbg_props.copy()
         self.metadata["Data interleave"] = self.interr.data_interleave
+        self.metadata["Num averages"] = self.interr.num_averages
         self.data = self.interr.data
 
     def run(self):
