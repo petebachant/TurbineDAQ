@@ -1089,7 +1089,7 @@ class MainWindow(QtGui.QMainWindow):
         """This function updates the FBG plots."""
         t = self.fbgdata["time"]
         for fbg, curve in zip(self.fbgs, self.fbg_curves):
-            curve.set_data(t, self.fbgdata[fbg.name + "_wavelength"])
+            curve.set_data(t, self.fbgdata[fbg.name + "_strain"])
         for plot in self.fbg_plot_list:
             plot.replot()
     
