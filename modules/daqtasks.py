@@ -279,7 +279,6 @@ class FbgDaqThread(QtCore.QThread):
             self.interr.auto_retrig = 1
         else:
             self.interr.trig_mode = 0
-        self.interr.set_trigger_defaults(usetrigger)
         self.interr.create_sensors()
         self.interr.data_interleave = 1
         self.interr.num_averages = 1
