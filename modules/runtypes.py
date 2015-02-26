@@ -66,7 +66,7 @@ class TurbineTow(QtCore.QThread):
         
         if self.fbg:
             self.fbgthread = daqtasks.FbgDaqThread(fbg_properties, 
-                                                   self.usetrigger)
+                                                   usetrigger=self.usetrigger)
             self.metadata["FBG metadata"] = self.fbgthread.metadata
             self.fbgdata = self.fbgthread.data
         
@@ -157,9 +157,13 @@ class TurbineTow(QtCore.QThread):
                 print("Waiting 6 seconds")
                 self.sleep(6)
                 self.daqthread.start()
+                if self.fbg:
+                    self.fbgthread.start()
                 self.start_motion()
         elif self.nidaq:
             self.daqthread.start()
+            if self.fbg:
+                self.fbgthread.start()
             self.start_motion()
         else:
             # Start motion

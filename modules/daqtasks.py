@@ -274,6 +274,7 @@ class FbgDaqThread(QtCore.QThread):
         self.interr.create_sensors()
         self.interr.data_interleave = 1
         self.interr.num_averages = 1
+        self.interr.setup_streaming()
         self.interr.zero_strain_sensors()
         self.interr.setup_append_data()
         self.collectdata = True
