@@ -163,7 +163,7 @@ class NiDaqThread(QtCore.QThread):
                                                    turbang)
             self.data["turbine_rpm"] \
                 = ts.smooth(fdiff.second_order_diff(self.data["turbine_angle"], 
-                                          self.data["time"])/6.0, 50)
+                                          self.data["time"])/6.0, 8)
             return 0 # The function should return an integer
             
         # Convert the python callback function to a CFunction
