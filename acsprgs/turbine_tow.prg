@@ -50,7 +50,7 @@ BLOCK
     collect_data = 1
     DC/c data, 100, 1.0, TIME, FVEL(5), FVEL(4)
     ! Send trigger pulse for data acquisition
-    OUT1.16 = 0
+    OUT1.16 = 1
 END
 
 wait tzero*1000
@@ -65,6 +65,6 @@ ptp 4, 0
 ptp/e 5, endpos
 STOPDC
 collect_data = 0
-OUT1.16 = 1
+OUT1.16 = 0
 
 STOP

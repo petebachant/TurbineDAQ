@@ -115,8 +115,8 @@ class TurbineTow(QtCore.QThread):
 
     def run(self):
         """Start the run. Comms should be open already with the controller."""
-        if not acsc.getOutput(self.hc, 1, 16):
-            acsc.setOutput(self.hc, 1, 16, 1)
+        if acsc.getOutput(self.hc, 1, 16):
+            acsc.setOutput(self.hc, 1, 16, 0)
         if self.vectrino:
             acsc.enable(self.hc, 0)
             acsc.enable(self.hc, 1)
