@@ -287,7 +287,8 @@ class FbgDaqThread(QtCore.QThread):
         self.interr.zero_strain_sensors()
         self.interr.setup_append_data()
         self.collectdata = True
-        self.metadata = fbg_props.copy()
+        self.metadata = {}
+        self.metadata["Sensors"] = fbg_props.copy()
         self.metadata["Data interleave"] = self.interr.data_interleave
         self.metadata["Num averages"] = self.interr.num_averages
         self.data = self.interr.data
