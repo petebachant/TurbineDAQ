@@ -980,7 +980,7 @@ class MainWindow(QtGui.QMainWindow):
     def on_monitor_fbg(self):
         if self.ui.actionMonitor_FBG.isChecked():
             fbg_props = self.fbg_properties
-            self.fbgthread = daqtasks.FbgDaqThread(fbg_props, usetrigger=True)
+            self.fbgthread = daqtasks.FbgDaqThread(fbg_props, usetrigger=False)
             self.fbgdata = self.fbgthread.data
             self.fbgs = self.fbgthread.interr.sensors
             self.fbgthread.start()
