@@ -284,7 +284,6 @@ class FbgDaqThread(QtCore.QThread):
         self.interr.data_interleave = 2
         self.interr.num_averages = 2
         self.interr.zero_strain_sensors()
-        self.interr.flush_buffer()
         self.interr.setup_append_data()
         self.collectdata = True
         self.metadata = {}
@@ -300,7 +299,6 @@ class FbgDaqThread(QtCore.QThread):
 
     def stop(self):
         self.collectdata = False
-        self.metadata["Triggering mode"] = self.interr.data_header["Triggering mode"]
         self.interr.disconnect()
 
 if __name__ == "__main__":

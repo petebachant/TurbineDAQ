@@ -182,6 +182,8 @@ class TurbineTow(QtCore.QThread):
         if self.nidaq:
             self.daqthread.clear()
             print("NI tasks cleared")
+        if self.fbg:
+            self.fbgthread.stop()
         if self.vectrino:
             if self.settling:
                 # Wait 10 minutes to measure tank settling time
