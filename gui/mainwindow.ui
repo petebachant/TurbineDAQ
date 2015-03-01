@@ -270,7 +270,7 @@
           <item>
            <widget class="QLabel" name="label_FBG_1">
             <property name="text">
-             <string>             Sensors 1 &amp; 6 Wavelength (nm)</string>
+             <string>             Sensors 1 &amp; 6 Microstrain</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -287,7 +287,7 @@
           <item>
            <widget class="QLabel" name="label_FBG_2">
             <property name="text">
-             <string>            Sensors 2 &amp; 7 Wavelength (nm)</string>
+             <string>            Sensor 2 Microstrain</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -304,7 +304,7 @@
           <item>
            <widget class="QLabel" name="label_FBG_3">
             <property name="text">
-             <string>            Sensors 3 &amp; 8 Wavelength (nm)</string>
+             <string>            Sensor 3 Microstrain</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -321,7 +321,7 @@
           <item>
            <widget class="QLabel" name="label_FBG_4">
             <property name="text">
-             <string>            Sensors 4 &amp; 9 Wavelength (nm)</string>
+             <string>            Sensor 4 Microstrain</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -338,7 +338,7 @@
           <item>
            <widget class="QLabel" name="label_FBG_5">
             <property name="text">
-             <string>           Sensors 5 &amp; 10 Wavelength (nm)</string>
+             <string>           Sensor 5 Microstrain</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>

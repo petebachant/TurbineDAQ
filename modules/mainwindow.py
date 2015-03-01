@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui\mainwindow.ui'
 #
-# Created: Tue Feb 24 13:32:20 2015
+# Created: Sun Mar 01 11:22:32 2015
 #      by: PyQt4 UI code generator 4.9.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -745,11 +745,11 @@ class Ui_MainWindow(object):
         self.label_15.setText(_translate("MainWindow", "            Correlation (%)", None))
         self.label_5.setText(_translate("MainWindow", "            SNR (dB)", None))
         self.dockWidget_FBG.setWindowTitle(_translate("MainWindow", "FBG", None))
-        self.label_FBG_1.setText(_translate("MainWindow", "             Sensors 1 & 6 Wavelength (nm)", None))
-        self.label_FBG_2.setText(_translate("MainWindow", "            Sensors 2 & 7 Wavelength (nm)", None))
-        self.label_FBG_3.setText(_translate("MainWindow", "            Sensors 3 & 8 Wavelength (nm)", None))
-        self.label_FBG_4.setText(_translate("MainWindow", "            Sensors 4 & 9 Wavelength (nm)", None))
-        self.label_FBG_5.setText(_translate("MainWindow", "           Sensors 5 & 10 Wavelength (nm)", None))
+        self.label_FBG_1.setText(_translate("MainWindow", "             Sensors 1 & 6 Microstrain", None))
+        self.label_FBG_2.setText(_translate("MainWindow", "            Sensor 2 Microstrain", None))
+        self.label_FBG_3.setText(_translate("MainWindow", "            Sensor 3 Microstrain", None))
+        self.label_FBG_4.setText(_translate("MainWindow", "            Sensor 4 Microstrain", None))
+        self.label_FBG_5.setText(_translate("MainWindow", "           Sensor 5 Microstrain", None))
         self.dockWidget_acscontrol.setWindowTitle(_translate("MainWindow", "ACS Controller", None))
         item = self.tableWidget_acs.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Axis", None))
