@@ -301,7 +301,6 @@ class FbgDaqThread(QtCore.QThread):
     def stop(self):
         self.collectdata = False
         self.metadata["Triggering mode"] = self.interr.data_header["Triggering mode"]
-        self.interr.flush_buffer()
         self.interr.disconnect()
 
 if __name__ == "__main__":
