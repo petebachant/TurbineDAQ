@@ -1,13 +1,20 @@
-[![Stories in Ready](https://badge.waffle.io/petebachant/turbinedaq.png?label=ready&title=Ready)](https://waffle.io/petebachant/turbinedaq)
 TurbineDAQ
 ==========
+
+[![Stories in Ready](https://badge.waffle.io/petebachant/turbinedaq.png?label=ready&title=Ready)](https://waffle.io/petebachant/turbinedaq)
+
 A Python desktop app for automated turbine data acquisition in the UNH tow tank. 
 
+![Screenshot](screenshots/TurbineDAQ_2014.03.03.PNG)
+
+
 ## Test plan
+
 A matrix of test parameters should be created and placed in the `Test plan` directory.
 Each "section" of the experiment gets its own CSV file. See `test/Test plan` for an
 example. The test plan, if one exists, is loaded into the GUI at startup. To change, it must be
 edited externally and reloaded. 
+
 
 ## Directory and file structure
 
@@ -57,15 +64,11 @@ In the `runtypes` module, there are classes to represent each type of run:
 Each of these subclass PyQt's `QThread`. For future experiments, there will likely be
 a `TurbineTowInWaves` or options in `TurbineTow` for wave generation with `makewaves`. 
 
-Screenshot
-----------
-
-![Screenshot](screenshots/TurbineDAQ_2014.03.03.PNG)
 
 License
 -------
 
-TurbineDAQ Copyright (c) 2013-2014 Peter Bachant
+TurbineDAQ Copyright (c) 2013-2015 Peter Bachant
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
