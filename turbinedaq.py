@@ -1,11 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Aug 15 20:43:44 2013
-@author: Pete Bachant
-
-This is the TurbineDAQ main module.
-
-"""
+#!/usr/bin/env python
+"""TurbineDAQ main app module."""
 
 from __future__ import division, print_function
 from PyQt4 import QtCore, QtGui
@@ -26,7 +20,7 @@ from pxl import timeseries as ts
 import shutil
 import pandas as pd
 import scipy.interpolate
-                  
+
 fluid_params = {"rho" : 1000.0}
 abort_on_bad_vecdata = True
 
@@ -36,11 +30,11 @@ class MainWindow(QtGui.QMainWindow):
         QtGui.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        
+
         # Create time vector
         self.t = np.array([])
         self.time_last_run = time.time()
-        
+
         # Some operating parameters
         self.plot_len_sec = 30.0
         self.monitoracs = False
@@ -53,7 +47,7 @@ class MainWindow(QtGui.QMainWindow):
         self.enabled_axes = {}
         self.test_plan = {}
         self.turbinetow = None
-        
+
         # Add file path combobox to toolbar
         self.line_edit_wdir = QtGui.QLineEdit()
         self.ui.toolBar_directory.addWidget(self.line_edit_wdir)
@@ -62,7 +56,7 @@ class MainWindow(QtGui.QMainWindow):
         self.toolbutton_wdir = QtGui.QToolButton()
         self.ui.toolBar_directory.addWidget(self.toolbutton_wdir)
         self.toolbutton_wdir.setIcon(QtGui.QIcon(":icons/folder_yellow.png"))
-        
+
         # Add labels to status bar
         self.add_labels_to_statusbar()
         # Read in and apply settings from last session
@@ -105,7 +99,7 @@ class MainWindow(QtGui.QMainWindow):
         if "Vectrino visible" in self.settings:
             self.ui.dockWidgetVectrino.setVisible(self.settings["Vectrino visible"])
             self.ui.actionVectrino_View.setChecked(self.settings["Vectrino visible"])
-        
+
     def load_settings(self):
         """Loads settings from JSON file."""
         self.pcid = platform.node()
@@ -153,9 +147,9 @@ class MainWindow(QtGui.QMainWindow):
         if "Shakedown FBG" in self.settings:
             val = self.settings["Shakedown FBG"]
             self.ui.checkBox_singleRunFBG.setChecked(val)
-            
+
     def read_turbine_properties(self):
-        """Reads turbine properties from `Config/turbine_properties.json` in 
+        """Reads turbine properties from `Config/turbine_properties.json` in
         the experiment's working directory."""
         fpath = os.path.join(self.wdir, "Config", "turbine_properties.json")
         try:
@@ -193,7 +187,7 @@ class MainWindow(QtGui.QMainWindow):
             print("FBG properties loaded")
         except IOError:
             self.fbg_properties = {}
-        
+
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
         runpath = os.path.join(self.wdir, "Data", "Raw", section, str(number))
@@ -201,7 +195,7 @@ class MainWindow(QtGui.QMainWindow):
             return True
         else:
             return False
-    
+
     def is_section_done(self, section):
         """Detects if a test plan section is done."""
         done = True
@@ -209,7 +203,7 @@ class MainWindow(QtGui.QMainWindow):
             if not self.is_run_done(section, nrun):
                 done = False
         return done
-    
+
     def import_test_plan(self):
         """Imports test plan from CSVs in "Test plan" subdirectory"""
         tpdir = os.path.join(self.wdir, "Config", "Test plan")
@@ -237,20 +231,20 @@ class MainWindow(QtGui.QMainWindow):
             self.test_plan_loaded = True
             print("Test plan loaded")
             self.test_plan_into_table()
-         
+
     def test_plan_into_table(self):
         """Takes test plan values and puts them in table widget"""
         section = str(self.ui.comboBox_testPlanSection.currentText())
         if section in self.test_plan:
             paramlist = list(self.test_plan[section].columns)
             self.ui.tableWidgetTestPlan.setColumnCount(len(paramlist)+1)
-            self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(paramlist+["Done?"])       
+            self.ui.tableWidgetTestPlan.setHorizontalHeaderLabels(paramlist+["Done?"])
             self.ui.tableWidgetTestPlan.setRowCount(
                     len(self.test_plan[section][paramlist[0]]))
             for i in range(len(paramlist)):
                 itemlist = self.test_plan[section][paramlist[i]]
                 for n in range(len(itemlist)):
-                    self.ui.tableWidgetTestPlan.setItem(n, i, 
+                    self.ui.tableWidgetTestPlan.setItem(n, i,
                                 QtGui.QTableWidgetItem(str(itemlist[n])))
                     # Check if run is done
                     if str(section).lower() != "top level":
@@ -262,7 +256,7 @@ class MainWindow(QtGui.QMainWindow):
                                 self.ui.tableWidgetTestPlan.item(n, j).\
                                         setTextColor(QtCore.Qt.darkGreen)
                                 self.ui.tableWidgetTestPlan.item(n, j).\
-                                        setBackgroundColor(QtCore.Qt.lightGray)                                    
+                                        setBackgroundColor(QtCore.Qt.lightGray)
                         else:
                             self.ui.tableWidgetTestPlan.setItem(n, i+1,
                                     QtGui.QTableWidgetItem("No"))
@@ -273,7 +267,7 @@ class MainWindow(QtGui.QMainWindow):
             # Set column widths
             self.ui.tableWidgetTestPlan.setColumnWidth(0, 31)
             self.ui.tableWidgetTestPlan.setColumnWidth(len(paramlist), 43)
-                                    
+
     def update_sections_done(self):
         for n in range(self.ui.tableWidgetTestPlan.rowCount()):
 #            section_type = str(self.ui.tableWidgetTestPlan.item(n, 0).text())
@@ -290,7 +284,7 @@ class MainWindow(QtGui.QMainWindow):
             else:
                 text = QtGui.QTableWidgetItem("No")
             self.ui.tableWidgetTestPlan.setItem(n+1, -1, text)
-            
+
     def add_acs_checkboxes(self):
         """Add checkboxes for axes being enabled."""
         self.checkbox_tow_axis = QtGui.QCheckBox()
@@ -329,7 +323,7 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.tableWidget_acs.setCellWidget(1, 1, widget_turbine)
         self.ui.tableWidget_acs.setCellWidget(2, 1, widget_y)
         self.ui.tableWidget_acs.setCellWidget(3, 1, widget_z)
-        
+
     def connect_sigs_slots(self):
         """Connect signals to appropriate slots."""
         self.toolbutton_wdir.clicked.connect(self.on_tbutton_wdir)
@@ -358,7 +352,7 @@ class MainWindow(QtGui.QMainWindow):
         self.checkbox_turbine_axis.clicked.connect(self.on_checkbox_turbine_axis)
         self.checkbox_y_axis.clicked.connect(self.on_checkbox_y_axis)
         self.checkbox_z_axis.clicked.connect(self.on_checkbox_z_axis)
-        
+
     def on_tbutton_wdir(self):
         self.wdir = QFileDialog.getExistingDirectory()
         if self.wdir:
@@ -369,7 +363,7 @@ class MainWindow(QtGui.QMainWindow):
         self.read_turbine_properties()
         self.read_vectrino_properties()
         self.read_fbg_properties()
-    
+
     def on_tab_change(self):
         tabindex = self.ui.tabWidgetMode.currentIndex()
         tabitem = self.ui.tabWidgetMode.tabText(tabindex)
@@ -384,19 +378,19 @@ class MainWindow(QtGui.QMainWindow):
             runsdone = [str(n) for n in runsdone]
             self.ui.comboBox_process_nrun.clear()
             self.ui.comboBox_process_nrun.addItems(runsdone)
-    
+
     def on_home_tow(self):
         acsc.runBuffer(self.hc, 2)
-    
+
     def on_home_turbine(self):
         acsc.runBuffer(self.hc, 8)
-        
+
     def on_home_y(self):
         acsc.runBuffer(self.hc, 12)
-        
+
     def on_home_z(self):
         acsc.runBuffer(self.hc, 11)
-    
+
     def on_open_section_folder(self):
         section = str(self.ui.comboBox_testPlanSection.currentText())
         subdir = os.path.join(self.wdir, "Data", "Raw", section)
@@ -405,7 +399,7 @@ class MainWindow(QtGui.QMainWindow):
         except WindowsError:
             os.makedirs(subdir)
             os.startfile(subdir)
-        
+
     def on_open_shakedown(self):
         subdir = os.path.join(self.wdir, "Data", "Raw", "Shakedown")
         try:
@@ -413,7 +407,7 @@ class MainWindow(QtGui.QMainWindow):
         except WindowsError:
             os.makedirs(subdir)
             os.startfile(subdir)
-            
+
     def on_section_change(self):
         section = self.ui.comboBox_testPlanSection.currentText()
         if str(section).lower() == "top level":
@@ -423,7 +417,7 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.actionStart.setEnabled(True)
         if section in self.test_plan:
             self.test_plan_into_table()
-        
+
     def add_labels_to_statusbar(self):
         self.label_acs_connect = QLabel()
         self.ui.statusbar.addWidget(self.label_acs_connect)
@@ -436,9 +430,9 @@ class MainWindow(QtGui.QMainWindow):
         self.label_runstatus = QLabel()
         self.label_runstatus.setText("Not running ")
         self.ui.statusbar.addWidget(self.label_runstatus)
-    
+
     def connect_to_controller(self):
-        self.hc = acsc.openCommEthernetTCP()    
+        self.hc = acsc.openCommEthernetTCP()
         if self.hc == acsc.INVALID:
             print("Cannot connect to ACS controller")
             print("Attempting to connect to simulator")
@@ -451,7 +445,7 @@ class MainWindow(QtGui.QMainWindow):
                 self.label_acs_connect.setText(" Connected to SPiiPlus simulator ")
         else:
             self.label_acs_connect.setText(" Connected to ACS controller ")
-            
+
     def initialize_plots(self):
         # Torque trans plot
         self.curve_torque_trans = guiqwt.curve.CurveItem()
@@ -523,7 +517,7 @@ class MainWindow(QtGui.QMainWindow):
         for n, curve in enumerate(self.fbg_curves):
             n = n%5
             self.fbg_plot_list[n].add_item(curve)
-        
+
     def on_start(self):
         """Start whatever is visible in the tab widget."""
         self.abort = False
@@ -552,7 +546,7 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.toolBar_DAQ.setEnabled(True)
             self.ui.toolBar_directory.setEnabled(True)
             self.ui.tabWidgetMode.setEnabled(True)
-            
+
     def on_abort(self):
         """Abort current run and don't save data, but ask whether or not to
         delete folder created."""
@@ -590,7 +584,7 @@ class MainWindow(QtGui.QMainWindow):
         except AttributeError:
             pass
         self.run_in_progress = False
-        
+
     def auto_abort(self):
         """Abort run, don't save data, and automatically delete any files
         or folders generated. Also will move turbine and tow axes back
@@ -610,7 +604,7 @@ class MainWindow(QtGui.QMainWindow):
         print("Bad Vectrino data detected")
         if abort_on_bad_vecdata:
             self.auto_abort()
-        
+
     def do_shakedown(self):
         """Executes a single shakedown run."""
         U = self.ui.doubleSpinBox_singleRun_U.value()
@@ -638,7 +632,7 @@ class MainWindow(QtGui.QMainWindow):
         os.mkdir(self.savesubdir)
         self.do_turbine_tow(U, tsr, y_R, z_H, turbine="shakedown",
                             vectrino=vectrino, fbg=fbg)
-                            
+
     def do_test_plan(self):
         """Continue test plan"""
         section = str(self.ui.comboBox_testPlanSection.currentText())
@@ -696,14 +690,14 @@ class MainWindow(QtGui.QMainWindow):
                     turbine = self.turbine_properties.keys()[0]
                 if "vectrino" in run_props:
                     vectrino = run_props.vectrino
-                else: 
+                else:
                     vectrino = True
                 if vectrino:
                     y_R = run_props["y/R"]
                     z_H = run_props["z/H"]
                 else:
                     y_R = z_H = None
-                try: 
+                try:
                     fbg = run_props["fbg"]
                 except KeyError:
                     fbg = False
@@ -713,17 +707,17 @@ class MainWindow(QtGui.QMainWindow):
         else:
             print("'{}' is done".format(section))
             self.ui.actionStart.trigger()
-        
-    def do_turbine_tow(self, U, tsr, y_R, z_H, turbine="RVAT", 
+
+    def do_turbine_tow(self, U, tsr, y_R, z_H, turbine="RVAT",
                        vectrino=True, fbg=False, settling=False):
         """Executes a single turbine tow."""
         if acsc.getMotorState(self.hc, 5)["enabled"]:
             self.abort = False
             vecsavepath = os.path.join(self.savesubdir, "vecdata")
             turbine_properties = self.turbine_properties[turbine]
-            self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H, 
+            self.turbinetow = runtypes.TurbineTow(self.hc, U, tsr, y_R, z_H,
                     nidaq=True, vectrino=vectrino, vecsavepath=vecsavepath,
-                    turbine_properties=turbine_properties, fbg=fbg, 
+                    turbine_properties=turbine_properties, fbg=fbg,
                     fbg_properties=self.fbg_properties,
                     settling=settling, vec_salinity=self.vec_salinity)
             self.turbinetow.towfinished.connect(self.on_tow_finished)
@@ -751,7 +745,7 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.actionStart.trigger()
             msg = "Run cannot start because the tow axis is disabled."
             QtGui.QMessageBox.information(self, "Cannot Start", msg)
-        
+
     def do_tare_drag_tow(self, U):
         """Executes a single tare drag run"""
         self.tarerun = runtypes.TareDragRun(self.hc, U)
@@ -764,7 +758,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorvec = False
         self.run_in_progress = True
         self.tarerun.start()
-        
+
     def do_tare_torque_run(self, rpm, dur):
         """Executes a single tare torque run"""
         self.tarerun = runtypes.TareTorqueRun(self.hc, rpm, dur)
@@ -777,10 +771,10 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorvec = False
         self.run_in_progress = True
         self.tarerun.start()
-        
+
     def do_strut_torque_run(self, ref_speed, tsr, radius, revs):
         """Executes a single strut torque run."""
-        self.tarerun = runtypes.StrutTorqueRun(self.hc, ref_speed, 
+        self.tarerun = runtypes.StrutTorqueRun(self.hc, ref_speed,
                                                tsr, radius, revs)
         self.tarerun.runfinished.connect(self.on_tare_run_finished)
         self.tarerun.metadata["Name"] = self.currentname
@@ -791,7 +785,7 @@ class MainWindow(QtGui.QMainWindow):
         self.monitorvec = False
         self.run_in_progress = True
         self.tarerun.start()
-        
+
     def on_tare_run_finished(self):
         """
         Once a tare run is complete, saves data if necessary and updates
@@ -819,7 +813,7 @@ class MainWindow(QtGui.QMainWindow):
             print("Saved")
         elif self.tarerun.aborted:
             quit_msg = "Delete files from aborted run?"
-            reply = QtGui.QMessageBox.question(self, 'Run Aborted', 
+            reply = QtGui.QMessageBox.question(self, 'Run Aborted',
                      quit_msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
             if reply == QtGui.QMessageBox.Yes:
                 shutil.rmtree(self.savesubdir)
@@ -856,12 +850,12 @@ class MainWindow(QtGui.QMainWindow):
                     self.ui.tableWidgetTestPlan.scrollToItem(cr)
                 except:
                     pass
-        else: 
+        else:
             self.ui.actionStart.setChecked(False)
             self.on_start()
         self.nidata = {}
         self.acsdata = {}
-        
+
     def on_tow_finished(self):
         """Current tow complete."""
         # Reset time of last run
@@ -901,7 +895,7 @@ class MainWindow(QtGui.QMainWindow):
                 subprocess.call(cmdlist, shell=True)
         elif self.turbinetow.aborted:
             quit_msg = "Delete files from aborted run?"
-            reply = QtGui.QMessageBox.question(self, "Run Aborted", 
+            reply = QtGui.QMessageBox.question(self, "Run Aborted",
                      quit_msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
             if reply == QtGui.QMessageBox.Yes:
                 shutil.rmtree(self.savesubdir)
@@ -917,7 +911,7 @@ class MainWindow(QtGui.QMainWindow):
                     idlesec = 5
                 else:
                     tow_speed = self.turbinetow.U
-                    stpath = os.path.join(self.wdir, "Config", 
+                    stpath = os.path.join(self.wdir, "Config",
                                           "settling_times.csv")
                     stdf = pd.read_csv(stpath)
                     f_interp = scipy.interpolate.interp1d(stdf.tow_speed,
@@ -939,22 +933,22 @@ class MainWindow(QtGui.QMainWindow):
         self.nidata = {}
         self.acsdata = {}
         self.fbgdata = {}
-        
+
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():
             self.do_test_plan()
-        
+
     def on_monitor_acs(self):
         if self.ui.actionMonitor_ACS.isChecked():
             self.acsthread = daqtasks.AcsDaqThread(self.hc, makeprg=True,
                                      sample_rate=1000, bufflen=100)
-            self.acsdata = self.acsthread.data            
+            self.acsdata = self.acsthread.data
             self.acsthread.start()
             self.monitoracs = True
         else:
             self.acsthread.stop()
             self.monitoracs = False
-        
+
     def on_monitor_ni(self):
         if self.ui.actionMonitor_NI.isChecked():
             self.daqthread = daqtasks.NiDaqThread(usetrigger=False)
@@ -967,7 +961,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def on_monitor_vec(self):
         if self.ui.actionMonitor_Vectrino.isChecked():
-            self.vecthread = vectasks.VectrinoThread(usetrigger=False, 
+            self.vecthread = vectasks.VectrinoThread(usetrigger=False,
                     maxvel=0.5, record=False, salinity=self.vec_salinity)
             self.vecdata = self.vecthread.vecdata
             self.vecthread.start()
@@ -976,7 +970,7 @@ class MainWindow(QtGui.QMainWindow):
             self.vecthread.stop()
             self.monitorvec = False
             self.label_vecstatus.setText(self.vecthread.vecstatus)
-            
+
     def on_monitor_fbg(self):
         if self.ui.actionMonitor_FBG.isChecked():
             fbg_props = self.fbg_properties
@@ -988,37 +982,37 @@ class MainWindow(QtGui.QMainWindow):
         else:
             self.fbgthread.stop()
             self.monitorfbg = False
-    
+
     def on_checkbox_tow_axis(self):
         if self.checkbox_tow_axis.isChecked():
             acsc.enable(self.hc, 5)
         else:
             acsc.disable(self.hc, 5)
-            
+
     def on_checkbox_turbine_axis(self):
         if self.checkbox_turbine_axis.isChecked():
             acsc.enable(self.hc, 4)
         else:
             acsc.disable(self.hc, 4)
-            
+
     def on_checkbox_y_axis(self):
         if self.checkbox_y_axis.isChecked():
             acsc.enable(self.hc, 0)
         else:
             acsc.disable(self.hc, 0)
-            
+
     def on_checkbox_z_axis(self):
         if self.checkbox_z_axis.isChecked():
             acsc.enable(self.hc, 1)
         else:
             acsc.disable(self.hc, 1)
-    
+
     def on_timer(self):
         self.update_acs()
         self.time_since_last_run = time.time() - self.time_last_run
         self.label_timer.setText("Time since last run: " + \
         str(int(self.time_since_last_run)) + " s ")
-            
+
     def on_plot_timer(self):
         if self.monitoracs:
             self.update_plots_acs()
@@ -1035,13 +1029,13 @@ class MainWindow(QtGui.QMainWindow):
             self.update_plots_ni()
         if self.monitorfbg:
             self.update_plots_fbg()
-            
+
     def on_process(self):
         section = str(self.ui.comboBox_process_section.currentText())
         nrun = str(self.ui.comboBox_process_nrun.currentText())
-        subprocess.call(["cd", self.wdir, "&", "python", 
+        subprocess.call(["cd", self.wdir, "&", "python",
                          self.wdir+"/processing.py", section, nrun], shell=True)
-    
+
     def update_plots_acs(self):
         """Update the acs plots for carriage speed, rpm, and tsr"""
         t = self.acsdata["time"]
@@ -1049,13 +1043,13 @@ class MainWindow(QtGui.QMainWindow):
         self.plot_acs_carvel.replot()
         self.curve_acs_rpm.set_data(t, self.acsdata["turbine_rpm"])
         self.plot_acs_rpm.replot()
-        
+
     def update_plots_ni(self):
         t = self.nidata["time"]
         self.curve_drag_left.set_data(t, self.nidata["drag_left"])
         self.plot_drag_left.replot()
         self.curve_torque_trans.set_data(t, self.nidata["torque_trans"])
-        self.curve_torque_arm.set_data(t, self.nidata["torque_arm"])        
+        self.curve_torque_arm.set_data(t, self.nidata["torque_arm"])
         self.plot_torque.replot()
         self.curve_drag_right.set_data(t, self.nidata["drag_right"])
         self.plot_drag_right.replot()
@@ -1065,7 +1059,7 @@ class MainWindow(QtGui.QMainWindow):
             self.plot_drag.replot()
         self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
         self.plot_rpm_ni.replot()
-        
+
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
         t = self.vecdata["time"]
@@ -1084,7 +1078,7 @@ class MainWindow(QtGui.QMainWindow):
         self.plot_vec_corr.replot()
         self.curve_vec_snr.set_data(t, meansnr)
         self.plot_vec_snr.replot()
-        
+
     def update_plots_fbg(self):
         """This function updates the FBG plots."""
         t = self.fbgdata["time"]
@@ -1092,14 +1086,14 @@ class MainWindow(QtGui.QMainWindow):
             curve.set_data(t, self.fbgdata[fbg.name + "_strain"])
         for plot in self.fbg_plot_list:
             plot.replot()
-    
+
     def update_acs(self):
-        """This function updates all the non-time-critical 
+        """This function updates all the non-time-critical
         ACS controller data"""
         self.checkbox_y_axis.setChecked(acsc.getMotorState(self.hc, 0)["enabled"])
         self.checkbox_z_axis.setChecked(acsc.getMotorState(self.hc, 1)["enabled"])
         self.checkbox_turbine_axis.setChecked(acsc.getMotorState(self.hc, 4)["enabled"])
-        self.checkbox_tow_axis.setChecked(acsc.getMotorState(self.hc, 5)["enabled"])  
+        self.checkbox_tow_axis.setChecked(acsc.getMotorState(self.hc, 5)["enabled"])
         # Put this data into table widget
         hc_tow = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_tow")
         hc_turbine = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_AKD")
@@ -1124,7 +1118,7 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.tableWidget_acs.item(1, 5).setText(str(acsc.getFVelocity(self.hc, 4)))
         self.ui.tableWidget_acs.item(2, 5).setText(str(acsc.getFVelocity(self.hc, 0)))
         self.ui.tableWidget_acs.item(3, 5).setText(str(acsc.getFVelocity(self.hc, 1)))
-                
+
     def save_raw_data(self, savedir, fname, datadict, verbose=True):
         """Saves a dict of raw data in HDF5 format."""
         fpath = os.path.join(savedir, fname)
@@ -1133,15 +1127,15 @@ class MainWindow(QtGui.QMainWindow):
         if not os.path.isdir(savedir):
             os.makedirs(savedir)
         ts.savehdf(fpath, datadict)
-    
+
     def closeEvent(self, event):
-        self.settings["Last window location"] = [self.pos().x(), 
+        self.settings["Last window location"] = [self.pos().x(),
                                                  self.pos().y()]
         self.settings["Last section index"] = \
                 self.ui.comboBox_testPlanSection.currentIndex()
         self.settings["Last tab index"] = self.ui.tabWidgetMode.currentIndex()
         self.settings["Last PC name"] = self.pcid
-        self.settings["Last size"] = (self.size().height(), 
+        self.settings["Last size"] = (self.size().height(),
                                       self.size().width())
         self.settings["FBG visible"] = self.ui.dockWidget_FBG.isVisible()
         self.settings["Vectrino visible"] = self.ui.dockWidgetVectrino.isVisible()
