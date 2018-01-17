@@ -367,7 +367,7 @@ class MainWindow(QtGui.QMainWindow):
     def on_tab_change(self):
         tabindex = self.ui.tabWidgetMode.currentIndex()
         tabitem = self.ui.tabWidgetMode.tabText(tabindex)
-        section = self.ui.comboBox_testPlanSection.currentText()
+        section = str(self.ui.comboBox_testPlanSection.currentText())
         if tabitem == "Test Plan" and str(section).lower() == "top level":
             self.ui.actionStart.setDisabled(True)
         else:
@@ -409,7 +409,7 @@ class MainWindow(QtGui.QMainWindow):
             os.startfile(subdir)
 
     def on_section_change(self):
-        section = self.ui.comboBox_testPlanSection.currentText()
+        section = str(self.ui.comboBox_testPlanSection.currentText())
         if str(section).lower() == "top level":
             self.ui.actionStart.setDisabled(True)
             self.update_sections_done()
@@ -531,7 +531,7 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.tabWidgetMode.setDisabled(True)
             if self.ui.tabTestPlan.isVisible():
                 """Continue working on test plan"""
-                section = self.ui.comboBox_testPlanSection.currentText()
+                section = str(self.ui.comboBox_testPlanSection.currentText())
                 self.section = section
                 if section.lower() != "top level":
                     self.do_test_plan()
