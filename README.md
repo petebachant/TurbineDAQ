@@ -1,8 +1,6 @@
 TurbineDAQ
 ==========
 
-[![Stories in Ready](https://badge.waffle.io/petebachant/turbinedaq.png?label=ready&title=Ready)](https://waffle.io/petebachant/turbinedaq)
-
 A Python desktop app for automated turbine data acquisition in the UNH tow tank. 
 
 ![Screenshot](https://raw.githubusercontent.com/petebachant/PhD-thesis/gh-pages/figures/TurbineDAQ.PNG)
