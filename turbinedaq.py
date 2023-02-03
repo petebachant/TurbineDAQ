@@ -470,8 +470,9 @@ class MainWindow(QMainWindow):
         self.ui.statusbar.addWidget(self.label_runstatus)
 
     def connect_to_controller(self):
-        self.hc = acsc.openCommEthernetTCP()
-        if self.hc == acsc.INVALID:
+        try:
+            self.hc = acsc.openCommEthernetTCP()
+        except acsc.AcscError:
             print("Cannot connect to ACS controller")
             print("Attempting to connect to simulator")
             self.label_acs_connect.setText(" Not connected to ACS controller ")
