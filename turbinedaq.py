@@ -281,7 +281,7 @@ class MainWindow(QMainWindow):
                                 ).setForeground(QtCore.Qt.darkGreen)
                                 self.ui.tableWidgetTestPlan.item(
                                     n, j
-                                ).setBackgroundColor(QtCore.Qt.lightGray)
+                                ).setBackground(QtCore.Qt.lightGray)
                         else:
                             self.ui.tableWidgetTestPlan.setItem(
                                 n, i + 1, QTableWidgetItem("No")
