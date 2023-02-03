@@ -1,6 +1,6 @@
 # TurbineDAQ Makefile
 
-app: ui
+app:
 	python turbinedaq.py
 
 ui:
