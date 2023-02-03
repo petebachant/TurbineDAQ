@@ -2,8 +2,10 @@
 """TurbineDAQ main app module."""
 
 from __future__ import division, print_function
-from PyQt4 import QtCore, QtGui
-from PyQt4.QtGui import *
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 import numpy as np
 from acspy import acsc
 from modules import daqtasks
@@ -24,10 +26,10 @@ import scipy.interpolate
 fluid_params = {"rho" : 1000.0}
 abort_on_bad_vecdata = True
 
-class MainWindow(QtGui.QMainWindow):
+class MainWindow(QMainWindow):
     badvecdata = QtCore.pyqtSignal()
     def __init__(self, parent=None):
-        QtGui.QMainWindow.__init__(self)
+        QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -49,13 +51,13 @@ class MainWindow(QtGui.QMainWindow):
         self.turbinetow = None
 
         # Add file path combobox to toolbar
-        self.line_edit_wdir = QtGui.QLineEdit()
+        self.line_edit_wdir = QLineEdit()
         self.ui.toolBar_directory.addWidget(self.line_edit_wdir)
         self.wdir = "C:\\temp"
         self.line_edit_wdir.setText("C:\\temp")
-        self.toolbutton_wdir = QtGui.QToolButton()
+        self.toolbutton_wdir = QToolButton()
         self.ui.toolBar_directory.addWidget(self.toolbutton_wdir)
-        self.toolbutton_wdir.setIcon(QtGui.QIcon(":icons/folder_yellow.png"))
+        self.toolbutton_wdir.setIcon(QIcon(":icons/folder_yellow.png"))
 
         # Add labels to status bar
         self.add_labels_to_statusbar()
@@ -245,13 +247,13 @@ class MainWindow(QtGui.QMainWindow):
                 itemlist = self.test_plan[section][paramlist[i]]
                 for n in range(len(itemlist)):
                     self.ui.tableWidgetTestPlan.setItem(n, i,
-                                QtGui.QTableWidgetItem(str(itemlist[n])))
+                                QTableWidgetItem(str(itemlist[n])))
                     # Check if run is done
                     if str(section).lower() != "top level":
                         isdone = self.is_run_done(section, n)
                         if isdone:
                             self.ui.tableWidgetTestPlan.setItem(n, i+1,
-                                    QtGui.QTableWidgetItem("Yes"))
+                                    QTableWidgetItem("Yes"))
                             for j in range(i+2):
                                 self.ui.tableWidgetTestPlan.item(n, j).\
                                         setTextColor(QtCore.Qt.darkGreen)
@@ -259,7 +261,7 @@ class MainWindow(QtGui.QMainWindow):
                                         setBackgroundColor(QtCore.Qt.lightGray)
                         else:
                             self.ui.tableWidgetTestPlan.setItem(n, i+1,
-                                    QtGui.QTableWidgetItem("No"))
+                                    QTableWidgetItem("No"))
                     elif str(section).lower() == "top level":
                         self.update_sections_done()
                     self.ui.tableWidgetTestPlan.item(n, i).setTextAlignment(QtCore.Qt.AlignCenter)
@@ -278,43 +280,43 @@ class MainWindow(QtGui.QMainWindow):
 #            print section
             isdone = None
             if isdone:
-                text = QtGui.QTableWidgetItem("Yes")
+                text = QTableWidgetItem("Yes")
             elif isdone == None:
-                text = QtGui.QTableWidgetItem("Maybe")
+                text = QTableWidgetItem("Maybe")
             else:
-                text = QtGui.QTableWidgetItem("No")
+                text = QTableWidgetItem("No")
             self.ui.tableWidgetTestPlan.setItem(n+1, -1, text)
 
     def add_acs_checkboxes(self):
         """Add checkboxes for axes being enabled."""
-        self.checkbox_tow_axis = QtGui.QCheckBox()
-        self.checkbox_turbine_axis = QtGui.QCheckBox()
-        self.checkbox_y_axis = QtGui.QCheckBox()
-        self.checkbox_z_axis = QtGui.QCheckBox()
+        self.checkbox_tow_axis = QCheckBox()
+        self.checkbox_turbine_axis = QCheckBox()
+        self.checkbox_y_axis = QCheckBox()
+        self.checkbox_z_axis = QCheckBox()
         # Tow axis checkbox widget centering
-        widget_tow = QtGui.QWidget()
-        layout_tow = QtGui.QHBoxLayout(widget_tow)
+        widget_tow = QWidget()
+        layout_tow = QHBoxLayout(widget_tow)
         layout_tow.addWidget(self.checkbox_tow_axis)
         layout_tow.setAlignment(QtCore.Qt.AlignCenter)
         layout_tow.setContentsMargins(0, 0, 0, 0)
         widget_tow.setLayout(layout_tow)
         # Turbine axis checkbox widget centering
-        widget_turbine = QtGui.QWidget()
-        layout_turbine = QtGui.QHBoxLayout(widget_turbine)
+        widget_turbine = QWidget()
+        layout_turbine = QHBoxLayout(widget_turbine)
         layout_turbine.addWidget(self.checkbox_turbine_axis)
         layout_turbine.setAlignment(QtCore.Qt.AlignCenter)
         layout_turbine.setContentsMargins(0, 0, 0, 0)
         widget_turbine.setLayout(layout_turbine)
         # y axis checkbox widget centering
-        widget_y = QtGui.QWidget()
-        layout_y = QtGui.QHBoxLayout(widget_y)
+        widget_y = QWidget()
+        layout_y = QHBoxLayout(widget_y)
         layout_y.addWidget(self.checkbox_y_axis)
         layout_y.setAlignment(QtCore.Qt.AlignCenter)
         layout_y.setContentsMargins(0, 0, 0, 0)
         widget_y.setLayout(layout_y)
         # z axis checkbox widget centering
-        widget_z = QtGui.QWidget()
-        layout_z = QtGui.QHBoxLayout(widget_z)
+        widget_z = QWidget()
+        layout_z = QHBoxLayout(widget_z)
         layout_z.addWidget(self.checkbox_z_axis)
         layout_z.setAlignment(QtCore.Qt.AlignCenter)
         layout_z.setContentsMargins(0, 0, 0, 0)
@@ -453,7 +455,7 @@ class MainWindow(QtGui.QMainWindow):
         self.plot_torque.add_item(self.curve_torque_trans)
         # Torque arm plot
         self.curve_torque_arm = guiqwt.curve.CurveItem()
-        self.curve_torque_arm.setPen(QtGui.QPen(QtCore.Qt.red, 1))
+        self.curve_torque_arm.setPen(QPen(QtCore.Qt.red, 1))
         self.plot_torque.add_item(self.curve_torque_arm)
         # Drag plot
         self.curve_drag = guiqwt.curve.CurveItem()
@@ -461,12 +463,12 @@ class MainWindow(QtGui.QMainWindow):
         self.plot_drag.add_item(self.curve_drag)
         # Drag left plot
         self.curve_drag_left = guiqwt.curve.CurveItem()
-        self.curve_drag_left.setPen(QtGui.QPen(QtCore.Qt.darkGreen, 1))
+        self.curve_drag_left.setPen(QPen(QtCore.Qt.darkGreen, 1))
         self.plot_drag_left = self.ui.plotDragL.get_plot()
         self.plot_drag_left.add_item(self.curve_drag_left)
         # Drag right plot
         self.curve_drag_right = guiqwt.curve.CurveItem()
-        self.curve_drag_right.setPen(QtGui.QPen(QtCore.Qt.red, 1))
+        self.curve_drag_right.setPen(QPen(QtCore.Qt.red, 1))
         self.plot_drag_right = self.ui.plotDragR.get_plot()
         self.plot_drag_right.add_item(self.curve_drag_right)
         # NI turbine RPM plot
@@ -512,7 +514,7 @@ class MainWindow(QtGui.QMainWindow):
         for n in range(len(self.fbg_properties)):
             self.fbg_curves.append(guiqwt.curve.CurveItem())
             if n > 4:
-                self.fbg_curves[n].setPen(QtGui.QPen(QtCore.Qt.blue, 1))
+                self.fbg_curves[n].setPen(QPen(QtCore.Qt.blue, 1))
         # Iterate through FBG curves list and add curves to plots
         for n, curve in enumerate(self.fbg_curves):
             n = n%5
@@ -744,7 +746,7 @@ class MainWindow(QtGui.QMainWindow):
             self.label_runstatus.setText(text + " cannot start ")
             self.ui.actionStart.trigger()
             msg = "Run cannot start because the tow axis is disabled."
-            QtGui.QMessageBox.information(self, "Cannot Start", msg)
+            QMessageBox.information(self, "Cannot Start", msg)
 
     def do_tare_drag_tow(self, U):
         """Executes a single tare drag run"""
@@ -813,9 +815,9 @@ class MainWindow(QtGui.QMainWindow):
             print("Saved")
         elif self.tarerun.aborted:
             quit_msg = "Delete files from aborted run?"
-            reply = QtGui.QMessageBox.question(self, 'Run Aborted',
-                     quit_msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
-            if reply == QtGui.QMessageBox.Yes:
+            reply = QMessageBox.question(self, 'Run Aborted',
+                     quit_msg, QMessageBox.Yes, QMessageBox.No)
+            if reply == QMessageBox.Yes:
                 shutil.rmtree(self.savesubdir)
         # Update test plan table
         self.test_plan_into_table()
@@ -895,9 +897,9 @@ class MainWindow(QtGui.QMainWindow):
                 subprocess.call(cmdlist, shell=True)
         elif self.turbinetow.aborted:
             quit_msg = "Delete files from aborted run?"
-            reply = QtGui.QMessageBox.question(self, "Run Aborted",
-                     quit_msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
-            if reply == QtGui.QMessageBox.Yes:
+            reply = QMessageBox.question(self, "Run Aborted",
+                     quit_msg, QMessageBox.Yes, QMessageBox.No)
+            if reply == QMessageBox.Yes:
                 shutil.rmtree(self.savesubdir)
         elif self.turbinetow.autoaborted:
             print("Deleting files from aborted run")
@@ -1161,7 +1163,7 @@ class MainWindow(QtGui.QMainWindow):
 
 def main():
     import sys
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())
