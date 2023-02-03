@@ -278,7 +278,7 @@ class MainWindow(QMainWindow):
                             for j in range(i + 2):
                                 self.ui.tableWidgetTestPlan.item(
                                     n, j
-                                ).setTextColor(QtCore.Qt.darkGreen)
+                                ).setForeground(QtCore.Qt.darkGreen)
                                 self.ui.tableWidgetTestPlan.item(
                                     n, j
                                 ).setBackgroundColor(QtCore.Qt.lightGray)
