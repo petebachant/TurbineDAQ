@@ -1206,10 +1206,24 @@ class MainWindow(QMainWindow):
             acsc.getMotorState(self.hc, 5)["enabled"]
         )
         # Put this data into table widget
-        hc_tow = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_tow")
-        hc_turbine = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_AKD")
-        hc_y = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_y")
-        hc_z = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_z")
+        try:
+            hc_tow = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_tow")
+        except acsc.AcscError:
+            hc_tow = 0
+        try:
+            hc_turbine = acsc.readInteger(
+                self.hc, acsc.NONE, "homeCounter_AKD"
+            )
+        except acsc.AcscError:
+            hc_turbine = 0
+        try:
+            hc_y = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_y")
+        except acsc.AcscError:
+            hc_y = 0
+        try:
+            hc_z = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_z")
+        except acsc.AcscError:
+            hc_z = 0
         self.ui.tableWidget_acs.item(0, 2).setText(str(hc_tow))
         self.ui.tableWidget_acs.item(1, 2).setText(str(hc_turbine))
         self.ui.tableWidget_acs.item(2, 2).setText(str(hc_y))
