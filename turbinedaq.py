@@ -451,10 +451,11 @@ class MainWindow(QMainWindow):
             self.ui.actionStart.setEnabled(True)
         if tabitem == "Processing":
             savedir = os.path.join(self.wdir, "Data", "Raw", "Shakedown")
-            runsdone = sorted([int(n) for n in os.listdir(savedir)])
-            runsdone = [str(n) for n in runsdone]
-            self.ui.comboBox_process_nrun.clear()
-            self.ui.comboBox_process_nrun.addItems(runsdone)
+            if os.path.isdir(savedir):
+                runsdone = sorted([int(n) for n in os.listdir(savedir)])
+                runsdone = [str(n) for n in runsdone]
+                self.ui.comboBox_process_nrun.clear()
+                self.ui.comboBox_process_nrun.addItems(runsdone)
 
     def on_home_tow(self):
         acsc.runBuffer(self.hc, 2)
