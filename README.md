@@ -1,7 +1,7 @@
 TurbineDAQ
 ==========
 
-A Python desktop app for automated turbine data acquisition in the UNH tow tank. 
+A Python desktop app for automated turbine data acquisition in the UNH tow tank.
 
 ![Screenshot](https://raw.githubusercontent.com/petebachant/PhD-thesis/gh-pages/figures/TurbineDAQ.PNG)
 
@@ -11,7 +11,7 @@ A Python desktop app for automated turbine data acquisition in the UNH tow tank.
 A matrix of test parameters should be created and placed in the `Test plan` directory.
 Each "section" of the experiment gets its own CSV file. See `test/Test plan` for an
 example. The test plan, if one exists, is loaded into the GUI at startup. To change, it must be
-edited externally and reloaded. 
+edited externally and reloaded.
 
 
 ## Directory and file structure
@@ -38,7 +38,7 @@ Experiment name/
                     vecdata.h5
                     fbgdata.h5
                     vecdata.vno
-                1/    
+                1/
                     metadata.json
                     acsdata.h5
                     fbgdata.h5
@@ -60,7 +60,7 @@ In the `runtypes` module, there are classes to represent each type of run:
   * `TareTorqueRun`
 
 Each of these subclass PyQt's `QThread`. For future experiments, there will likely be
-a `TurbineTowInWaves` or options in `TurbineTow` for wave generation with `makewaves`. 
+a `TurbineTowInWaves` or options in `TurbineTow` for wave generation with `makewaves`.
 
 
 License
@@ -80,6 +80,3 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-This copy was last edited by Nicole Marone 07/2022. Edits include the capabilities to trigger the ODiSI interrogator on and off, and to save the lateral force data from load cells.
