@@ -21,7 +21,8 @@ class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
     def __init__(self, acs_hcomm, U, tsr, y_R, z_H, 
                  turbine_properties, nidaq=True, vectrino=True, vecsavepath="",
-                 fbg=False, fbg_properties={}, settling=False, vec_salinity=0.0):
+                 fbg=False, fbg_properties={}, odisi=False, odisi_properties={},
+                 settling=False, vec_salinity=0.0):
         """Turbine tow run object."""
         QtCore.QThread.__init__(self)        
         self.hc = acs_hcomm
@@ -34,6 +35,7 @@ class TurbineTow(QtCore.QThread):
         self.vectrino = vectrino
         self.nidaq = nidaq 
         self.fbg = fbg
+        self.odisi = odisi
         self.settling = settling
         self.build_acsprg()
         self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
@@ -67,6 +69,11 @@ class TurbineTow(QtCore.QThread):
                                                    usetrigger=self.usetrigger)
             self.metadata["FBG metadata"] = self.fbgthread.metadata
             self.fbgdata = self.fbgthread.data
+
+        if self.odisi:
+            self.odisithread = daqtasks.ODiSIDaqThread(odisi_properties)
+            self.metadata["ODiSI metadata"] = self.odisithread.metadata
+            # self.odisidata = self.odisithread.data
         
     def build_acsprg(self):
         """Create the ACSPL+ program for running the run.
@@ -157,11 +164,15 @@ class TurbineTow(QtCore.QThread):
                 self.daqthread.start()
                 if self.fbg:
                     self.fbgthread.start()
+                if self.odisi:
+                    self.odisithread.start()
                 self.start_motion()
         elif self.nidaq:
             self.daqthread.start()
             if self.fbg:
                 self.fbgthread.start()
+            if self.odisi:
+                self.odisithread.start()
             self.start_motion()
         else:
             # Start motion
@@ -184,6 +195,8 @@ class TurbineTow(QtCore.QThread):
             print("NI tasks cleared")
         if self.fbg:
             self.fbgthread.stop()
+        if self.odisi:
+            self.odisithread.stop()
         if self.vectrino:
             if self.settling:
                 # Wait 10 minutes to measure tank settling time
@@ -297,7 +310,7 @@ class TareDragRun(QtCore.QThread):
 
 class TareTorqueRun(QtCore.QThread):
     runfinished = QtCore.pyqtSignal()
-    def __init__(self, acs_hcomm, rpm, dur):
+    def __init__(self, acs_hcomm, rpm, dur, odisi_properties={}):
         """Tare torque run object."""
         QtCore.QThread.__init__(self)  
         self.aborted = False
@@ -319,6 +332,12 @@ class TareTorqueRun(QtCore.QThread):
         self.daqthread = daqtasks.NiDaqThread(usetrigger=True)
         self.nidata = self.daqthread.data
         self.metadata["NI metadata"] = self.daqthread.metadata
+
+        self.odisithread = daqtasks.ODiSIDaqThread(odisi_properties)
+        # self.metadata["ODiSI metadata"] = self.odisithread.metadata
+
+
+
         
     def build_acsprg(self):
         """Create the ACSPL+ program for the run.

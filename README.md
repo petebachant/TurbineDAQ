@@ -82,3 +82,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+This copy was last edited by Nicole Marone 07/2022. Edits include the capabilities to trigger the ODiSI interrogator on and off, and to save the lateral force data from load cells.

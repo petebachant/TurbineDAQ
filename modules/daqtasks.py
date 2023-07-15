@@ -11,6 +11,7 @@ from __future__ import division, print_function
 from PyQt4 import QtCore
 import numpy as np
 import daqmx
+import nidaqmx
 import time
 from acspy import acsc, prgs
 from pxl import fdiff, timeseries as ts
@@ -43,26 +44,38 @@ class NiDaqThread(QtCore.QThread):
                      "drag_left" : np.array([]),
                      "drag_right" : np.array([]),
                      "time" : np.array([]),
-                     "carriage_pos" : np.array([])}
+                     "carriage_pos" : np.array([]),
+					 "LF_left" : np.array([]),
+					 "LF_right" : np.array([])}
         # Create one analog and one digital task
         # Probably should be a bridge task in there too!
         self.analogtask = daqmx.TaskHandle()
         self.carpostask = daqmx.TaskHandle()
         self.turbangtask = daqmx.TaskHandle()
+       
         
         # Create tasks
         daqmx.CreateTask("", self.analogtask)
         daqmx.CreateTask("", self.carpostask)
         daqmx.CreateTask("", self.turbangtask)
-        
+
+        ## ODiSI Tasks
+        self.odisistarttask = nidaqmx.Task()
+        self.odisistarttask.do_channels.add_do_chan("/cDAQ9188-16D66BBMod1/port0/line0")
+
+        self.odisistoptask = nidaqmx.Task()
+        self.odisistoptask.do_channels.add_do_chan("/cDAQ9188-16D66BBMod1/port0/line1")
+       
         # Add channels to tasks
         self.analogchans = ["torque_trans", "torque_arm", 
-                            "drag_left", "drag_right"]
+                            "drag_left", "drag_right",
+							"LF_left", "LF_right"]
         self.carposchan = "carriage_pos"
         self.turbangchan = "turbine_angle"
         daqmx.AddGlobalChansToTask(self.analogtask, self.analogchans)
         daqmx.AddGlobalChansToTask(self.carpostask, self.carposchan)
         daqmx.AddGlobalChansToTask(self.turbangtask, self.turbangchan)
+        
 
         # Get channel information to add to metadata
         self.chaninfo = {}
@@ -105,21 +118,23 @@ class NiDaqThread(QtCore.QThread):
         daqmx.CfgSampClkTiming(self.turbangtask, trigname, self.sr,
                                daqmx.Val_Rising, daqmx.Val_ContSamps,
                                self.nsamps)
+       
                                
         # If using trigger for analog signals set source to chassis PFI0
         if self.usetrigger:
             daqmx.CfgDigEdgeStartTrig(self.analogtask, "/cDAQ9188-16D66BB/PFI0",
                                       daqmx.Val_Falling)
-                               
+           
         # Set trigger functions for counter channels
         daqmx.SetStartTrigType(self.carpostask, daqmx.Val_DigEdge)
         daqmx.SetStartTrigType(self.turbangtask, daqmx.Val_DigEdge)
         trigsrc = \
-        daqmx.GetTrigSrcWithDevPrefix(self.analogtask, "ai/StartTrigger")
+        daqmx.GetTrigSrcWithDevPrefix(self.analogtask, "ai/StartTrigger")        
         daqmx.SetDigEdgeStartTrigSrc(self.carpostask, trigsrc)
         daqmx.SetDigEdgeStartTrigSrc(self.turbangtask, trigsrc)
         daqmx.SetDigEdgeStartTrigEdge(self.carpostask, daqmx.Val_Rising)
         daqmx.SetDigEdgeStartTrigEdge(self.turbangtask, daqmx.Val_Rising)
+
         
 
     def run(self):
@@ -149,6 +164,10 @@ class NiDaqThread(QtCore.QThread):
                                                 data[:,2], axis=0)
             self.data["drag_right"] = np.append(self.data["drag_right"], 
                                                 data[:,3], axis=0)
+            self.data["LF_left"] = np.append(self.data["LF_left"], 
+                                                data[:,4], axis=0)
+            self.data["LF_right"] = np.append(self.data["LF_right"], 
+                                                data[:,5], axis=0)
             self.data["time"] = np.arange(len(self.data["torque_trans"]), 
                                        dtype=float)/self.sr                                                
             carpos, cpoints = daqmx.ReadCounterF64(self.carpostask,
@@ -181,22 +200,46 @@ class NiDaqThread(QtCore.QThread):
         daqmx.StartTask(self.carpostask)
         daqmx.StartTask(self.turbangtask)
         daqmx.StartTask(self.analogtask)
+
+        # Send trigger for ODiSI Interrogater
+        self.odisistarttask.start()
+        for n in range(1):
+            self.odisistarttask.write(True)
+            time.sleep(1e-6) # make longer to see pulse width on oscilloscope
+            self.odisistarttask.write(False)
+            time.sleep(1e-6) # make longer to see pulse width on oscilloscope
+        self.odisistarttask.stop
+        self.odisistarttask.close()
+        print("ODiSI interrogator starting measurements...")
+        
         self.collecting.emit()
 
         # Keep the acquisition going until task it cleared
         while self.collect:
             pass
-        
+
     def stopdaq(self):
         daqmx.StopTask(self.analogtask)
         daqmx.StopTask(self.carpostask)
         daqmx.StopTask(self.turbangtask)
-    
+
+        # Send stop trigger to ODiSI Interrogator
+        self.odisistoptask.start()
+        for n in range(1):
+            self.odisistoptask.write(True)
+            time.sleep(1e-6) # make longer to see pulse width on oscilloscope
+            self.odisistoptask.write(False)
+            time.sleep(1e-6) # make longer to see pulse width on oscilloscope
+        self.odisistoptask.stop
+        self.odisistoptask.close()
+        print("ODiSI interrogator stopping measurements...")
+        
     def clear(self):
         self.stopdaq()
         daqmx.ClearTask(self.analogtask)
         daqmx.ClearTask(self.carpostask)
         daqmx.ClearTask(self.turbangtask)
+        
         self.collect = False
         self.cleared.emit()
 
@@ -300,6 +343,45 @@ class FbgDaqThread(QtCore.QThread):
     def stop(self):
         self.collectdata = False
         self.interr.disconnect()
+
+class ODiSIDaqThread(QtCore.QThread):
+    collecting = QtCore.pyqtSignal()
+    cleared = QtCore.pyqtSignal()
+    def __init__(self, odisi_props):
+        QtCore.QThread.__init__(self)
+
+
+        ## AT SOME POINT I SHOULD FIGURE OUT HOW TO MAKE IT WORK THROUGH ITS OWN THREAD AND ALSO ACQUIRE DATA FROM INTERROGATOR
+
+        # self.starttask = nidaqmx.Task()
+        # self.starttask.do_channels.add_do_chan("/cDAQ9188-16D66BBMod1/port0/line0")
+        # self.starttask.start()
+        # for n in range(1):
+        #     self.starttask.write(True)
+        #     time.sleep(1) # make longer to see pulse width on oscilloscope
+        #     self.starttask.write(False)
+        #     time.sleep(1) # make longer to see pulse width on oscilloscope
+        # self.starttask.stop
+        # self.starttask.close()
+        # print("ODiSI interrogator starting measurements...")
+
+
+    # def stop(self):
+        # nidaqmx.StopTask(self.starttask)
+        # nidaqmx.StopTask(self.stoptask)
+        # print("ODiSI disengaged.")
+        # self.stoptask = nidaqmx.Task()
+        # self.stoptask.do_channels.add_do_chan("/cDAQ9188-16D66BBMod1/port0/line1")
+        # self.stoptask.start()
+        # for n in range(1):
+        #     self.stoptask.write(True)
+        #     time.sleep(1) # make longer to see pulse width on oscilloscope
+        #     self.stoptask.write(False)
+        #     time.sleep(1) # make longer to see pulse width on oscilloscope (1e-6)
+        # self.stoptask.stop
+        # self.stoptask.close()
+        # print("ODiSI interrogator stopping measurements...")
+
 
 if __name__ == "__main__":
     pass
