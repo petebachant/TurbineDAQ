@@ -1,6 +1,8 @@
-{"odisiS61704" : 
-    {"sensor type" : "microstrain",
-     "position" : 0,
-     "part number" : "FSHD2019LUNAS61704",
-     "gage factor" : 100.0}
+{
+  "odisiS61704": {
+    "sensor type": "microstrain",
+    "position": 0,
+    "part number": "FSHD2019LUNAS61704",
+    "gage factor": 100.0
+  }
 }
