@@ -1,0 +1,23 @@
+name: turbinedaq
+channels:
+  - conda-forge
+dependencies:
+  - h5py
+  - matplotlib
+  - numpy
+  - pandas
+  - pyqt=5
+  - python=3
+  - pywin32
+  - pip
+  - scipy
+  - qt
+  - pip:
+      - https://github.com/petebachant/daqmx/archive/refs/heads/master.zip
+      - https://github.com/petebachant/MicronOpt-Python/archive/refs/heads/master.zip
+      - https://github.com/petebachant/Nortek-Python/archive/refs/heads/master.zip
+      - https://github.com/petebachant/ACSpy/archive/refs/heads/master.zip
+      - pythonqwt
+      - nidaqmx
+      - pxl
+      - guiqwt
