@@ -12,19 +12,35 @@ import acsprgs
 from acspy import acsc
 from . import daqtasks
 import time
-from PyQt4 import QtCore
+from PyQt5 import QtCore
 from nortek.controls import PdControl
 from subprocess import check_output
 import numpy as np
 
+
 class TurbineTow(QtCore.QThread):
     towfinished = QtCore.pyqtSignal()
-    def __init__(self, acs_hcomm, U, tsr, y_R, z_H, 
-                 turbine_properties, nidaq=True, vectrino=True, vecsavepath="",
-                 fbg=False, fbg_properties={}, odisi=False, odisi_properties={},
-                 settling=False, vec_salinity=0.0):
+
+    def __init__(
+        self,
+        acs_hcomm,
+        U,
+        tsr,
+        y_R,
+        z_H,
+        turbine_properties,
+        nidaq=True,
+        vectrino=True,
+        vecsavepath="",
+        fbg=False,
+        fbg_properties={},
+        odisi=False,
+        odisi_properties={},
+        settling=False,
+        vec_salinity=0.0,
+    ):
         """Turbine tow run object."""
-        QtCore.QThread.__init__(self)        
+        QtCore.QThread.__init__(self)
         self.hc = acs_hcomm
         self.U = float(U)
         self.tsr = tsr
@@ -33,13 +49,13 @@ class TurbineTow(QtCore.QThread):
         self.R = turbine_properties["radius"]
         self.H = turbine_properties["height"]
         self.vectrino = vectrino
-        self.nidaq = nidaq 
+        self.nidaq = nidaq
         self.fbg = fbg
         self.odisi = odisi
         self.settling = settling
         self.build_acsprg()
         self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
-        self.maxvel = U*1.3
+        self.maxvel = U * 1.3
         self.usetrigger = True
         self.vecsavepath = vecsavepath
         self.recordvno = True
@@ -47,26 +63,29 @@ class TurbineTow(QtCore.QThread):
         self.autoaborted = False
         self.aborted = False
         self.vec_salinity = vec_salinity
-        
+
         commit = check_output(["git", "rev-parse", "--verify", "HEAD"])[:-1]
-        
-        self.metadata = {"Tow speed (m/s)" : float(U),
-                         "Tip speed ratio" : tsr, 
-                         "Time created" : time.asctime(),
-                         "TurbineDAQ version" : commit}
-        
+
+        self.metadata = {
+            "Tow speed (m/s)": float(U),
+            "Tip speed ratio": tsr,
+            "Time created": time.asctime(),
+            "TurbineDAQ version": commit,
+        }
+
         if self.vectrino:
             self.vec = PdControl()
             self.metadata["Vectrino metadata"] = {"y/R": y_R, "z/H": z_H}
-            
+
         if self.nidaq:
             self.daqthread = daqtasks.NiDaqThread(usetrigger=self.usetrigger)
             self.nidata = self.daqthread.data
             self.metadata["NI metadata"] = self.daqthread.metadata
-        
+
         if self.fbg:
-            self.fbgthread = daqtasks.FbgDaqThread(fbg_properties, 
-                                                   usetrigger=self.usetrigger)
+            self.fbgthread = daqtasks.FbgDaqThread(
+                fbg_properties, usetrigger=self.usetrigger
+            )
             self.metadata["FBG metadata"] = self.fbgthread.metadata
             self.fbgdata = self.fbgthread.data
 
@@ -74,7 +93,7 @@ class TurbineTow(QtCore.QThread):
             self.odisithread = daqtasks.ODiSIDaqThread(odisi_properties)
             self.metadata["ODiSI metadata"] = self.odisithread.metadata
             # self.odisidata = self.odisithread.data
-        
+
     def build_acsprg(self):
         """Create the ACSPL+ program for running the run.
         This run should send a trigger pulse."""
@@ -82,9 +101,10 @@ class TurbineTow(QtCore.QThread):
             endpos = 9.0
         else:
             endpos = 0.0
-        self.acs_prg = acsprgs.turbine_tow_prg(self.U, self.tsr, self.R,
-                                               endpos=endpos)
-                                               
+        self.acs_prg = acsprgs.turbine_tow_prg(
+            self.U, self.tsr, self.R, endpos=endpos
+        )
+
     def setvecconfig(self):
         self.vec.start_on_sync = self.usetrigger
         self.vec.sync_master = not self.usetrigger
@@ -96,7 +116,7 @@ class TurbineTow(QtCore.QThread):
         self.vec.sampling_volume = 3
         self.vec.sound_speed_mode = "measured"
         self.vec.salinity = self.vec_salinity
-        
+
         if self.maxvel <= 4.0 and self.maxvel > 2.5:
             self.vec.vel_range = 0
         elif self.maxvel <= 2.5 and self.maxvel > 1.0:
@@ -106,18 +126,24 @@ class TurbineTow(QtCore.QThread):
         elif self.maxvel <= 0.3 or self.settling:
             self.vec.vel_range = 3
         self.vec.set_config()
-        self.metadata["Vectrino metadata"]["Velocity range (index)"] = \
-                self.vec.vel_range
-        self.metadata["Vectrino metadata"]["Sample rate (Hz)"] = \
-                self.vec.sample_rate
-        self.metadata["Vectrino metadata"]["Coordinate system"] = \
-                self.vec.coordinate_system
-        self.metadata["Vectrino metadata"]["Salinity (ppt)"] = \
-                self.vec.salinity
-        self.metadata["Vectrino metadata"]["Transmit length"] = \
-                self.vec.transmit_length
-        self.metadata["Vectrino metadata"]["Sampling volume"] = \
-                self.vec.sampling_volume
+        self.metadata["Vectrino metadata"][
+            "Velocity range (index)"
+        ] = self.vec.vel_range
+        self.metadata["Vectrino metadata"][
+            "Sample rate (Hz)"
+        ] = self.vec.sample_rate
+        self.metadata["Vectrino metadata"][
+            "Coordinate system"
+        ] = self.vec.coordinate_system
+        self.metadata["Vectrino metadata"][
+            "Salinity (ppt)"
+        ] = self.vec.salinity
+        self.metadata["Vectrino metadata"][
+            "Transmit length"
+        ] = self.vec.transmit_length
+        self.metadata["Vectrino metadata"][
+            "Sampling volume"
+        ] = self.vec.sampling_volume
         print("Vectrino configuration set")
 
     def run(self):
@@ -127,13 +153,17 @@ class TurbineTow(QtCore.QThread):
         if self.vectrino:
             acsc.enable(self.hc, 0)
             acsc.enable(self.hc, 1)
-            while not acsc.getMotorState(self.hc, 0)["enabled"] or not \
-                    acsc.getMotorState(self.hc, 1)["enabled"]:
+            while (
+                not acsc.getMotorState(self.hc, 0)["enabled"]
+                or not acsc.getMotorState(self.hc, 1)["enabled"]
+            ):
                 self.msleep(100)
-            acsc.toPoint(self.hc, None, 0, self.y_R*self.R)
-            acsc.toPoint(self.hc, None, 1, self.z_H*self.H)
-            while not acsc.getMotorState(self.hc, 0)["in position"] or not \
-                    acsc.getMotorState(self.hc, 1)["in position"]:
+            acsc.toPoint(self.hc, None, 0, self.y_R * self.R)
+            acsc.toPoint(self.hc, None, 1, self.z_H * self.H)
+            while (
+                not acsc.getMotorState(self.hc, 0)["in position"]
+                or not acsc.getMotorState(self.hc, 1)["in position"]
+            ):
                 self.msleep(300)
             print("y- and z-axes in position")
             acsc.disable(self.hc, 0)
@@ -217,7 +247,7 @@ class TurbineTow(QtCore.QThread):
             print("Resetting Vectrino")
             self.reset_vec()
         self.towfinished.emit()
-        
+
     def reset_vec(self):
         self.vec.connect()
         self.vec.stop_disk_recording()
@@ -235,7 +265,7 @@ class TurbineTow(QtCore.QThread):
         acsc.halt(self.hc, 1)
         acsc.halt(self.hc, 4)
         acsc.halt(self.hc, 5)
-        
+
     def autoabort(self):
         """This should stop everything and return carriage and turbine back
         to zero."""
@@ -252,6 +282,7 @@ class TurbineTow(QtCore.QThread):
 
 class TareDragRun(QtCore.QThread):
     runfinished = QtCore.pyqtSignal()
+
     def __init__(self, acs_hc, U):
         QtCore.QThread.__init__(self)
         self.aborted = False
@@ -260,17 +291,19 @@ class TareDragRun(QtCore.QThread):
         self.build_acsprg()
         self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
         self.acsdata = self.acsdaqthread.data
-        
+
         commit = check_output(["git", "rev-parse", "--verify", "HEAD"])[:-1]
-        
-        self.metadata = {"Tow speed (m/s)" : U,
-                         "Time created" : time.asctime(),
-                         "TurbineDAQ version" : commit}
-            
+
+        self.metadata = {
+            "Tow speed (m/s)": U,
+            "Time created": time.asctime(),
+            "TurbineDAQ version": commit,
+        }
+
         self.daqthread = daqtasks.NiDaqThread(usetrigger=True)
         self.nidata = self.daqthread.data
         self.metadata["NI metadata"] = self.daqthread.metadata
-        
+
     def build_acsprg(self):
         """Create the ACSPL+ program for running the run.
         This run should send a trigger pulse."""
@@ -282,7 +315,7 @@ class TareDragRun(QtCore.QThread):
         if not acsc.getOutput(self.hc, 1, 16):
             acsc.setOutput(self.hc, 1, 16, 1)
         self.daqthread.start()
-        self.msleep(2000) # Wait for NI to start waiting for trigger
+        self.msleep(2000)  # Wait for NI to start waiting for trigger
         self.start_motion()
 
     def start_motion(self):
@@ -292,13 +325,13 @@ class TareDragRun(QtCore.QThread):
         acsc.enable(self.hc, 5)
         acsc.runBuffer(self.hc, nbuf)
         prgstate = acsc.getProgramState(self.hc, nbuf)
-        while prgstate == 3: # means the program is running in the controller
+        while prgstate == 3:  # means the program is running in the controller
             time.sleep(0.3)
             prgstate = acsc.getProgramState(self.hc, nbuf)
         self.acsdaqthread.stop()
         self.daqthread.clear()
         self.runfinished.emit()
-            
+
     def abort(self):
         """This should stop everything."""
         self.aborted = True
@@ -310,9 +343,10 @@ class TareDragRun(QtCore.QThread):
 
 class TareTorqueRun(QtCore.QThread):
     runfinished = QtCore.pyqtSignal()
+
     def __init__(self, acs_hcomm, rpm, dur, odisi_properties={}):
         """Tare torque run object."""
-        QtCore.QThread.__init__(self)  
+        QtCore.QThread.__init__(self)
         self.aborted = False
         self.hc = acs_hcomm
         self.rpm = rpm
@@ -321,14 +355,16 @@ class TareTorqueRun(QtCore.QThread):
         self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
         self.acsdata = self.acsdaqthread.data
         self.vecsavepath = ""
-        
+
         commit = check_output(["git", "rev-parse", "--verify", "HEAD"])[:-1]
-        
-        self.metadata = {"RPM" : rpm,
-                         "Duration" : dur,
-                         "Time created" : time.asctime(),
-                         "TurbineDAQ version" : commit}
-        
+
+        self.metadata = {
+            "RPM": rpm,
+            "Duration": dur,
+            "Time created": time.asctime(),
+            "TurbineDAQ version": commit,
+        }
+
         self.daqthread = daqtasks.NiDaqThread(usetrigger=True)
         self.nidata = self.daqthread.data
         self.metadata["NI metadata"] = self.daqthread.metadata
@@ -336,9 +372,6 @@ class TareTorqueRun(QtCore.QThread):
         self.odisithread = daqtasks.ODiSIDaqThread(odisi_properties)
         # self.metadata["ODiSI metadata"] = self.odisithread.metadata
 
-
-
-        
     def build_acsprg(self):
         """Create the ACSPL+ program for the run.
         This run should send a trigger pulse."""
@@ -349,7 +382,7 @@ class TareTorqueRun(QtCore.QThread):
         if not acsc.getOutput(self.hc, 1, 16):
             acsc.setOutput(self.hc, 1, 16, 1)
         self.daqthread.start()
-        self.msleep(2000) # Wait for NI to start waiting for trigger
+        self.msleep(2000)  # Wait for NI to start waiting for trigger
         self.start_motion()
 
     def start_motion(self):
@@ -365,7 +398,7 @@ class TareTorqueRun(QtCore.QThread):
         self.acsdaqthread.stop()
         self.daqthread.clear()
         self.runfinished.emit()
-            
+
     def abort(self):
         """This should stop everything."""
         acsc.stopBuffer(self.hc, 19)
@@ -373,13 +406,13 @@ class TareTorqueRun(QtCore.QThread):
         self.acsdaqthread.stop()
         self.daqthread.clear()
         self.aborted = True
-        
-        
+
+
 class StrutTorqueRun(TareTorqueRun):
     """
     A strut torque run measures the parasitic torque on the shaft caused by
     the blade support struts.
-    
+
     Parameters
     ----------
     acs_hcomm : int
@@ -392,19 +425,22 @@ class StrutTorqueRun(TareTorqueRun):
         Turbine radius (m) for calculating RPM
     revs : float
         Test duration in revolutions
-    
+
     """
+
     def __init__(self, acs_hcomm, ref_speed, tsr, radius, revs):
         # Convert ref_speed and tsr into RPM
-        omega = tsr/radius*ref_speed
-        self.rpm = omega/(2*np.pi)*60.0
+        omega = tsr / radius * ref_speed
+        self.rpm = omega / (2 * np.pi) * 60.0
         self.hc = acs_hcomm
         self.ref_speed = ref_speed
         self.tsr = tsr
         self.radius = radius
-        dur = revs/self.rpm*60
+        dur = revs / self.rpm * 60
         self.dur = dur
-        self.metadata = {"Reference speed (m/s)" : ref_speed,
-                         "Tip speed ratio" : tsr,
-                         "Turbine radius (m)" : radius}
+        self.metadata = {
+            "Reference speed (m/s)": ref_speed,
+            "Tip speed ratio": tsr,
+            "Turbine radius (m)": radius,
+        }
         TareTorqueRun.__init__(self, self.hc, self.rpm, dur)
