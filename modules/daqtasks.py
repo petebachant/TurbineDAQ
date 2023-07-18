@@ -33,7 +33,7 @@ class NiDaqThread(QtCore.QThread):
         # Create some meta data for the run
         self.metadata = {}
         # Initialize sample rate
-        self.sr = 2000.0
+        self.sr = 2000
         self.metadata["Sample rate (Hz)"] = self.sr
         self.nsamps = int(self.sr / 10)
         # Create a dict of arrays for storing data
@@ -171,16 +171,20 @@ class NiDaqThread(QtCore.QThread):
 
     def run(self):
         """Start DAQmx tasks."""
+        stream = self.analogtask.in_stream
+        reader = AnalogMultiChannelReader(stream)
+        stream_cp = self.carpostask.in_stream
+        reader_cp = CounterReader(stream_cp)
+        stream_ta = self.turbangtask.in_stream
+        reader_ta = CounterReader(stream_ta)
 
         def every_n_samples(
             task_handle, every_n_samps_event_type, n_samps, callback_data
         ):
             """Function called every N samples"""
-            stream = self.analogtask.in_stream
-            reader = AnalogMultiChannelReader(stream)
-            data = np.zeros((len(self.analogchans), self.nsamps))
+            data = np.zeros((len(self.analogchans), n_samps))
             n = reader.read_many_sample(
-                data, number_of_samples_per_channel=self.nsamps
+                data, number_of_samples_per_channel=n_samps
             )
             self.data["torque_trans"] = np.append(
                 self.data["torque_trans"], data[:, 0], axis=0
@@ -204,20 +208,16 @@ class NiDaqThread(QtCore.QThread):
                 np.arange(len(self.data["torque_trans"]), dtype=float)
                 / self.sr
             )
-            stream_cp = self.carpostask.in_stream
-            reader_cp = CounterReader(stream_cp)
-            carpos = np.zeros(self.nsamps)
+            carpos = np.zeros(n_samps)
             reader_cp.read_many_sample_double(
-                carpos, number_of_samples_per_channel=self.nsamps
+                carpos, number_of_samples_per_channel=n_samps
             )
             self.data["carriage_pos"] = np.append(
                 self.data["carriage_pos"], carpos
             )
-            stream_ta = self.turbangtask.in_stream
-            reader_ta = CounterReader(stream_ta)
-            turbang = np.zeros(self.nsamps)
+            turbang = np.zeros(n_samps)
             reader_ta.read_many_sample_double(
-                turbang, number_of_samples_per_channel=self.nsamps
+                turbang, number_of_samples_per_channel=n_samps
             )
             self.data["turbine_angle"] = np.append(
                 self.data["turbine_angle"], turbang
