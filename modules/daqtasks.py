@@ -189,22 +189,22 @@ class NiDaqThread(QtCore.QThread):
                 data, number_of_samples_per_channel=n_samps
             )
             self.data["torque_trans"] = np.append(
-                self.data["torque_trans"], data[:, 0], axis=0
+                self.data["torque_trans"], data[0, :], axis=0
             )
             self.data["torque_arm"] = np.append(
-                self.data["torque_arm"], data[:, 1], axis=0
+                self.data["torque_arm"], data[1, :], axis=0
             )
             self.data["drag_left"] = np.append(
-                self.data["drag_left"], data[:, 2], axis=0
+                self.data["drag_left"], data[2, :], axis=0
             )
             self.data["drag_right"] = np.append(
-                self.data["drag_right"], data[:, 3], axis=0
+                self.data["drag_right"], data[3, :], axis=0
             )
             self.data["LF_left"] = np.append(
-                self.data["LF_left"], data[:, 4], axis=0
+                self.data["LF_left"], data[4, :], axis=0
             )
             self.data["LF_right"] = np.append(
-                self.data["LF_right"], data[:, 5], axis=0
+                self.data["LF_right"], data[5, :], axis=0
             )
             self.data["time"] = (
                 np.arange(len(self.data["torque_trans"]), dtype=float)
