@@ -8,14 +8,17 @@ import micronopt
 import nidaqmx
 import numpy as np
 from acspy import acsc, prgs
+from nidaqmx.stream_readers import (
+    AnalogMultiChannelReader,
+    CounterReader,
+    DigitalSingleChannelReader,
+)
 from nidaqmx.system.storage.persisted_channel import (
     PersistedChannel as GlobalVirtualChannel,
 )
 from pxl import fdiff
 from pxl import timeseries as ts
 from PyQt5 import QtCore
-
-from nidaqmx.stream_readers import AnalogMultiChannelReader
 
 
 class NiDaqThread(QtCore.QThread):
@@ -24,20 +27,15 @@ class NiDaqThread(QtCore.QThread):
 
     def __init__(self, usetrigger=True):
         QtCore.QThread.__init__(self)
-
         # Some parameters for the thread
         self.usetrigger = usetrigger
-
         self.collect = True
-
         # Create some meta data for the run
         self.metadata = {}
-
         # Initialize sample rate
         self.sr = 2000.0
         self.metadata["Sample rate (Hz)"] = self.sr
         self.nsamps = int(self.sr / 10)
-
         # Create a dict of arrays for storing data
         self.data = {
             "turbine_angle": np.array([]),
@@ -51,20 +49,15 @@ class NiDaqThread(QtCore.QThread):
             "LF_left": np.array([]),
             "LF_right": np.array([]),
         }
-        # Create one analog and one digital task
-        # Probably should be a bridge task in there too!
-        self.analogtask = nidaqmx.Task("analog-inputs")
-        self.carpostask = daqmx.TaskHandle()
-        self.turbangtask = daqmx.TaskHandle()
         # Create tasks
-        daqmx.CreateTask("", self.carpostask)
-        daqmx.CreateTask("", self.turbangtask)
-        # Create ODiSI Tasks
-        self.odisistarttask = nidaqmx.Task()
+        self.analogtask = nidaqmx.Task("analog-inputs")
+        self.carpostask = nidaqmx.Task("carriage-pos")
+        self.turbangtask = nidaqmx.Task("turbine-angle")
+        self.odisistarttask = nidaqmx.Task("odisi-start")
         self.odisistarttask.do_channels.add_do_chan(
             "/cDAQ9188-16D66BBMod1/port0/line0"
         )
-        self.odisistoptask = nidaqmx.Task()
+        self.odisistoptask = nidaqmx.Task("odisi-stop")
         self.odisistoptask.do_channels.add_do_chan(
             "/cDAQ9188-16D66BBMod1/port0/line1"
         )
@@ -82,8 +75,12 @@ class NiDaqThread(QtCore.QThread):
         self.analogtask.add_global_channels(
             [GlobalVirtualChannel(c) for c in self.analogchans]
         )
-        daqmx.AddGlobalChansToTask(self.carpostask, self.carposchan)
-        daqmx.AddGlobalChansToTask(self.turbangtask, self.turbangchan)
+        self.carpostask.add_global_channels(
+            [GlobalVirtualChannel(self.carposchan)]
+        )
+        self.turbangtask.add_global_channels(
+            [GlobalVirtualChannel(self.turbangchan)]
+        )
         # Get channel information to add to metadata
         self.chaninfo = {}
         for channame in self.analogchans:
@@ -133,7 +130,7 @@ class NiDaqThread(QtCore.QThread):
             self.analogtask._handle, "ai/SampleClock"
         )
         daqmx.CfgSampClkTiming(
-            self.carpostask,
+            self.carpostask._handle,
             trigname,
             self.sr,
             daqmx.Val_Rising,
@@ -141,7 +138,7 @@ class NiDaqThread(QtCore.QThread):
             self.nsamps,
         )
         daqmx.CfgSampClkTiming(
-            self.turbangtask,
+            self.turbangtask._handle,
             trigname,
             self.sr,
             daqmx.Val_Rising,
@@ -156,15 +153,19 @@ class NiDaqThread(QtCore.QThread):
                 daqmx.Val_Falling,
             )
         # Set trigger functions for counter channels
-        daqmx.SetStartTrigType(self.carpostask, daqmx.Val_DigEdge)
-        daqmx.SetStartTrigType(self.turbangtask, daqmx.Val_DigEdge)
+        daqmx.SetStartTrigType(self.carpostask._handle, daqmx.Val_DigEdge)
+        daqmx.SetStartTrigType(self.turbangtask._handle, daqmx.Val_DigEdge)
         trigsrc = daqmx.GetTrigSrcWithDevPrefix(
             self.analogtask._handle, "ai/StartTrigger"
         )
-        daqmx.SetDigEdgeStartTrigSrc(self.carpostask, trigsrc)
-        daqmx.SetDigEdgeStartTrigSrc(self.turbangtask, trigsrc)
-        daqmx.SetDigEdgeStartTrigEdge(self.carpostask, daqmx.Val_Rising)
-        daqmx.SetDigEdgeStartTrigEdge(self.turbangtask, daqmx.Val_Rising)
+        daqmx.SetDigEdgeStartTrigSrc(self.carpostask._handle, trigsrc)
+        daqmx.SetDigEdgeStartTrigSrc(self.turbangtask._handle, trigsrc)
+        daqmx.SetDigEdgeStartTrigEdge(
+            self.carpostask._handle, daqmx.Val_Rising
+        )
+        daqmx.SetDigEdgeStartTrigEdge(
+            self.turbangtask._handle, daqmx.Val_Rising
+        )
 
     def run(self):
         """Start DAQmx tasks."""
@@ -201,14 +202,20 @@ class NiDaqThread(QtCore.QThread):
                 np.arange(len(self.data["torque_trans"]), dtype=float)
                 / self.sr
             )
-            carpos, cpoints = daqmx.ReadCounterF64(
-                self.carpostask, self.nsamps, 10.0, self.nsamps
+            stream_cp = self.carpostask.in_stream
+            reader_cp = CounterReader(stream_cp)
+            carpos = np.zeros(len(self.nsamps))
+            reader_cp.read_many_sample_double(
+                carpos, number_of_samples_per_channel=self.nsamps
             )
             self.data["carriage_pos"] = np.append(
                 self.data["carriage_pos"], carpos
             )
-            turbang, cpoints = daqmx.ReadCounterF64(
-                self.turbangtask, self.nsamps, 10.0, self.nsamps
+            stream_ta = self.turbangtask.in_stream
+            reader_ta = CounterReader(stream_ta)
+            turbang = np.zeros(len(self.nsamps))
+            reader_cp.read_many_sample_double(
+                turbang, number_of_samples_per_channel=self.nsamps
             )
             self.data["turbine_angle"] = np.append(
                 self.data["turbine_angle"], turbang
