@@ -251,7 +251,7 @@ class NiDaqThread(QtCore.QThread):
         self.collecting.emit()
         # Keep the acquisition going until task it cleared
         while self.collect:
-            pass
+            time.sleep(0.2)
 
     def stopdaq(self):
         self.analogtask.stop()
