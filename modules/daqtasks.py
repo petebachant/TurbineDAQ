@@ -1,21 +1,21 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug 19 10:51:28 2013
+"""DAQ tasks."""
 
-@author: Pete
-
-This module contains the DAQ stuff for TurbineDAQ
-
-"""
-from __future__ import division, print_function
-from PyQt5 import QtCore
-import numpy as np
-import daqmx
-import nidaqmx
+import ctypes
 import time
-from acspy import acsc, prgs
-from pxl import fdiff, timeseries as ts
+
+import daqmx
 import micronopt
+import nidaqmx
+import numpy as np
+from acspy import acsc, prgs
+from nidaqmx.system.storage.persisted_channel import (
+    PersistedChannel as GlobalVirtualChannel,
+)
+from pxl import fdiff
+from pxl import timeseries as ts
+from PyQt5 import QtCore
+
+from nidaqmx.stream_readers import AnalogMultiChannelReader
 
 
 class NiDaqThread(QtCore.QThread):
@@ -53,11 +53,10 @@ class NiDaqThread(QtCore.QThread):
         }
         # Create one analog and one digital task
         # Probably should be a bridge task in there too!
-        self.analogtask = daqmx.TaskHandle()
+        self.analogtask = nidaqmx.Task("analog-inputs")
         self.carpostask = daqmx.TaskHandle()
         self.turbangtask = daqmx.TaskHandle()
         # Create tasks
-        daqmx.CreateTask("", self.analogtask)
         daqmx.CreateTask("", self.carpostask)
         daqmx.CreateTask("", self.turbangtask)
         # Create ODiSI Tasks
@@ -80,7 +79,9 @@ class NiDaqThread(QtCore.QThread):
         ]
         self.carposchan = "carriage_pos"
         self.turbangchan = "turbine_angle"
-        daqmx.AddGlobalChansToTask(self.analogtask, self.analogchans)
+        self.analogtask.add_global_channels(
+            [GlobalVirtualChannel(c) for c in self.analogchans]
+        )
         daqmx.AddGlobalChansToTask(self.carpostask, self.carposchan)
         daqmx.AddGlobalChansToTask(self.turbangtask, self.turbangchan)
         # Get channel information to add to metadata
@@ -120,7 +121,7 @@ class NiDaqThread(QtCore.QThread):
         self.metadata["Channel info"] = self.chaninfo
         # Configure sample clock timing
         daqmx.CfgSampClkTiming(
-            self.analogtask,
+            self.analogtask._handle,
             "",
             self.sr,
             daqmx.Val_Rising,
@@ -129,7 +130,7 @@ class NiDaqThread(QtCore.QThread):
         )
         # Get source for analog sample clock
         trigname = daqmx.GetTerminalNameWithDevPrefix(
-            self.analogtask, "ai/SampleClock"
+            self.analogtask._handle, "ai/SampleClock"
         )
         daqmx.CfgSampClkTiming(
             self.carpostask,
@@ -150,13 +151,15 @@ class NiDaqThread(QtCore.QThread):
         # If using trigger for analog signals set source to chassis PFI0
         if self.usetrigger:
             daqmx.CfgDigEdgeStartTrig(
-                self.analogtask, "/cDAQ9188-16D66BB/PFI0", daqmx.Val_Falling
+                self.analogtask._handle,
+                "/cDAQ9188-16D66BB/PFI0",
+                daqmx.Val_Falling,
             )
         # Set trigger functions for counter channels
         daqmx.SetStartTrigType(self.carpostask, daqmx.Val_DigEdge)
         daqmx.SetStartTrigType(self.turbangtask, daqmx.Val_DigEdge)
         trigsrc = daqmx.GetTrigSrcWithDevPrefix(
-            self.analogtask, "ai/StartTrigger"
+            self.analogtask._handle, "ai/StartTrigger"
         )
         daqmx.SetDigEdgeStartTrigSrc(self.carpostask, trigsrc)
         daqmx.SetDigEdgeStartTrigSrc(self.turbangtask, trigsrc)
@@ -166,30 +169,16 @@ class NiDaqThread(QtCore.QThread):
     def run(self):
         """Start DAQmx tasks."""
 
-        # Acquire and throwaway samples for alignment
-        # Need to set these up on a different task?
-        # Callback code from PyDAQmx
-        class MyList(list):
-            pass
-
-        # List where the data are stored
-        data = MyList()
-        id_data = daqmx.create_callbackdata_id(data)
-
-        def EveryNCallback_py(
-            taskHandle, everyNsamplesEventType, nSamples, callbackData_ptr
+        def every_n_samples(
+            task_handle, every_n_samps_event_type, n_samps, callback_data
         ):
             """Function called every N samples"""
-            callbackdata = daqmx.get_callbackdata_from_id(callbackData_ptr)
-            data, npoints = daqmx.ReadAnalogF64(
-                taskHandle,
-                self.nsamps,
-                10.0,
-                daqmx.Val_GroupByChannel,
-                self.nsamps,
-                len(self.analogchans),
+            stream = self.analogtask.in_stream
+            reader = AnalogMultiChannelReader(stream)
+            data = np.zeros((len(self.analogchans), self.nsamps))
+            n = reader.read_many_sample(
+                data, number_of_samples_per_channel=self.nsamps
             )
-            callbackdata.extend(data.tolist())
             self.data["torque_trans"] = np.append(
                 self.data["torque_trans"], data[:, 0], axis=0
             )
@@ -233,27 +222,13 @@ class NiDaqThread(QtCore.QThread):
             )
             return 0  # The function should return an integer
 
-        # Convert the python callback function to a CFunction
-        EveryNCallback = daqmx.EveryNSamplesEventCallbackPtr(EveryNCallback_py)
-        daqmx.RegisterEveryNSamplesEvent(
-            self.analogtask,
-            daqmx.Val_Acquired_Into_Buffer,
-            self.nsamps,
-            0,
-            EveryNCallback,
-            id_data,
+        self.analogtask.register_every_n_samples_acquired_into_buffer_event(
+            sample_interval=self.nsamps, callback_method=every_n_samples
         )
-
-        def DoneCallback_py(taskHandle, status, callbackData_ptr):
-            print("Status", status.value)
-            return 0
-
-        DoneCallback = daqmx.DoneEventCallbackPtr(DoneCallback_py)
-        daqmx.RegisterDoneEvent(self.analogtask, 0, DoneCallback, None)
         # Start the tasks
         daqmx.StartTask(self.carpostask)
         daqmx.StartTask(self.turbangtask)
-        daqmx.StartTask(self.analogtask)
+        self.analogtask.start()
         # Send trigger for ODiSI Interrogater
         self.odisistarttask.start()
         for n in range(1):
@@ -270,7 +245,7 @@ class NiDaqThread(QtCore.QThread):
             pass
 
     def stopdaq(self):
-        daqmx.StopTask(self.analogtask)
+        self.analogtask.stop()
         daqmx.StopTask(self.carpostask)
         daqmx.StopTask(self.turbangtask)
         # Send stop trigger to ODiSI Interrogator
@@ -286,7 +261,7 @@ class NiDaqThread(QtCore.QThread):
 
     def clear(self):
         self.stopdaq()
-        daqmx.ClearTask(self.analogtask)
+        self.analogtask.close()
         daqmx.ClearTask(self.carpostask)
         daqmx.ClearTask(self.turbangtask)
         self.collect = False
