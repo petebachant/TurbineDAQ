@@ -177,13 +177,15 @@ class NiDaqThread(QtCore.QThread):
         reader_cp = CounterReader(stream_cp)
         stream_ta = self.turbangtask.in_stream
         reader_ta = CounterReader(stream_ta)
+        data = np.zeros((len(self.analogchans), self.nsamps))
+        carpos = np.zeros(self.nsamps)
+        turbang = np.zeros(self.nsamps)
 
         def every_n_samples(
             task_handle, every_n_samps_event_type, n_samps, callback_data
         ):
             """Function called every N samples"""
-            data = np.zeros((len(self.analogchans), n_samps))
-            n = reader.read_many_sample(
+            reader.read_many_sample(
                 data, number_of_samples_per_channel=n_samps
             )
             self.data["torque_trans"] = np.append(
@@ -208,14 +210,12 @@ class NiDaqThread(QtCore.QThread):
                 np.arange(len(self.data["torque_trans"]), dtype=float)
                 / self.sr
             )
-            carpos = np.zeros(n_samps)
             reader_cp.read_many_sample_double(
                 carpos, number_of_samples_per_channel=n_samps
             )
             self.data["carriage_pos"] = np.append(
                 self.data["carriage_pos"], carpos
             )
-            turbang = np.zeros(n_samps)
             reader_ta.read_many_sample_double(
                 turbang, number_of_samples_per_channel=n_samps
             )
