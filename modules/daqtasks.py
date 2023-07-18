@@ -103,17 +103,19 @@ class NiDaqThread(QtCore.QThread):
         self.chaninfo[self.turbangchan][
             "Pulses per rev"
         ] = daqmx.GetCIAngEncoderPulsesPerRev(
-            self.turbangtask, self.turbangchan
+            self.turbangtask._handle, self.turbangchan
         )
         self.chaninfo[self.turbangchan]["Units"] = daqmx.GetCIAngEncoderUnits(
-            self.turbangtask, self.turbangchan
+            self.turbangtask._handle, self.turbangchan
         )
         self.chaninfo[self.carposchan] = {}
         self.chaninfo[self.carposchan][
             "Distance per pulse"
-        ] = daqmx.GetCILinEncoderDisPerPulse(self.carpostask, self.carposchan)
+        ] = daqmx.GetCILinEncoderDisPerPulse(
+            self.carpostask._handle, self.carposchan
+        )
         self.chaninfo[self.carposchan]["Units"] = daqmx.GetCILinEncoderUnits(
-            self.carpostask, self.carposchan
+            self.carpostask._handle, self.carposchan
         )
         self.metadata["Channel info"] = self.chaninfo
         # Configure sample clock timing
@@ -233,8 +235,8 @@ class NiDaqThread(QtCore.QThread):
             sample_interval=self.nsamps, callback_method=every_n_samples
         )
         # Start the tasks
-        daqmx.StartTask(self.carpostask)
-        daqmx.StartTask(self.turbangtask)
+        self.carpostask.start()
+        self.turbangtask.start()
         self.analogtask.start()
         # Send trigger for ODiSI Interrogater
         self.odisistarttask.start()
@@ -253,8 +255,8 @@ class NiDaqThread(QtCore.QThread):
 
     def stopdaq(self):
         self.analogtask.stop()
-        daqmx.StopTask(self.carpostask)
-        daqmx.StopTask(self.turbangtask)
+        self.carpostask.stop()
+        self.turbangtask.stop()
         # Send stop trigger to ODiSI Interrogator
         self.odisistoptask.start()
         for n in range(1):
@@ -269,8 +271,8 @@ class NiDaqThread(QtCore.QThread):
     def clear(self):
         self.stopdaq()
         self.analogtask.close()
-        daqmx.ClearTask(self.carpostask)
-        daqmx.ClearTask(self.turbangtask)
+        self.carpostask.close()
+        self.turbangtask.close()
         self.collect = False
         self.cleared.emit()
 
