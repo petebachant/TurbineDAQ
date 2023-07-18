@@ -245,7 +245,7 @@ class NiDaqThread(QtCore.QThread):
             time.sleep(1e-6)  # make longer to see pulse width on oscilloscope
             self.odisistarttask.write(False)
             time.sleep(1e-6)  # make longer to see pulse width on oscilloscope
-        self.odisistarttask.stop
+        self.odisistarttask.stop()
         self.odisistarttask.close()
         print("ODiSI interrogator starting measurements...")
         self.collecting.emit()
