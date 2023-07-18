@@ -206,7 +206,7 @@ class NiDaqThread(QtCore.QThread):
             )
             stream_cp = self.carpostask.in_stream
             reader_cp = CounterReader(stream_cp)
-            carpos = np.zeros(len(self.nsamps))
+            carpos = np.zeros(self.nsamps)
             reader_cp.read_many_sample_double(
                 carpos, number_of_samples_per_channel=self.nsamps
             )
@@ -215,7 +215,7 @@ class NiDaqThread(QtCore.QThread):
             )
             stream_ta = self.turbangtask.in_stream
             reader_ta = CounterReader(stream_ta)
-            turbang = np.zeros(len(self.nsamps))
+            turbang = np.zeros(self.nsamps)
             reader_ta.read_many_sample_double(
                 turbang, number_of_samples_per_channel=self.nsamps
             )
