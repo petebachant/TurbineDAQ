@@ -10,9 +10,7 @@ from acspy import acsc
 from nortek.controls import PdControl
 from PyQt5 import QtCore
 
-import acsprgs
-
-from . import daqtasks
+from . import acsprgs, daqtasks
 
 
 class TurbineTow(QtCore.QThread):
