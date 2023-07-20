@@ -2,12 +2,14 @@
 
 import ctypes
 import time
+import warnings
 
 import daqmx
 import micronopt
 import nidaqmx
 import numpy as np
 from acspy import acsc, prgs
+from acspy.acsc import AcscError
 from nidaqmx.stream_readers import (
     AnalogMultiChannelReader,
     CounterReader,
@@ -301,14 +303,21 @@ class AcsDaqThread(QtCore.QThread):
         self.makeprg = makeprg
 
     def run(self):
+        def collecting_data() -> bool:
+            try:
+                return bool(
+                    acsc.readInteger(self.hc, acsc.NONE, "collect_data")
+                )
+            except AcscError as e:
+                warnings.warn("Failed to read 'collect_data':", e)
+                return False
+
         if self.makeprg:
             self.makedaqprg()
             acsc.loadBuffer(self.hc, 19, self.prg, 1024)
             acsc.runBuffer(self.hc, 19)
-        collect = acsc.readInteger(self.hc, acsc.NONE, "collect_data")
-        while collect == 0:
+        while not collecting_data():
             time.sleep(0.01)
-            collect = acsc.readInteger(self.hc, acsc.NONE, "collect_data")
         while self.collectdata:
             time.sleep(self.sleeptime)
             t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
