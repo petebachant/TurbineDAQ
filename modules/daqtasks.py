@@ -309,7 +309,7 @@ class AcsDaqThread(QtCore.QThread):
                     acsc.readInteger(self.hc, acsc.NONE, "collect_data")
                 )
             except AcscError as e:
-                warnings.warn("Failed to read 'collect_data':", e)
+                warnings.warn(f"Failed to read 'collect_data': {e}")
                 return False
 
         if self.makeprg:
