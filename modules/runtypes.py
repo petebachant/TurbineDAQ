@@ -1,21 +1,16 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug 05 14:17:51 2013
+"""This module contains classes for experiment run types."""
 
-@author: Pete
+from __future__ import division, print_function
 
-This module contains classes for experiment run types
-
-"""
-from __future__ import print_function, division
-import acsprgs
-from acspy import acsc
-from . import daqtasks
 import time
-from PyQt5 import QtCore
-from nortek.controls import PdControl
 from subprocess import check_output
+
 import numpy as np
+from acspy import acsc
+from nortek.controls import PdControl
+from PyQt5 import QtCore
+
+from . import acsprgs, daqtasks
 
 
 class TurbineTow(QtCore.QThread):
