@@ -1416,9 +1416,10 @@ class MainWindow(QMainWindow):
         self.settings[
             "Shakedown ODiSI"
         ] = self.ui.checkBox_singleRunODiSI.isChecked()
-        self.settings[
-            "Shakedown lateral forces"
-        ] = self.ui.checkBox_singleRunLF.isChecked()
+        # TODO: Checkbox below does not exist
+        # self.settings[
+        #     "Shakedown lateral forces"
+        # ] = self.ui.checkBox_singleRunLF.isChecked()
         self.settings[
             "Vectrino visible"
         ] = self.ui.dockWidgetVectrino.isVisible()
