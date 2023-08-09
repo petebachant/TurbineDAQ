@@ -283,15 +283,12 @@ class TareDragRun(QtCore.QThread):
         self.build_acsprg()
         self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
         self.acsdata = self.acsdaqthread.data
-
         commit = check_output(["git", "rev-parse", "--verify", "HEAD"])[:-1]
-
         self.metadata = {
             "Tow speed (m/s)": U,
             "Time created": time.asctime(),
             "TurbineDAQ version": commit,
         }
-
         self.daqthread = daqtasks.NiDaqThread(usetrigger=True)
         self.nidata = self.daqthread.data
         self.metadata["NI metadata"] = self.daqthread.metadata
