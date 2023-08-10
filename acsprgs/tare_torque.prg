@@ -16,10 +16,10 @@ if RPOS(4) <> 60 & RPOS(4) <> 0
     ptp 4, 0
 end
 
-ACC(turbine) = rpm/tacc
-DEC(turbine) = ACC(turbine)
-VEL(turbine) = rpm
-JERK(turbine) = ACC(turbine)*10
+ACC(4) = rpm/tacc
+DEC(4) = ACC(4)
+VEL(4) = rpm
+JERK(4) = ACC(4)*10
 
 ! Start controller data acquisition and send trigger pulse in same cycle
 BLOCK
@@ -32,10 +32,10 @@ BLOCK
 END
 
 wait tzero*1000
-jog/v turbine, rpm
+jog/v 4, rpm
 WAIT dur*1000
-HALT turbine
-ptp/e turbine, 0
+HALT 4
+ptp/e 4, 0
 OUT1.16 = 1
 STOPDC
 collect_data = 0
