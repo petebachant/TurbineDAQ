@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>loadcell.png</file>
     <file>turbinedaq.png</file>
     <file>micron.svg</file>
     <file>acs.png</file>
@@ -18,5 +19,6 @@
     <file>agt_stop.png</file>
     <file>play.png</file>
     <file>record.png</file>
+    <file>odisi.png</file>
   </qresource>
 </RCC>

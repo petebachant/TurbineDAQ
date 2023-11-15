@@ -45,6 +45,7 @@ class MainWindow(QMainWindow):
         self.monitorni = False
         self.monitorvec = False
         self.monitorfbg = False
+        self.monitorodisi = False
         self.run_in_progress = False
         self.test_plan_loaded = False
         self.autoprocess = True
@@ -72,10 +73,11 @@ class MainWindow(QMainWindow):
         self.connect_to_controller()
         # Import test plan
         self.import_test_plan()
-        # Read turbine, vectrino, and fbg properties
+        # Read turbine, vectrino, fbg, and odisi properties
         self.read_turbine_properties()
         self.read_vectrino_properties()
         self.read_fbg_properties()
+        self.read_odisi_properties()
         # Initialize plots
         self.initialize_plots()
         # Add checkboxes to ACS table widget
@@ -101,6 +103,24 @@ class MainWindow(QMainWindow):
         else:
             self.ui.dockWidget_FBG.close()
             self.ui.actionFBG.setChecked(False)
+        # Remember ODiSI dock widget visibility from last session
+        if "ODiSI visible" in self.settings:
+            self.ui.dockWidget_ODiSI.setVisible(self.settings["ODiSI visible"])
+            self.ui.actionODiSI.setChecked(self.settings["ODiSI visible"])
+        else:
+            self.ui.dockWidget_ODiSI.close()
+            self.ui.actionODiSI.setChecked(False)
+        # Remember Lateral Force dock widget visibility from last session
+        if "Lateral forces visible" in self.settings:
+            self.ui.dockWidget_LF.setVisible(
+                self.settings["Lateral forces visible"]
+            )
+            self.ui.actionLF.setChecked(
+                self.settings["Lateral forces visible"]
+            )
+        else:
+            self.ui.dockWidget_LF.close()
+            self.ui.actionLF.setChecked(False)
         # Remember Vectrino dock widget visibility from last session
         if "Vectrino visible" in self.settings:
             self.ui.dockWidgetVectrino.setVisible(
@@ -163,6 +183,12 @@ class MainWindow(QMainWindow):
         if "Shakedown FBG" in self.settings:
             val = self.settings["Shakedown FBG"]
             self.ui.checkBox_singleRunFBG.setChecked(val)
+        if "Shakedown ODiSI" in self.settings:
+            val = self.settings["Shakedown ODiSI"]
+            self.ui.checkBox_singleRunODiSI.setChecked(val)
+        if "Shakedown lateral forces" in self.settings:
+            val = self.settings["Shakedown lateral forces"]
+            self.ui.checkBox_singleRunLF.setChecked(val)
 
     def read_turbine_properties(self):
         """Reads turbine properties from `Config/turbine_properties.json` in
@@ -205,6 +231,15 @@ class MainWindow(QMainWindow):
         except IOError:
             self.fbg_properties = {}
 
+    def read_odisi_properties(self):
+        fpath = os.path.join(self.wdir, "Config", "odisi_properties.json")
+        try:
+            with open(fpath) as f:
+                self.odisi_properties = json.load(f)
+            print("ODiSI properties loaded")
+        except IOError:
+            self.odisi_properties = {}
+
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
         runpath = os.path.join(self.wdir, "Data", "Raw", section, str(number))
@@ -227,6 +262,7 @@ class MainWindow(QMainWindow):
         self.test_plan_loaded = False
         self.test_plan = {}
         self.test_plan_sections = []
+        self.test_plan_runs = []
         if os.path.isdir(tpdir):
             test_plan_files = os.listdir(os.path.join(tpdir))
             for f in test_plan_files:
@@ -363,6 +399,8 @@ class MainWindow(QMainWindow):
         self.ui.actionMonitor_Vectrino.triggered.connect(self.on_monitor_vec)
         self.ui.actionMonitor_NI.triggered.connect(self.on_monitor_ni)
         self.ui.actionMonitor_FBG.triggered.connect(self.on_monitor_fbg)
+        self.ui.actionMonitor_ODiSI.triggered.connect(self.on_monitor_ODiSI)
+        self.ui.actionMonitor_LF.triggered.connect(self.on_monitor_ni)
         self.ui.actionStart.triggered.connect(self.on_start)
         self.ui.actionAbort.triggered.connect(self.on_abort)
         self.ui.actionImportTestPlan.triggered.connect(self.import_test_plan)
@@ -401,6 +439,7 @@ class MainWindow(QMainWindow):
         self.read_turbine_properties()
         self.read_vectrino_properties()
         self.read_fbg_properties()
+        self.read_odisi_properties()
 
     def on_tab_change(self):
         tabindex = self.ui.tabWidgetMode.currentIndex()
@@ -412,10 +451,11 @@ class MainWindow(QMainWindow):
             self.ui.actionStart.setEnabled(True)
         if tabitem == "Processing":
             savedir = os.path.join(self.wdir, "Data", "Raw", "Shakedown")
-            runsdone = sorted([int(n) for n in os.listdir(savedir)])
-            runsdone = [str(n) for n in runsdone]
-            self.ui.comboBox_process_nrun.clear()
-            self.ui.comboBox_process_nrun.addItems(runsdone)
+            if os.path.isdir(savedir):
+                runsdone = sorted([int(n) for n in os.listdir(savedir)])
+                runsdone = [str(n) for n in runsdone]
+                self.ui.comboBox_process_nrun.clear()
+                self.ui.comboBox_process_nrun.addItems(runsdone)
 
     def on_home_tow(self):
         acsc.runBuffer(self.hc, 2)
@@ -560,6 +600,19 @@ class MainWindow(QMainWindow):
         for n, curve in enumerate(self.fbg_curves):
             n = n % 5
             self.fbg_plot_list[n].add_item(curve)
+        # ODiSI Plot
+        # self.curve_odisi = guiqwt.curve.CurveItem()
+        #       self.plot_odisi = self.ui.plotODiSI.get_plot()
+        #       self.plot_odisi.add_item(self.curve_odisi)
+        # Lateral force left plot
+        self.curve_LF_left = guiqwt.curve.CurveItem()
+        self.curve_LF_left.setPen(QtGui.QPen(QtCore.Qt.darkGreen, 1))
+        self.plot_LF = self.ui.plotLF.get_plot()
+        self.plot_LF.add_item(self.curve_LF_left)
+        # Lateral force right plot
+        self.curve_LF_right = guiqwt.curve.CurveItem()
+        self.curve_LF_right.setPen(QtGui.QPen(QtCore.Qt.red, 1))
+        self.plot_LF.add_item(self.curve_LF_right)
 
     def on_start(self):
         """Start whatever is visible in the tab widget."""
@@ -569,6 +622,8 @@ class MainWindow(QMainWindow):
             self.ui.actionStart.setToolTip("Stop after current run")
             self.ui.actionMonitor_NI.setChecked(False)
             self.ui.actionMonitor_Vectrino.setChecked(False)
+            self.ui.actionMonitor_ODiSI.setChecked(False)
+            self.ui.actionMonitor_LF.setChecked(False)
             self.ui.toolBar_DAQ.setDisabled(True)
             self.ui.toolBar_directory.setDisabled(True)
             self.ui.tabWidgetMode.setDisabled(True)
@@ -598,6 +653,8 @@ class MainWindow(QMainWindow):
         self.monitoracs = False
         self.monitorvec = False
         self.monitorfbg = False
+        self.monitorodisi = False
+
         if self.ui.actionStart.isChecked():
             self.ui.actionStart.setChecked(False)
             print("Aborting current run")
@@ -612,6 +669,11 @@ class MainWindow(QMainWindow):
         if self.ui.actionMonitor_Vectrino.isChecked():
             self.ui.actionMonitor_Vectrino.setChecked(False)
             self.vecthread.stop()
+        if self.ui.actionMonitor_ODiSI.isChecked():
+            self.ui.actionMonitor_ODiSI.setChecked(False)
+            self.odisithread.stop()
+        if self.ui.actionMonitor_LF.isChecked():
+            self.ui.actionMonitor_LF.setChecked(False)
         self.ui.actionStart.setIcon(QIcon(":icons/play.png"))
         self.ui.toolBar_DAQ.setEnabled(True)
         self.ui.toolBar_directory.setEnabled(True)
@@ -637,6 +699,7 @@ class MainWindow(QMainWindow):
         self.monitoracs = False
         self.monitorvec = False
         self.monitorfbg = False
+        self.monitorodisi = False
         print("Automatically aborting current run")
         text = str(self.label_runstatus.text())
         self.label_runstatus.setText(text[:-13] + " autoaborted ")
@@ -661,6 +724,7 @@ class MainWindow(QMainWindow):
         z_H = self.ui.doubleSpinBox_singleRun_z_H.value()
         vectrino = self.ui.checkBox_singleRunVectrino.isChecked()
         fbg = self.ui.checkBox_singleRunFBG.isChecked()
+        odisi = self.ui.checkBox_singleRunODiSI.isChecked()
         self.savedir = os.path.join(self.wdir, "Data", "Raw", "Shakedown")
         if not os.path.isdir(self.savedir):
             os.makedirs(self.savedir)
@@ -674,7 +738,14 @@ class MainWindow(QMainWindow):
         self.savesubdir = os.path.join(self.savedir, str(self.currentrun))
         os.mkdir(self.savesubdir)
         self.do_turbine_tow(
-            U, tsr, y_R, z_H, turbine="shakedown", vectrino=vectrino, fbg=fbg
+            U,
+            tsr,
+            y_R,
+            z_H,
+            turbine="shakedown",
+            vectrino=vectrino,
+            fbg=fbg,
+            odisi=odisi,
         )
 
     def do_test_plan(self):
@@ -747,6 +818,10 @@ class MainWindow(QMainWindow):
                     fbg = run_props["fbg"]
                 except KeyError:
                     fbg = False
+                try:
+                    odisi = run_props["odisi"]
+                except KeyError:
+                    odisi = False
                 settling = "settling" in section.lower()
                 self.do_turbine_tow(
                     U,
@@ -756,6 +831,7 @@ class MainWindow(QMainWindow):
                     vectrino=vectrino,
                     turbine=turbine,
                     fbg=fbg,
+                    odisi=odisi,
                     settling=settling,
                 )
         else:
@@ -771,6 +847,7 @@ class MainWindow(QMainWindow):
         turbine="RVAT",
         vectrino=True,
         fbg=False,
+        odisi=False,
         settling=False,
     ):
         """Executes a single turbine tow."""
@@ -790,6 +867,8 @@ class MainWindow(QMainWindow):
                 turbine_properties=turbine_properties,
                 fbg=fbg,
                 fbg_properties=self.fbg_properties,
+                odisi=odisi,
+                odisi_properties=self.odisi_properties,
                 settling=settling,
                 vec_salinity=self.vec_salinity,
             )
@@ -804,11 +883,14 @@ class MainWindow(QMainWindow):
             if fbg:
                 self.fbgdata = self.turbinetow.fbgdata
                 self.fbgs = self.turbinetow.fbgthread.interr.sensors
+            # if odisi:
+            #     self.odisidata = self.turbinetow.odisidata
             self.run_in_progress = True
             self.monitoracs = True
             self.monitorni = True
             self.monitorvec = vectrino
             self.monitorfbg = fbg
+            self.monitorodisi = odisi
             self.turbinetow.start()
         else:
             print("Cannot start turbine tow because axis is disabled")
@@ -829,6 +911,7 @@ class MainWindow(QMainWindow):
         self.monitorni = True
         self.monitoracs = True
         self.monitorvec = False
+        self.monitorodisi = False
         self.run_in_progress = True
         self.tarerun.start()
 
@@ -841,6 +924,7 @@ class MainWindow(QMainWindow):
         self.nidata = self.tarerun.nidata
         self.monitorni = True
         self.monitoracs = True
+        self.monitorodisi = True
         self.monitorvec = False
         self.run_in_progress = True
         self.tarerun.start()
@@ -857,6 +941,7 @@ class MainWindow(QMainWindow):
         self.monitorni = True
         self.monitoracs = True
         self.monitorvec = False
+        self.monitorodisi = False
         self.run_in_progress = True
         self.tarerun.start()
 
@@ -870,6 +955,7 @@ class MainWindow(QMainWindow):
         self.monitoracs = False
         self.monitorni = False
         self.monitorfbg = False
+        self.monitorodisi = False
         self.time_last_run = time.time()
         # Save data from the run that just finished
         savedir = self.savesubdir
@@ -880,7 +966,7 @@ class MainWindow(QMainWindow):
             self.save_raw_data(savedir, "acsdata.h5", self.acsdata)
             self.save_raw_data(savedir, "nidata.h5", nidata)
             with open(os.path.join(savedir, "metadata.json"), "w") as fn:
-                json.dump(self.tarerun.metadata, fn, indent=4)
+                json.dump(self.tarerun.metadata, fn, indent=4, default=str)
             text = str(self.label_runstatus.text())
             if "in progress" in text:
                 self.label_runstatus.setText(text[:-13] + " saved ")
@@ -941,6 +1027,7 @@ class MainWindow(QMainWindow):
         self.monitorni = False
         self.monitorvec = False
         self.monitorfbg = False
+        self.monitorodisi = False
         self.time_last_run = time.time()
         # Save data from the run that just finished
         savedir = self.savesubdir
@@ -956,8 +1043,10 @@ class MainWindow(QMainWindow):
                 self.save_raw_data(savedir, "vecdata.h5", self.vecdata)
             if self.turbinetow.fbg:
                 self.save_raw_data(savedir, "fbgdata.h5", self.fbgdata)
+            # if self.turbinetow.odisi:
+            #     self.save_raw_data(savedir, "odisidata.h5", self.odisidata)
             with open(os.path.join(savedir, "metadata.json"), "w") as fn:
-                json.dump(self.turbinetow.metadata, fn, indent=4)
+                json.dump(self.turbinetow.metadata, fn, indent=4, default=str)
             text = str(self.label_runstatus.text())
             if "in progress" in text:
                 self.label_runstatus.setText(text[:-13] + " saved ")
@@ -1017,6 +1106,7 @@ class MainWindow(QMainWindow):
         self.nidata = {}
         self.acsdata = {}
         self.fbgdata = {}
+        # self.odisidata = {}
 
     def on_idletimer(self):
         if self.ui.actionStart.isChecked():
@@ -1072,6 +1162,17 @@ class MainWindow(QMainWindow):
             self.fbgthread.stop()
             self.monitorfbg = False
 
+    def on_monitor_ODiSI(self):
+        if self.ui.actionMonitor_ODiSI.isChecked():
+            odisi_props = self.odisi_properties
+            self.odisithread = daqtasks.ODiSIDaqThread(odisi_props)
+            # self.odisidata = self.odisithread.data
+            self.odisithread.start()
+            self.monitorodisi = True
+        else:
+            self.odisithread.stop()
+            self.monitorodisi = False
+
     def on_checkbox_tow_axis(self):
         if self.checkbox_tow_axis.isChecked():
             acsc.enable(self.hc, 5)
@@ -1121,10 +1222,17 @@ class MainWindow(QMainWindow):
             self.update_plots_ni()
         if self.monitorfbg:
             self.update_plots_fbg()
+        # if self.monitorodisi:
+        #     self.update_plots_odisi()
 
     def on_process(self):
         section = str(self.ui.comboBox_process_section.currentText())
         nrun = str(self.ui.comboBox_process_nrun.currentText())
+        print(
+            "Working on processing in {} on section {} run {}. ".format(
+                self.wdir, section, nrun
+            )
+        )
         subprocess.call(
             [
                 "cd",
@@ -1162,6 +1270,9 @@ class MainWindow(QMainWindow):
             self.plot_drag.replot()
         self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
         self.plot_rpm_ni.replot()
+        self.curve_LF_left.set_data(t, self.nidata["LF_left"])
+        self.curve_LF_right.set_data(t, self.nidata["LF_right"])
+        self.plot_LF.replot()
 
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
@@ -1189,6 +1300,12 @@ class MainWindow(QMainWindow):
             curve.set_data(t, self.fbgdata[fbg.name + "_strain"])
         for plot in self.fbg_plot_list:
             plot.replot()
+
+    # def update_plots_odisi(self):
+    #     """This function updates the ODiSI plots."""
+    #     t = self.odisidata["time"]
+    #     self.curve_odisi.set_data(t, self.odisidata[odisi.name + "_strain"])
+    #     self.plot_odisi.replot()
 
     def update_acs(self):
         """This function updates all the non-time-critical
@@ -1292,6 +1409,17 @@ class MainWindow(QMainWindow):
             self.size().width(),
         )
         self.settings["FBG visible"] = self.ui.dockWidget_FBG.isVisible()
+        self.settings["ODiSI visible"] = self.ui.dockWidget_ODiSI.isVisible()
+        self.settings[
+            "Lateral forces visible"
+        ] = self.ui.dockWidget_LF.isVisible()
+        self.settings[
+            "Shakedown ODiSI"
+        ] = self.ui.checkBox_singleRunODiSI.isChecked()
+        # TODO: Checkbox below does not exist
+        # self.settings[
+        #     "Shakedown lateral forces"
+        # ] = self.ui.checkBox_singleRunLF.isChecked()
         self.settings[
             "Vectrino visible"
         ] = self.ui.dockWidgetVectrino.isVisible()
@@ -1322,7 +1450,7 @@ class MainWindow(QMainWindow):
         if not os.path.isdir("settings"):
             os.mkdir("settings")
         with open("settings/settings.json", "w") as fn:
-            json.dump(self.settings, fn, indent=4)
+            json.dump(self.settings, fn, indent=4, default=str)
         acsc.closeComm(self.hc)
         if self.monitorni and not self.run_in_progress:
             self.daqthread.clear()
@@ -1330,6 +1458,8 @@ class MainWindow(QMainWindow):
             self.vecthread.stop()
         if self.monitorfbg and not self.run_in_progress:
             self.fbgthread.stop()
+        if self.monitorodisi and not self.run_in_progress:
+            self.odisithread.stop()
 
 
 def main():
