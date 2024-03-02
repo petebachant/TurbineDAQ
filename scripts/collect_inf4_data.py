@@ -10,11 +10,11 @@ from acspy import acsc
 SAMPLE_PERIOD_MS = 2
 
 # First, define the ACSPL+ program text
-prg_txt = f"""
+prg_txt = f"""! AUTO-GENERATED -- CHANGES WILL BE OVERWRITTEN
 ! Here we will try to continuously collect data from the INF4
 global int inf4_data(8)(100) ! 8 columns and 100 rows
 global int collect_data
-local real start_time
+global real start_time
 local int sample_period_ms = {SAMPLE_PERIOD_MS}
 global real ch1_force, ch2_force, ch3_force, ch4_force
 global real inf4_data_processed(5)(100) ! 5 columns and 100 rows
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     hc = acsc.openCommEthernetTCP()
     # Load our program into buffer 9 (arbitrary for now)
     print("Loading program into buffer 9:\n", prg_txt)
-    acsc.loadBuffer(hc, 9, prg_txt, 1024)
+    acsc.loadBuffer(hc, 9, prg_txt, 4096)
     print("Running buffer 9")
     acsc.runBuffer(hc, 9)
     # Collect data for a bit then set collect_data=0 to stop data collection
@@ -69,9 +69,10 @@ if __name__ == "__main__":
     ch3_force_vals = []
     ch4_force_vals = []
     dblen = 100  # The number of rows in our buffer in the ACS program
-    sr = 1 / (SAMPLE_PERIOD_MS * 1000)
+    sr = 1000 / SAMPLE_PERIOD_MS
     sleeptime = float(dblen) / float(sr) / 2 * 1.05
-    for i in range(100):
+    print(f"Sleeping for {sleeptime} seconds each iteration")
+    for i in range(20):
         print("Data collection iteration", i + 1)
         # Sleep to let buffer accumulate
         time.sleep(sleeptime)
@@ -104,8 +105,6 @@ if __name__ == "__main__":
     df["ch2_force"] = ch2_force_vals
     df["ch3_force"] = ch3_force_vals
     df["ch4_force"] = ch4_force_vals
-    # TODO: Put data values into their own columns by slicing from `newdata`
-    # each iteration
     print("Collected data:\n", df)
     fpath = "inf4-test-data.csv"
     print("Saving to", fpath)
