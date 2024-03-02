@@ -71,12 +71,12 @@ if __name__ == "__main__":
     dblen = 100  # The number of rows in our buffer in the ACS program
     sr = 1000 / SAMPLE_PERIOD_MS
     sleeptime = float(dblen) / float(sr) / 2 * 1.05
+    t0 = acsc.readReal(hc, acsc.NONE, "start_time")
     print(f"Sleeping for {sleeptime} seconds each iteration")
     for i in range(20):
         print("Data collection iteration", i + 1)
         # Sleep to let buffer accumulate
         time.sleep(sleeptime)
-        t0 = acsc.readReal(hc, acsc.NONE, "start_time")
         newdata = acsc.readReal(
             hc, acsc.NONE, "inf4_data_processed", 0, 2, 0, dblen // 2 - 1
         )
