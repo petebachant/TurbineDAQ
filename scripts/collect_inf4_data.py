@@ -62,7 +62,11 @@ if __name__ == "__main__":
     # to change the IP address or port for the EC so they aren't identical
     print("Connecting to the controller")
     hc = acsc.openCommEthernetTCP()
-    print("Connected to controller serial number:", acsc.getSerialNumber(hc))
+    target_serial_number = "ECM18038C"
+    actual_serial_number = acsc.getSerialNumber(hc)
+    print("Connected to controller serial number:", actual_serial_number)
+    if actual_serial_number != target_serial_number:
+        raise RuntimeError("Connected to the wrong controller")
     # Stop data collection if this failed last time
     acsc.writeInteger(hc, "collect_data", 0)
     # Load our program into buffer 9 (arbitrary for now)
