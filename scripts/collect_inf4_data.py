@@ -63,7 +63,7 @@ if __name__ == "__main__":
     print("Connecting to the controller")
     hc = acsc.openCommEthernetTCP()
     target_serial_number = "ECM18038C"
-    actual_serial_number = acsc.getSerialNumber(hc)
+    actual_serial_number = acsc.getSerialNumber(hc).strip()
     print("Connected to controller serial number:", actual_serial_number)
     if actual_serial_number != target_serial_number:
         raise RuntimeError("Connected to the wrong controller")
