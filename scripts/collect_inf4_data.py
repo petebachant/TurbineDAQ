@@ -10,6 +10,7 @@ from acspy import acsc
 SAMPLE_PERIOD_MS = 2
 N_BUFFER_ROWS = 100
 N_BUFFER_COLS = 5
+N_ITERATIONS = 10
 
 # First, define the ACSPL+ program text
 prg_txt = f"""! AUTO-GENERATED -- CHANGES WILL BE OVERWRITTEN
@@ -47,7 +48,7 @@ WHILE collect_data
 		ch1_force = DI0 + DI1 + DI2 + DI3
 		ch2_force = DI4 + DI5 + DI6 + DI7
         ch3_force = DI8 + DI9 + DI10 + DI11
-        ch4_force = DI12 + DI13 + DI14 + DI15
+        ch4_force = TIME + 55.55  ! A test of dynamic updates
 	END
 END
 
@@ -61,6 +62,7 @@ if __name__ == "__main__":
     # to change the IP address or port for the EC so they aren't identical
     print("Connecting to the controller")
     hc = acsc.openCommEthernetTCP()
+    print("Connected to controller serial number:", acsc.getSerialNumber(hc))
     # Stop data collection if this failed last time
     acsc.writeInteger(hc, "collect_data", 0)
     # Load our program into buffer 9 (arbitrary for now)
@@ -69,19 +71,19 @@ if __name__ == "__main__":
     print("Running buffer 9")
     acsc.runBuffer(hc, 9)
     # Collect data for a bit then set collect_data=0 to stop data collection
-    time_vals = []
+    normalized_time_vals = []
     ch1_force_vals = []
     ch2_force_vals = []
     ch3_force_vals = []
     ch4_force_vals = []
     sr = 1000 / SAMPLE_PERIOD_MS
     sleeptime = float(N_BUFFER_ROWS) / float(sr) / 2 * 1.05
-    t0 = acsc.readReal(hc, acsc.NONE, "start_time")
     print(f"Sleeping for {sleeptime} seconds each iteration")
-    for i in range(20):
+    for i in range(N_ITERATIONS):
         print("Data collection iteration", i + 1)
         # Sleep to let buffer accumulate
         time.sleep(sleeptime)
+        t0 = acsc.readReal(hc, acsc.NONE, "start_time")
         newdata = acsc.readReal(
             hc,
             acsc.NONE,
@@ -92,7 +94,7 @@ if __name__ == "__main__":
             N_BUFFER_ROWS // 2 - 1,
         )
         t = (newdata[0] - t0) / 1000.0
-        time_vals += list(t)
+        normalized_time_vals += list(t)
         ch1_force_vals += list(newdata[1])
         ch2_force_vals += list(newdata[2])
         ch3_force_vals += list(newdata[3])
@@ -108,7 +110,7 @@ if __name__ == "__main__":
             N_BUFFER_ROWS - 1,
         )
         t = (newdata[0] - t0) / 1000.0
-        time_vals += list(t)
+        normalized_time_vals += list(t)
         ch1_force_vals += list(newdata[1])
         ch2_force_vals += list(newdata[2])
         ch3_force_vals += list(newdata[3])
@@ -117,7 +119,7 @@ if __name__ == "__main__":
     acsc.writeInteger(hc, "collect_data", 0)
     # Save data to CSV
     df = pd.DataFrame()
-    df["time"] = time_vals
+    df["time_s"] = normalized_time_vals
     df["ch1_force"] = ch1_force_vals
     df["ch2_force"] = ch2_force_vals
     df["ch3_force"] = ch3_force_vals
