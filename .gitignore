@@ -3,3 +3,4 @@ sync.ffs_db
 *.pyc
 *.vno
 *.h5
+inf4-test-data.csv
