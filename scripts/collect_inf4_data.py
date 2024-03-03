@@ -57,6 +57,7 @@ WHILE collect_data
         else
             sign_value = 1
             ch2_force = subtract_value - ch2_force
+        end
         ch2_force = 5e-6 * ch2_force
         ! Channel 3
         ch3_force = (DI9 << 16) | (DI10 << 8) | DI11
@@ -65,6 +66,7 @@ WHILE collect_data
         else
             sign_value = 1
             ch3_force = subtract_value - ch3_force
+        end
         ch3_force = 5e-6 * ch3_force
         ch4_force = (DI13 << 16) | (DI14 << 8) | DI15
         if DI12
@@ -72,6 +74,7 @@ WHILE collect_data
         else
             sign_value = 1
             ch4_force = subtract_value - ch4_force
+        end
         ch4_force = 5e-6 * ch4_force
 	END
 END
