@@ -22,6 +22,9 @@ local int sample_period_ms = {SAMPLE_PERIOD_MS}
 global real ch1_force, ch2_force, ch3_force, ch4_force
 global real inf4_data_processed({N_BUFFER_COLS})({N_BUFFER_ROWS})
 
+local int subtract_value = 16777215
+local int sign_value
+
 ! Put into high res mode
 ! TODO: Check that this works okay
 DO1 = 27
@@ -30,11 +33,6 @@ BLOCK
     ! Define start time from now
     start_time = TIME
     collect_data = 1
-	! Collect raw data
-	! This could be a problem because the guide claims we can collect up to 24, but maybe doesn't work with DC/c
-	! Seems to error for more than 8 sampled variables
-    ! DC/c inf4_data, 100, sample_period_ms, TIME, DI1, DI2, DI3, DI4, DI5, DI6, DI7
-	! Instead let's store derived data
 	! TODO: We probably want to collect FPOS and FVEL from the AFT axis as well
 	DC/c inf4_data_processed, {N_BUFFER_ROWS}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force
 END
@@ -43,12 +41,38 @@ END
 WHILE collect_data
 	BLOCK
 		! Compute all force values in the same controller cycle
-		! TODO: Use the correct formula to make this a real number
-		! in some kind of engineering units
-		ch1_force = DI0 + DI1 + DI2 + DI3
-		ch2_force = DI4 + DI5 + DI6 + DI7
-        ch3_force = DI8 + DI9 + DI10 + DI11
-        ch4_force = TIME + 55.55  ! A test of dynamic updates
+		ch1_force = (DI1 << 16) | (DI2 << 8) | DI3
+		if DI0
+			sign_value = -1
+		else
+			sign_value = 1
+			ch1_force = subtract_value - ch1_force
+		end
+		! Convert to mV
+		ch1_force = 5e-6 * ch1_force
+        ! Channel 2
+        ch2_force = (DI5 << 16) | (DI6 << 8) | DI7
+        if DI4
+            sign_value = -1
+        else
+            sign_value = 1
+            ch2_force = subtract_value - ch2_force
+        ch2_force = 5e-6 * ch2_force
+        ! Channel 3
+        ch3_force = (DI9 << 16) | (DI10 << 8) | DI11
+        if DI8
+            sign_value = -1
+        else
+            sign_value = 1
+            ch3_force = subtract_value - ch3_force
+        ch3_force = 5e-6 * ch3_force
+        ch4_force = (DI13 << 16) | (DI14 << 8) | DI15
+        if DI12
+            sign_value = -1
+        else
+            sign_value = 1
+            ch4_force = subtract_value - ch4_force
+        ch4_force = 5e-6 * ch4_force
 	END
 END
 
