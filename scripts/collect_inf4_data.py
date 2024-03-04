@@ -27,56 +27,56 @@ local int sign_value
 
 ! Put into high res mode
 ! TODO: Check that this works okay
-DO1 = 27
+DO1 = 25
 
 BLOCK
     ! Define start time from now
     start_time = TIME
     collect_data = 1
-	! TODO: We probably want to collect FPOS and FVEL from the AFT axis as well
-	DC/c inf4_data_processed, {N_BUFFER_ROWS}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force
+    ! TODO: We probably want to collect FPOS and FVEL from the AFT axis as well
+    DC/c inf4_data_processed, {N_BUFFER_ROWS}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force
 END
 
 ! Continuously compute processed force values from the INF4
 WHILE collect_data
-	BLOCK
-		! Compute all force values in the same controller cycle
-		ch1_force = (DI1 << 16) | (DI2 << 8) | DI3
-		if DI0
-			sign_value = -1
-		else
-			sign_value = 1
-			ch1_force = subtract_value - ch1_force
-		end
-		! Convert to mV
-		ch1_force = 5e-6 * ch1_force
+    BLOCK
+        ! Compute all force values in the same controller cycle
+        ch1_force = (DI1 << 16) | (DI2 << 8) | DI3
+        if DI0
+            sign_value = -1
+            ch1_force = subtract_value - ch1_force
+        else
+            sign_value = 1
+        end
+        ! Convert to mV
+        ch1_force = 5e-6 * ch1_force
         ! Channel 2
         ch2_force = (DI5 << 16) | (DI6 << 8) | DI7
         if DI4
             sign_value = -1
+            ch2_force = subtract_value - ch2_force
         else
             sign_value = 1
-            ch2_force = subtract_value - ch2_force
         end
         ch2_force = 5e-6 * ch2_force
         ! Channel 3
         ch3_force = (DI9 << 16) | (DI10 << 8) | DI11
         if DI8
             sign_value = -1
+            ch3_force = subtract_value - ch3_force
         else
             sign_value = 1
-            ch3_force = subtract_value - ch3_force
         end
-        ch3_force = 5e-6 * ch3_force
+        ch3_force = 5e-6 * ch3_force * (87.823)
         ch4_force = (DI13 << 16) | (DI14 << 8) | DI15
         if DI12
             sign_value = -1
+            ch4_force = subtract_value - ch4_force
         else
             sign_value = 1
-            ch4_force = subtract_value - ch4_force
         end
         ch4_force = 5e-6 * ch4_force
-	END
+    END
 END
 
 STOPDC
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     # Note that when we want to connect to both the NTM and EC we will need
     # to change the IP address or port for the EC so they aren't identical
     print("Connecting to the controller")
-    hc = acsc.openCommEthernetTCP()
+    hc = acsc.openCommEthernetTCP("10.0.0.101")
     target_serial_number = "ECM18038C"
     actual_serial_number = acsc.getSerialNumber(hc).strip()
     print("Connected to controller serial number:", actual_serial_number)
