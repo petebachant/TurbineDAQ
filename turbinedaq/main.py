@@ -129,11 +129,15 @@ class MainWindow(QMainWindow):
                 self.settings["Vectrino visible"]
             )
 
+    @property
+    def settings_fpath(self) -> str:
+        return "settings/settings.json"
+
     def load_settings(self):
         """Loads settings from JSON file."""
         self.pcid = platform.node()
         try:
-            with open("settings/settings.json", "r") as fn:
+            with open(self.settings_fpath, "r") as fn:
                 self.settings = json.load(fn)
         except IOError:
             self.settings = {}
@@ -1448,7 +1452,7 @@ class MainWindow(QMainWindow):
         ] = self.ui.checkBox_singleRunFBG.isChecked()
         if not os.path.isdir("settings"):
             os.mkdir("settings")
-        with open("settings/settings.json", "w") as fn:
+        with open(self.settings_fpath, "w") as fn:
             json.dump(self.settings, fn, indent=4, default=str)
         acsc.closeComm(self.hc)
         if self.monitorni and not self.run_in_progress:
