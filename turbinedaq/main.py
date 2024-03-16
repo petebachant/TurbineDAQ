@@ -1,27 +1,26 @@
 #!/usr/bin/env python
 """TurbineDAQ main app module."""
 
-from __future__ import division, print_function
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-import numpy as np
-from acspy import acsc
-from modules import daqtasks
-from modules import vectasks
-from modules import runtypes
-from modules.mainwindow import *
 import json
-import guiqwt
-import time
 import os
 import platform
-import subprocess
-from pxl import timeseries as ts
 import shutil
+import subprocess
+import time
+
+import guiqwt
+import numpy as np
 import pandas as pd
 import scipy.interpolate
+from acspy import acsc
+from pxl import timeseries as ts
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
+from turbinedaq import daqtasks, runtypes, vectasks
+from turbinedaq.mainwindow import *
 
 fluid_params = {"rho": 1000.0}
 abort_on_bad_vecdata = True
@@ -130,11 +129,17 @@ class MainWindow(QMainWindow):
                 self.settings["Vectrino visible"]
             )
 
+    @property
+    def settings_fpath(self) -> str:
+        return os.path.join(
+            os.path.expanduser("~"), ".turbinedaq", "settings.json"
+        )
+
     def load_settings(self):
         """Loads settings from JSON file."""
         self.pcid = platform.node()
         try:
-            with open("settings/settings.json", "r") as fn:
+            with open(self.settings_fpath, "r") as fn:
                 self.settings = json.load(fn)
         except IOError:
             self.settings = {}
@@ -1447,9 +1452,10 @@ class MainWindow(QMainWindow):
         self.settings[
             "Shakedown FBG"
         ] = self.ui.checkBox_singleRunFBG.isChecked()
-        if not os.path.isdir("settings"):
-            os.mkdir("settings")
-        with open("settings/settings.json", "w") as fn:
+        settings_dir = os.path.dirname(self.settings_fpath)
+        if not os.path.isdir(settings_dir):
+            os.mkdir(settings_dir)
+        with open(self.settings_fpath, "w") as fn:
             json.dump(self.settings, fn, indent=4, default=str)
         acsc.closeComm(self.hc)
         if self.monitorni and not self.run_in_progress:

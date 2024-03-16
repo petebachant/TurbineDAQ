@@ -1,16 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Sep 02 12:41:32 2013
+"""This is a non-GUI tare torque running program.
 
-@author: Pete
-
-This is a non-GUI tare torque running program
+It does not work in its current form!
 """
 
-from acspy import acsc
 import matplotlib.pyplot as plt
 import numpy as np
-import daqmx
 
 # Create arrays for U and tsr
 speeds = np.array([0.5, 1.0, 1.5, 2.0])
@@ -32,6 +26,5 @@ for U in speeds:
         omega = tsr*U/r
         rpm = omega/(2*np.pi)*60
         rpms.append(rpm)
-        print rpm
+        print(rpm)
         # Run experiment
-    

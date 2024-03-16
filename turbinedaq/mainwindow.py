@@ -952,4 +952,4 @@ class Ui_MainWindow(object):
         self.actionMonitor_LF.setToolTip(_translate("MainWindow", "Monitor lateral force signals..."))
         self.actionLF.setText(_translate("MainWindow", "Lateral Forces"))
 from guiqwt.plot import CurveWidget
-from . import resources_rc
+import resources_rc
