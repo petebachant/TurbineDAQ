@@ -1,6 +1,6 @@
 """Tests for the ``acsprgs`` module."""
 
-from modules.acsprgs import tare_drag_prg, tare_torque_prg, turbine_tow_prg
+from turbinedaq.acsprgs import tare_drag_prg, tare_torque_prg, turbine_tow_prg
 
 
 def test_turbine_tow():

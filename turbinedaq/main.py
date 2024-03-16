@@ -1,17 +1,16 @@
 #!/usr/bin/env python
 """TurbineDAQ main app module."""
 
-from __future__ import division, print_function
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 import numpy as np
 from acspy import acsc
-from modules import daqtasks
-from modules import vectasks
-from modules import runtypes
-from modules.mainwindow import *
+from turbinedaq import daqtasks
+from turbinedaq import vectasks
+from turbinedaq import runtypes
+from turbinedaq.mainwindow import *
 import json
 import guiqwt
 import time

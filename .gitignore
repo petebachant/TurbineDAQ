@@ -4,3 +4,4 @@ sync.ffs_db
 *.vno
 *.h5
 inf4-test-data.csv
+*.egg-info
