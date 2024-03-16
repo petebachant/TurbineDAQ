@@ -7,81 +7,12 @@ import time
 import pandas as pd
 from acspy import acsc
 
+from modules.acsprgs import make_aft_prg
+
 SAMPLE_PERIOD_MS = 2
 N_BUFFER_ROWS = 100
 N_BUFFER_COLS = 5
 N_ITERATIONS = 10
-
-# First, define the ACSPL+ program text
-prg_txt = f"""! AUTO-GENERATED -- CHANGES WILL BE OVERWRITTEN
-! Here we will try to continuously collect data from the INF4
-global int inf4_data(8)(100) ! 8 columns and 100 rows
-global int collect_data
-global real start_time
-local int sample_period_ms = {SAMPLE_PERIOD_MS}
-global real ch1_force, ch2_force, ch3_force, ch4_force
-global real inf4_data_processed({N_BUFFER_COLS})({N_BUFFER_ROWS})
-
-local int subtract_value = 16777215
-local int sign_value
-
-! Put into high res mode
-! TODO: Check that this works okay
-DO1 = 25
-
-BLOCK
-    ! Define start time from now
-    start_time = TIME
-    collect_data = 1
-    ! TODO: We probably want to collect FPOS and FVEL from the AFT axis as well
-    DC/c inf4_data_processed, {N_BUFFER_ROWS}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force
-END
-
-! Continuously compute processed force values from the INF4
-WHILE collect_data
-    BLOCK
-        ! Compute all force values in the same controller cycle
-        ch1_force = (DI1 << 16) | (DI2 << 8) | DI3
-        if DI0
-            sign_value = -1
-            ch1_force = subtract_value - ch1_force
-        else
-            sign_value = 1
-        end
-        ! Convert to mV
-        ch1_force = 5e-6 * ch1_force
-        ! Channel 2
-        ch2_force = (DI5 << 16) | (DI6 << 8) | DI7
-        if DI4
-            sign_value = -1
-            ch2_force = subtract_value - ch2_force
-        else
-            sign_value = 1
-        end
-        ch2_force = 5e-6 * ch2_force
-        ! Channel 3
-        ch3_force = (DI9 << 16) | (DI10 << 8) | DI11
-        if DI8
-            sign_value = -1
-            ch3_force = subtract_value - ch3_force
-        else
-            sign_value = 1
-        end
-        ch3_force = 5e-6 * ch3_force * (87.823)
-        ch4_force = (DI13 << 16) | (DI14 << 8) | DI15
-        if DI12
-            sign_value = -1
-            ch4_force = subtract_value - ch4_force
-        else
-            sign_value = 1
-        end
-        ch4_force = 5e-6 * ch4_force
-    END
-END
-
-STOPDC
-STOP
-"""
 
 if __name__ == "__main__":
     # First connect to the controller and get a communication handle
@@ -96,7 +27,12 @@ if __name__ == "__main__":
         raise RuntimeError("Connected to the wrong controller")
     # Stop data collection if this failed last time
     acsc.writeInteger(hc, "collect_data", 0)
-    # Load our program into buffer 9 (arbitrary for now)
+    # Create and load our program into buffer 9 (arbitrary for now)
+    prg_txt = make_aft_prg(
+        sample_period_ms=SAMPLE_PERIOD_MS,
+        n_buffer_rows=N_BUFFER_ROWS,
+        n_buffer_cols=N_BUFFER_COLS,
+    )
     print("Loading program into buffer 9:\n", prg_txt)
     acsc.loadBuffer(hc, 9, prg_txt, 4096)
     print("Running buffer 9")
