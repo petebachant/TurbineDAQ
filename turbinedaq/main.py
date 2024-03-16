@@ -1,26 +1,26 @@
 #!/usr/bin/env python
 """TurbineDAQ main app module."""
 
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-import numpy as np
-from acspy import acsc
-from turbinedaq import daqtasks
-from turbinedaq import vectasks
-from turbinedaq import runtypes
-from turbinedaq.mainwindow import *
 import json
-import guiqwt
-import time
 import os
 import platform
-import subprocess
-from pxl import timeseries as ts
 import shutil
+import subprocess
+import time
+
+import guiqwt
+import numpy as np
 import pandas as pd
 import scipy.interpolate
+from acspy import acsc
+from pxl import timeseries as ts
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
+from turbinedaq import daqtasks, runtypes, vectasks
+from turbinedaq.mainwindow import *
 
 fluid_params = {"rho": 1000.0}
 abort_on_bad_vecdata = True
