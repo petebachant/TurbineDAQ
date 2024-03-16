@@ -131,7 +131,9 @@ class MainWindow(QMainWindow):
 
     @property
     def settings_fpath(self) -> str:
-        return "settings/settings.json"
+        return os.path.join(
+            os.path.expanduser("~"), ".turbinedaq", "settings.json"
+        )
 
     def load_settings(self):
         """Loads settings from JSON file."""
@@ -1450,8 +1452,9 @@ class MainWindow(QMainWindow):
         self.settings[
             "Shakedown FBG"
         ] = self.ui.checkBox_singleRunFBG.isChecked()
-        if not os.path.isdir("settings"):
-            os.mkdir("settings")
+        settings_dir = os.path.dirname(self.settings_fpath)
+        if not os.path.isdir(settings_dir):
+            os.mkdir(settings_dir)
         with open(self.settings_fpath, "w") as fn:
             json.dump(self.settings, fn, indent=4, default=str)
         acsc.closeComm(self.hc)
