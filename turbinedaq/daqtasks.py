@@ -92,29 +92,29 @@ class NiDaqThread(QtCore.QThread):
             self.chaninfo[channame]["Scale slope"] = daqmx.GetScaleLinSlope(
                 scale
             )
-            self.chaninfo[channame][
-                "Scale y-intercept"
-            ] = daqmx.GetScaleLinYIntercept(scale)
-            self.chaninfo[channame][
-                "Scaled units"
-            ] = daqmx.GetScaleScaledUnits(scale)
-            self.chaninfo[channame][
-                "Prescaled units"
-            ] = daqmx.GetScalePreScaledUnits(scale)
+            self.chaninfo[channame]["Scale y-intercept"] = (
+                daqmx.GetScaleLinYIntercept(scale)
+            )
+            self.chaninfo[channame]["Scaled units"] = (
+                daqmx.GetScaleScaledUnits(scale)
+            )
+            self.chaninfo[channame]["Prescaled units"] = (
+                daqmx.GetScalePreScaledUnits(scale)
+            )
         self.chaninfo[self.turbangchan] = {}
-        self.chaninfo[self.turbangchan][
-            "Pulses per rev"
-        ] = daqmx.GetCIAngEncoderPulsesPerRev(
-            self.turbangtask._handle, self.turbangchan
+        self.chaninfo[self.turbangchan]["Pulses per rev"] = (
+            daqmx.GetCIAngEncoderPulsesPerRev(
+                self.turbangtask._handle, self.turbangchan
+            )
         )
         self.chaninfo[self.turbangchan]["Units"] = daqmx.GetCIAngEncoderUnits(
             self.turbangtask._handle, self.turbangchan
         )
         self.chaninfo[self.carposchan] = {}
-        self.chaninfo[self.carposchan][
-            "Distance per pulse"
-        ] = daqmx.GetCILinEncoderDisPerPulse(
-            self.carpostask._handle, self.carposchan
+        self.chaninfo[self.carposchan]["Distance per pulse"] = (
+            daqmx.GetCILinEncoderDisPerPulse(
+                self.carpostask._handle, self.carposchan
+            )
         )
         self.chaninfo[self.carposchan]["Units"] = daqmx.GetCILinEncoderUnits(
             self.carpostask._handle, self.carposchan
@@ -369,6 +369,89 @@ class AcsDaqThread(QtCore.QThread):
         self.prg.addline("TILL collect_data = 0")
         self.prg.addline("STOPDC")
         self.prg.addstopline()
+
+    def stop(self):
+        self.collectdata = False
+        try:
+            acsc.writeInteger(self.hc, "collect_data", 0)
+        except:
+            print("Could not write collect_data = 0")
+
+
+class AftDaqThread(QtCore.QThread):
+    """A thread for collecting data from the ACS EC controller that runs the
+    AFT test bed.
+    """
+
+    def __init__(self, acs_hc, sample_rate=1000, bufflen=100, makeprg=False):
+        QtCore.QThread.__init__(self)
+        self.hc = acs_hc
+        self.collectdata = True
+        self.data = {
+            "load_cell_ch1": np.array([]),
+            "load_cell_ch2": np.array([]),
+            "load_cell_ch3": np.array([]),
+            "load_cell_ch4": np.array([]),
+            "atf_rpm": np.array([]),
+            "time": np.array([]),
+        }
+        self.dblen = bufflen
+        self.sr = sample_rate
+        self.sleeptime = float(self.dblen) / float(self.sr) / 2 * 1.05
+        self.makeprg = makeprg
+
+    def run(self):
+        def collecting_data() -> bool:
+            try:
+                return bool(
+                    acsc.readInteger(self.hc, acsc.NONE, "collect_data")
+                )
+            except AcscError as e:
+                warnings.warn(f"Failed to read 'collect_data': {e}")
+                return False
+
+        if self.makeprg:
+            self.makedaqprg()
+            acsc.loadBuffer(self.hc, 8, self.prg, 1024)
+            acsc.runBuffer(self.hc, 8)
+        while not collecting_data():
+            time.sleep(0.01)
+        while self.collectdata:
+            time.sleep(self.sleeptime)
+            t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
+            newdata = acsc.readReal(
+                self.hc, acsc.NONE, "data", 0, 2, 0, self.dblen // 2 - 1
+            )
+            t = (newdata[0] - t0) / 1000.0
+            self.data["time"] = np.append(self.data["time"], t)
+            self.data["carriage_vel"] = np.append(
+                self.data["carriage_vel"], newdata[1]
+            )
+            self.data["turbine_rpm"] = np.append(
+                self.data["turbine_rpm"], newdata[2]
+            )
+            time.sleep(self.sleeptime)
+            newdata = acsc.readReal(
+                self.hc,
+                acsc.NONE,
+                "data",
+                0,
+                2,
+                self.dblen // 2,
+                self.dblen - 1,
+            )
+            t = (newdata[0] - t0) / 1000.0
+            self.data["time"] = np.append(self.data["time"], t)
+            self.data["time"] = self.data["time"] - self.data["time"][0]
+            # TODO: Get load cell data
+            self.data["turbine_rpm"] = np.append(
+                self.data["turbine_rpm"], newdata[2]
+            )
+
+    def makedaqprg(self):
+        """Create an ACSPL+ program to load into the controller"""
+        # TODO: Make this from the AFT template in `acsprgs`
+        self.prg = ""
 
     def stop(self):
         self.collectdata = False
