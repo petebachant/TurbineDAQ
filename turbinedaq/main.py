@@ -197,7 +197,10 @@ class MainWindow(QMainWindow):
 
     def read_turbine_properties(self):
         """Reads turbine properties from `Config/turbine_properties.json` in
-        the experiment's working directory."""
+        the experiment's working directory.
+
+        TODO: Make this more explicitly required to handle the AFT.
+        """
         fpath = os.path.join(self.wdir, "Config", "turbine_properties.json")
         try:
             with open(fpath) as f:
@@ -843,7 +846,7 @@ class MainWindow(QMainWindow):
         tsr,
         y_R,
         z_H,
-        turbine="RVAT",
+        turbine="RVAT",  # TODO: Make this explicitly chosen
         vectrino=True,
         fbg=False,
         odisi=False,
