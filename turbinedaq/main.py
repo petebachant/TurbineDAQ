@@ -516,19 +516,13 @@ class MainWindow(QMainWindow):
 
     def connect_to_controller(self):
         try:
-            self.hc = acsc.openCommEthernetTCP()
+            self.hc = acsc.open_comm_ethernet_tcp()
         except acsc.AcscError:
             print("Cannot connect to ACS controller")
             print("Attempting to connect to simulator")
             self.label_acs_connect.setText(" Not connected to ACS controller ")
-            self.hc = acsc.openCommDirect()
-            if self.hc == acsc.INVALID:
-                print("Cannot connect to simulator")
-            else:
-                print("Connected to simulator")
-                self.label_acs_connect.setText(
-                    " Connected to SPiiPlus simulator "
-                )
+            self.hc = acsc.open_comm_simulator()
+            self.label_acs_connect.setText(" Connected to SPiiPlus simulator ")
         else:
             self.label_acs_connect.setText(" Connected to ACS controller ")
 
@@ -1404,9 +1398,9 @@ class MainWindow(QMainWindow):
             self.pos().x(),
             self.pos().y(),
         ]
-        self.settings[
-            "Last section index"
-        ] = self.ui.comboBox_testPlanSection.currentIndex()
+        self.settings["Last section index"] = (
+            self.ui.comboBox_testPlanSection.currentIndex()
+        )
         self.settings["Last tab index"] = self.ui.tabWidgetMode.currentIndex()
         self.settings["Last PC name"] = self.pcid
         self.settings["Last size"] = (
@@ -1415,43 +1409,43 @@ class MainWindow(QMainWindow):
         )
         self.settings["FBG visible"] = self.ui.dockWidget_FBG.isVisible()
         self.settings["ODiSI visible"] = self.ui.dockWidget_ODiSI.isVisible()
-        self.settings[
-            "Lateral forces visible"
-        ] = self.ui.dockWidget_LF.isVisible()
-        self.settings[
-            "Shakedown ODiSI"
-        ] = self.ui.checkBox_singleRunODiSI.isChecked()
+        self.settings["Lateral forces visible"] = (
+            self.ui.dockWidget_LF.isVisible()
+        )
+        self.settings["Shakedown ODiSI"] = (
+            self.ui.checkBox_singleRunODiSI.isChecked()
+        )
         # TODO: Checkbox below does not exist
         # self.settings[
         #     "Shakedown lateral forces"
         # ] = self.ui.checkBox_singleRunLF.isChecked()
-        self.settings[
-            "Vectrino visible"
-        ] = self.ui.dockWidgetVectrino.isVisible()
-        self.settings[
-            "Shakedown tow speed"
-        ] = self.ui.doubleSpinBox_singleRun_U.value()
-        self.settings[
-            "Shakedown radius"
-        ] = self.ui.doubleSpinBox_turbineRadius.value()
-        self.settings[
-            "Shakedown height"
-        ] = self.ui.doubleSpinBox_turbineHeight.value()
-        self.settings[
-            "Shakedown TSR"
-        ] = self.ui.doubleSpinBox_singleRun_tsr.value()
-        self.settings[
-            "Shakedown y/R"
-        ] = self.ui.doubleSpinBox_singleRun_y_R.value()
-        self.settings[
-            "Shakedown z/H"
-        ] = self.ui.doubleSpinBox_singleRun_z_H.value()
-        self.settings[
-            "Shakedown Vectrino"
-        ] = self.ui.checkBox_singleRunVectrino.isChecked()
-        self.settings[
-            "Shakedown FBG"
-        ] = self.ui.checkBox_singleRunFBG.isChecked()
+        self.settings["Vectrino visible"] = (
+            self.ui.dockWidgetVectrino.isVisible()
+        )
+        self.settings["Shakedown tow speed"] = (
+            self.ui.doubleSpinBox_singleRun_U.value()
+        )
+        self.settings["Shakedown radius"] = (
+            self.ui.doubleSpinBox_turbineRadius.value()
+        )
+        self.settings["Shakedown height"] = (
+            self.ui.doubleSpinBox_turbineHeight.value()
+        )
+        self.settings["Shakedown TSR"] = (
+            self.ui.doubleSpinBox_singleRun_tsr.value()
+        )
+        self.settings["Shakedown y/R"] = (
+            self.ui.doubleSpinBox_singleRun_y_R.value()
+        )
+        self.settings["Shakedown z/H"] = (
+            self.ui.doubleSpinBox_singleRun_z_H.value()
+        )
+        self.settings["Shakedown Vectrino"] = (
+            self.ui.checkBox_singleRunVectrino.isChecked()
+        )
+        self.settings["Shakedown FBG"] = (
+            self.ui.checkBox_singleRunFBG.isChecked()
+        )
         settings_dir = os.path.dirname(self.settings_fpath)
         if not os.path.isdir(settings_dir):
             os.mkdir(settings_dir)

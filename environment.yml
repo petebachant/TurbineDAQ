@@ -16,7 +16,7 @@ dependencies:
       - https://github.com/petebachant/daqmx/archive/refs/heads/master.zip
       - https://github.com/petebachant/MicronOpt-Python/archive/refs/heads/master.zip
       - https://github.com/petebachant/Nortek-Python/archive/refs/heads/master.zip
-      - acspy==0.0.6
+      - acspy==0.0.7
       - pythonqwt
       - nidaqmx
       - pxl
