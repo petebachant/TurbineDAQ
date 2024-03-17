@@ -1,18 +1,19 @@
-TurbineDAQ
-==========
+# TurbineDAQ
 
 A Python desktop app for automated turbine data acquisition in the UNH tow tank.
 
 ![Screenshot](https://raw.githubusercontent.com/petebachant/PhD-thesis/gh-pages/figures/TurbineDAQ.PNG)
 
-
 ## Test plan
 
-A matrix of test parameters should be created and placed in the `Test plan` directory.
-Each "section" of the experiment gets its own CSV file. See `test/Test plan` for an
-example. The test plan, if one exists, is loaded into the GUI at startup. To change, it must be
+A matrix of test parameters should be created and placed in the
+`Test plan` directory inside of an experiment directory.
+Each "section" of the experiment gets its own CSV file.
+See `test/Test plan` for an
+example.
+The test plan, if one exists, is loaded into the GUI at startup.
+To change, it must be
 edited externally and reloaded.
-
 
 ## Directory and file structure
 
@@ -53,30 +54,28 @@ Experiment name/
 ```
 
 ## Types of runs
+
 In the `runtypes` module, there are classes to represent each type of run:
 
   * `TurbineTow`
   * `TareDragRun`
   * `TareTorqueRun`
 
-Each of these subclass PyQt's `QThread`. For future experiments, there will likely be
-a `TurbineTowInWaves` or options in `TurbineTow` for wave generation with `makewaves`.
+Each of these subclass PyQt's `QThread`. For future experiments,
+there will likely be
+a `TurbineTowInWaves` or options in `TurbineTow` for wave generation with
+`makewaves`.
 
+## Developers
 
-License
--------
-
-TurbineDAQ Copyright (c) 2013-2015 Peter Bachant
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+To get started, install a Python distribution that includes Conda or Mamba.
+Miniforge is a good choice.
+Next, create the `turbinedaq` conda environment with `conda env create` or
+`mamba env create`.
+Additional useful dev dependencies can be installed with
+`pip install isort black`.
+Next, install the `turbinedaq` package in editable mode with
+`pip install -e .`.
+The app can be run by running `turbinedaq` from the command line.
+Note that the `turbinedaq` environment should be activated before installation
+or running with `conda activate turbinedaq`.
