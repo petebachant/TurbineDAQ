@@ -63,20 +63,21 @@ class MainWindow(QMainWindow):
 
         # Add labels to status bar
         self.add_labels_to_statusbar()
-        # Read in and apply settings from last session
-        self.load_settings()
         # Create timers
         self.timer = QtCore.QTimer()
         self.plot_timer = QtCore.QTimer()
         # Connect to controller
         self.connect_to_controller()
-        # Import test plan
-        self.import_test_plan()
-        # Read turbine, vectrino, fbg, and odisi properties
+        # Read turbine, vectrino, FBG, and ODIsi properties
         self.read_turbine_properties()
+        self.ui.comboBox_turbine.addItems(self.turbine_properties.keys())
         self.read_vectrino_properties()
         self.read_fbg_properties()
         self.read_odisi_properties()
+        # Read in and apply settings from last session
+        self.load_settings()
+        # Import test plan
+        self.import_test_plan()
         # Initialize plots
         self.initialize_plots()
         # Add checkboxes to ACS table widget
@@ -138,10 +139,13 @@ class MainWindow(QMainWindow):
     def load_settings(self):
         """Loads settings from JSON file."""
         self.pcid = platform.node()
+        print("Attempting to load settings from:", self.settings_fpath)
         try:
             with open(self.settings_fpath, "r") as fn:
                 self.settings = json.load(fn)
+                print("Loaded settings:", self.settings)
         except IOError:
+            print("Failed to load settings")
             self.settings = {}
         if "Last PC name" in self.settings:
             if self.settings["Last PC name"] == self.pcid:
@@ -167,12 +171,10 @@ class MainWindow(QMainWindow):
         if "Shakedown tow speed" in self.settings:
             val = self.settings["Shakedown tow speed"]
             self.ui.doubleSpinBox_singleRun_U.setValue(val)
-        if "Shakedown radius" in self.settings:
-            val = self.settings["Shakedown radius"]
-            self.ui.doubleSpinBox_turbineRadius.setValue(val)
-        if "Shakedown height" in self.settings:
-            val = self.settings["Shakedown height"]
-            self.ui.doubleSpinBox_turbineHeight.setValue(val)
+        if "Shakedown turbine" in self.settings:
+            self.ui.comboBox_turbine.setCurrentText(
+                self.settings["Shakedown turbine"]
+            )
         if "Shakedown TSR" in self.settings:
             val = self.settings["Shakedown TSR"]
             self.ui.doubleSpinBox_singleRun_tsr.setValue(val)
@@ -201,14 +203,18 @@ class MainWindow(QMainWindow):
 
         TODO: Make this more explicitly required to handle the AFT.
         """
+        self.turbine_properties = {
+            "RVAT": {"kind": "CFT", "radius": 0.5, "height": 1.0},
+            "RM2": {"kind": "CFT", "diameter": 1.075, "height": 0.807},
+        }
         fpath = os.path.join(self.wdir, "Config", "turbine_properties.json")
         try:
             with open(fpath) as f:
-                self.turbine_properties = json.load(f)
+                new = json.load(f)
+            self.turbine_properties.update(new)
             print("Turbine properties loaded")
         except IOError:
             print("No turbine properties file found")
-            self.turbine_properties = {"RVAT": {"radius": 0.5, "height": 1.0}}
         # Calculate radius if only diameter supplied and vice versa
         for turbine in self.turbine_properties:
             if not "radius" in self.turbine_properties[turbine]:
@@ -717,11 +723,7 @@ class MainWindow(QMainWindow):
         """Executes a single shakedown run."""
         U = self.ui.doubleSpinBox_singleRun_U.value()
         tsr = self.ui.doubleSpinBox_singleRun_tsr.value()
-        radius = self.ui.doubleSpinBox_turbineRadius.value()
-        height = self.ui.doubleSpinBox_turbineHeight.value()
-        self.turbine_properties["shakedown"] = {}
-        self.turbine_properties["shakedown"]["radius"] = radius
-        self.turbine_properties["shakedown"]["height"] = height
+        turbine = self.ui.comboBox_turbine.getCurrentText()
         y_R = self.ui.doubleSpinBox_singleRun_y_R.value()
         z_H = self.ui.doubleSpinBox_singleRun_z_H.value()
         vectrino = self.ui.checkBox_singleRunVectrino.isChecked()
@@ -744,7 +746,7 @@ class MainWindow(QMainWindow):
             tsr,
             y_R,
             z_H,
-            turbine="shakedown",
+            turbine=turbine,
             vectrino=vectrino,
             fbg=fbg,
             odisi=odisi,
@@ -1397,6 +1399,7 @@ class MainWindow(QMainWindow):
         ts.savehdf(fpath, datadict)
 
     def closeEvent(self, event):
+        self.settings["Last working directory"] = self.wdir
         self.settings["Last window location"] = [
             self.pos().x(),
             self.pos().y(),
@@ -1428,11 +1431,8 @@ class MainWindow(QMainWindow):
         self.settings["Shakedown tow speed"] = (
             self.ui.doubleSpinBox_singleRun_U.value()
         )
-        self.settings["Shakedown radius"] = (
-            self.ui.doubleSpinBox_turbineRadius.value()
-        )
-        self.settings["Shakedown height"] = (
-            self.ui.doubleSpinBox_turbineHeight.value()
+        self.settings["Shakedown turbine"] = (
+            self.ui.comboBox_turbine.currentText()
         )
         self.settings["Shakedown TSR"] = (
             self.ui.doubleSpinBox_singleRun_tsr.value()
@@ -1450,6 +1450,7 @@ class MainWindow(QMainWindow):
             self.ui.checkBox_singleRunFBG.isChecked()
         )
         settings_dir = os.path.dirname(self.settings_fpath)
+        print("Saving settings:", self.settings)
         if not os.path.isdir(settings_dir):
             os.mkdir(settings_dir)
         with open(self.settings_fpath, "w") as fn:
