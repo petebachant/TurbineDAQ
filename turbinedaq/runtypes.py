@@ -20,12 +20,13 @@ class TurbineTow(QtCore.QThread):
 
     def __init__(
         self,
-        acs_hcomm,
-        U,
-        tsr,
-        y_R,
-        z_H,
-        turbine_properties,
+        acs_ntm_hcomm: int,
+        acs_ec_hcomm: int,
+        U: float,
+        tsr: float,
+        y_R: float,
+        z_H: float,
+        turbine_properties: dict,
         nidaq=True,
         vectrino=True,
         vecsavepath="",
@@ -37,13 +38,15 @@ class TurbineTow(QtCore.QThread):
         vec_salinity=0.0,
     ):
         QtCore.QThread.__init__(self)
-        self.hc = acs_hcomm
+        self.hc = acs_ntm_hcomm
+        self.hc_ec = acs_ec_hcomm
         self.U = float(U)
         self.tsr = tsr
         self.y_R = y_R
         self.z_H = z_H
         self.R = turbine_properties["radius"]
         self.H = turbine_properties["height"]
+        self.turbine_type = turbine_properties["kind"]
         self.vectrino = vectrino
         self.nidaq = nidaq
         self.fbg = fbg
@@ -66,6 +69,11 @@ class TurbineTow(QtCore.QThread):
             "Time created": time.asctime(),
             "TurbineDAQ version": commit,
         }
+        if self.turbine_type == "AFT":
+            self.aft_daq_thread = daqtasks.AftDaqThread(
+                acs_hc=self.hc_ec, makeprg=False
+            )
+            self.aftdata = self.aft_daq_thread.data
         if self.vectrino:
             self.vec = PdControl()
             self.metadata["Vectrino metadata"] = {"y/R": y_R, "z/H": z_H}
@@ -201,17 +209,23 @@ class TurbineTow(QtCore.QThread):
             self.start_motion()
 
     def start_motion(self):
+        if self.turbine_type == "AFT":
+            self.aft_daq_thread.start()
+            # TODO: Start jogging the AFT axis at the correct RPM
         self.acsdaqthread.start()
         nbuf = 19
         acsc.loadBuffer(self.hc, nbuf, self.acs_prg, 2048)
         acsc.enable(self.hc, 4)
         acsc.enable(self.hc, 5)
         acsc.runBuffer(self.hc, nbuf)
+        # Wait until the program is done executing
         prgstate = acsc.getProgramState(self.hc, nbuf)
         while prgstate == 3:
             time.sleep(0.3)
             prgstate = acsc.getProgramState(self.hc, nbuf)
         self.acsdaqthread.stop()
+        if self.turbine_type == "AFT":
+            self.aft_daq_thread.stop()
         if self.nidaq:
             self.daqthread.clear()
             print("NI tasks cleared")

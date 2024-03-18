@@ -67,7 +67,7 @@ class MainWindow(QMainWindow):
         self.timer = QtCore.QTimer()
         self.plot_timer = QtCore.QTimer()
         # Connect to controller
-        self.connect_to_controller()
+        self.connect_to_acs_controllers()
         # Read turbine, vectrino, FBG, and ODIsi properties
         self.read_turbine_properties()
         self.ui.comboBox_turbine.addItems(self.turbine_properties.keys())
@@ -523,17 +523,24 @@ class MainWindow(QMainWindow):
         self.label_runstatus.setText("Not running ")
         self.ui.statusbar.addWidget(self.label_runstatus)
 
-    def connect_to_controller(self):
+    def connect_to_acs_controllers(self):
         try:
-            self.hc = acsc.open_comm_ethernet_tcp()
+            self.hc = acsc.open_comm_ethernet_tcp("10.0.0.100")
+            ntm = "connected"
         except acsc.AcscError:
-            print("Cannot connect to ACS controller")
+            print("Cannot connect to ACS NTM controller")
             print("Attempting to connect to simulator")
-            self.label_acs_connect.setText(" Not connected to ACS controller ")
             self.hc = acsc.open_comm_simulator()
-            self.label_acs_connect.setText(" Connected to SPiiPlus simulator ")
-        else:
-            self.label_acs_connect.setText(" Connected to ACS controller ")
+            ntm = "simulated"
+        try:
+            self.hc_ec = acsc.open_comm_ethernet_tcp("10.0.0.101")
+            ec = "connected"
+        except acsc.AcscError:
+            print("Cannot connect to ACS EC controller")
+            self.hc_ec = acsc.open_comm_simulator()
+            ec = "simulated"
+        txt = f" ACS controllers: NTM: {ntm}, EC: {ec} "
+        self.label_acs_connect.setText(txt)
 
     def initialize_plots(self):
         # Torque trans plot
@@ -860,7 +867,8 @@ class MainWindow(QMainWindow):
             vecsavepath = os.path.join(self.savesubdir, "vecdata")
             turbine_properties = self.turbine_properties[turbine]
             self.turbinetow = runtypes.TurbineTow(
-                acs_hcomm=self.hc,
+                acs_ntm_hcomm=self.hc,
+                acs_ec_hcomm=self.hc_ec,
                 U=U,
                 tsr=tsr,
                 y_R=y_R,

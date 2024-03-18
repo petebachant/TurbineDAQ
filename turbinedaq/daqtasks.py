@@ -383,7 +383,7 @@ class AftDaqThread(QtCore.QThread):
     AFT test bed.
     """
 
-    def __init__(self, acs_hc, sample_rate=1000, bufflen=100, makeprg=False):
+    def __init__(self, acs_hc, sample_rate=500, bufflen=100, makeprg=False):
         QtCore.QThread.__init__(self)
         self.hc = acs_hc
         self.collectdata = True
@@ -392,7 +392,7 @@ class AftDaqThread(QtCore.QThread):
             "load_cell_ch2": np.array([]),
             "load_cell_ch3": np.array([]),
             "load_cell_ch4": np.array([]),
-            "atf_rpm": np.array([]),
+            "turbine_rpm": np.array([]),
             "time": np.array([]),
         }
         self.dblen = bufflen
