@@ -77,7 +77,7 @@ class MainWindow(QMainWindow):
         # Read in and apply settings from last session
         self.load_settings()
         # Import test plan
-        self.import_test_plan()
+        self.load_test_plan()
         # Initialize plots
         self.initialize_plots()
         # Add checkboxes to ACS table widget
@@ -270,8 +270,8 @@ class MainWindow(QMainWindow):
                 done = False
         return done
 
-    def import_test_plan(self):
-        """Imports test plan from CSVs in "Test plan" subdirectory"""
+    def load_test_plan(self):
+        """Load test plan from CSVs in "Test plan" subdirectory."""
         tpdir = os.path.join(self.wdir, "Config", "Test plan")
         self.test_plan_loaded = False
         self.test_plan = {}
@@ -417,7 +417,7 @@ class MainWindow(QMainWindow):
         self.ui.actionMonitor_LF.triggered.connect(self.on_monitor_ni)
         self.ui.actionStart.triggered.connect(self.on_start)
         self.ui.actionAbort.triggered.connect(self.on_abort)
-        self.ui.actionImportTestPlan.triggered.connect(self.import_test_plan)
+        self.ui.actionImportTestPlan.triggered.connect(self.load_test_plan)
         self.ui.comboBox_testPlanSection.currentIndexChanged.connect(
             self.test_plan_into_table
         )
@@ -449,7 +449,7 @@ class MainWindow(QMainWindow):
             self.line_edit_wdir.setText(self.wdir)
         self.wdir = str(self.line_edit_wdir.text())
         self.settings["Last working directory"] = self.wdir
-        self.import_test_plan()
+        self.load_test_plan()
         self.read_turbine_properties()
         self.read_vectrino_properties()
         self.read_fbg_properties()
