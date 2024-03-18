@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1501</width>
-    <height>803</height>
+    <width>1408</width>
+    <height>793</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -37,120 +37,11 @@
     <bool>false</bool>
    </property>
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="0" column="3" rowspan="6">
-     <widget class="QDockWidget" name="dockWidgetVectrino">
-      <property name="minimumSize">
-       <size>
-        <width>198</width>
-        <height>601</height>
-       </size>
-      </property>
-      <property name="features">
-       <set>QDockWidget::AllDockWidgetFeatures</set>
-      </property>
-      <property name="windowTitle">
-       <string>Vectrino</string>
-      </property>
-      <widget class="QWidget" name="dockWidgetContents">
-       <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QLabel" name="label_vecu">
-            <property name="text">
-             <string>            u (m/s)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotVecU">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>          v (m/s)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotVecV">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string>          w (m/s)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotVecW">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_15">
-            <property name="text">
-             <string>            Correlation (%)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotVecCorr">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>            SNR (dB)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotVecSNR">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
     <item row="0" column="4" rowspan="6">
      <widget class="QDockWidget" name="dockWidget_FBG">
       <property name="minimumSize">
        <size>
-        <width>198</width>
+        <width>224</width>
         <height>601</height>
        </size>
       </property>
@@ -255,127 +146,18 @@
       </widget>
      </widget>
     </item>
-    <item row="0" column="2" rowspan="6">
-     <widget class="QDockWidget" name="dockWidgetNISignals">
-      <property name="floating">
-       <bool>false</bool>
-      </property>
-      <property name="features">
-       <set>QDockWidget::AllDockWidgetFeatures</set>
-      </property>
-      <property name="allowedAreas">
-       <set>Qt::AllDockWidgetAreas</set>
-      </property>
-      <property name="windowTitle">
-       <string>NI-DAQ</string>
-      </property>
-      <widget class="QWidget" name="dockWidgetContents_2">
-       <layout class="QGridLayout" name="gridLayout_8">
-        <item row="0" column="1">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>            Torque (Nm)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotTorque">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>            Drag (N)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotDrag">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>             Drag Left (N)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotDragL">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>            Drag Right (N)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotDragR">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_16">
-            <property name="text">
-             <string>           Turbine RPM</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CurveWidget" name="plotRPM_ni">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidgetMode">
       <property name="minimumSize">
        <size>
         <width>385</width>
-        <height>300</height>
+        <height>314</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>389</width>
-        <height>374</height>
+        <height>330</height>
        </size>
       </property>
       <property name="currentIndex">
@@ -388,8 +170,8 @@
        <widget class="QWidget" name="gridLayoutWidget_4">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>10</y>
+          <x>30</x>
+          <y>20</y>
           <width>311</width>
           <height>251</height>
          </rect>
@@ -398,7 +180,24 @@
          <property name="spacing">
           <number>6</number>
          </property>
-         <item row="4" column="1">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Turbine</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QCheckBox" name="checkBox_singleRunODiSI">
+           <property name="text">
+            <string>ODiSI</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
           <widget class="QDoubleSpinBox" name="doubleSpinBox_singleRun_y_R">
            <property name="minimum">
             <double>-3.000000000000000</double>
@@ -411,37 +210,7 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Tip Speed Ratio</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_34">
-           <property name="text">
-            <string>R (m)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_33">
-           <property name="text">
-            <string>z/H</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
+         <item row="2" column="1">
           <widget class="QDoubleSpinBox" name="doubleSpinBox_singleRun_tsr">
            <property name="maximum">
             <double>7.000000000000000</double>
@@ -454,7 +223,44 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_33">
+           <property name="text">
+            <string>z/H</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Tip Speed Ratio</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QCheckBox" name="checkBox_singleRunFBG">
+           <property name="text">
+            <string>FBG</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_singleRun_z_H">
+           <property name="singleStep">
+            <double>0.125000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.250000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
           <widget class="QDoubleSpinBox" name="doubleSpinBox_singleRun_U">
            <property name="maximum">
             <double>2.000000000000000</double>
@@ -467,17 +273,7 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Tow Speed (m/s)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
+         <item row="3" column="0">
           <widget class="QLabel" name="label_10">
            <property name="text">
             <string>y/R</string>
@@ -487,77 +283,30 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
+         <item row="5" column="1">
           <widget class="QCheckBox" name="checkBox_singleRunVectrino">
            <property name="text">
             <string>Vectrino</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_turbineRadius">
-           <property name="decimals">
-            <number>4</number>
-           </property>
-           <property name="singleStep">
-            <double>0.010000000000000</double>
-           </property>
-           <property name="value">
-            <double>0.500000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QToolButton" name="toolButtonOpenShakedown">
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>...</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_singleRun_z_H">
-           <property name="singleStep">
-            <double>0.125000000000000</double>
-           </property>
-           <property name="value">
-            <double>0.250000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_turbineHeight">
-           <property name="decimals">
-            <number>4</number>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
-           </property>
-           <property name="value">
-            <double>1.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_35">
-           <property name="text">
-            <string>H (m)</string>
+            <string>Tow Speed (m/s)</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
-          <widget class="QCheckBox" name="checkBox_singleRunFBG">
-           <property name="text">
-            <string>FBG</string>
-           </property>
-          </widget>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="comboBox_turbine"/>
          </item>
-         <item row="8" column="1">
-          <widget class="QCheckBox" name="checkBox_singleRunODiSI">
+         <item row="0" column="2">
+          <widget class="QToolButton" name="toolButtonOpenShakedown">
            <property name="text">
-            <string>ODiSI</string>
+            <string>...</string>
            </property>
           </widget>
          </item>
@@ -604,6 +353,12 @@
         </item>
         <item row="1" column="0" colspan="3">
          <widget class="QTableWidget" name="tableWidgetTestPlan">
+          <property name="maximumSize">
+           <size>
+            <width>367</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="verticalScrollBarPolicy">
            <enum>Qt::ScrollBarAsNeeded</enum>
           </property>
@@ -622,11 +377,11 @@
           <property name="textElideMode">
            <enum>Qt::ElideMiddle</enum>
           </property>
-          <attribute name="horizontalHeaderDefaultSectionSize">
-           <number>57</number>
-          </attribute>
           <attribute name="horizontalHeaderMinimumSectionSize">
            <number>20</number>
+          </attribute>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>57</number>
           </attribute>
           <attribute name="horizontalHeaderStretchLastSection">
            <bool>false</bool>
@@ -634,14 +389,14 @@
           <attribute name="verticalHeaderVisible">
            <bool>false</bool>
           </attribute>
+          <attribute name="verticalHeaderMinimumSectionSize">
+           <number>15</number>
+          </attribute>
           <attribute name="verticalHeaderDefaultSectionSize">
            <number>15</number>
           </attribute>
           <attribute name="verticalHeaderHighlightSections">
            <bool>false</bool>
-          </attribute>
-          <attribute name="verticalHeaderMinimumSectionSize">
-           <number>15</number>
           </attribute>
           <attribute name="verticalHeaderStretchLastSection">
            <bool>false</bool>
@@ -650,8 +405,10 @@
            <property name="text">
             <string>Run</string>
            </property>
-           <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+          </column>
+          <column>
+           <property name="text">
+            <string>Turbine</string>
            </property>
           </column>
           <column>
@@ -780,8 +537,8 @@
           <rect>
            <x>10</x>
            <y>20</y>
-           <width>161</width>
-           <height>111</height>
+           <width>163</width>
+           <height>115</height>
           </rect>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
@@ -843,10 +600,10 @@
        <widget class="QCheckBox" name="checkBox">
         <property name="geometry">
          <rect>
-          <x>150</x>
-          <y>250</y>
+          <x>210</x>
+          <y>256</y>
           <width>76</width>
-          <height>17</height>
+          <height>31</height>
          </rect>
         </property>
         <property name="text">
@@ -857,7 +614,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>230</y>
+          <y>250</y>
           <width>91</width>
           <height>41</height>
          </rect>
@@ -904,8 +661,14 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>0</width>
-            <height>112</height>
+            <width>322</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>400</width>
+            <height>135</height>
            </size>
           </property>
           <property name="verticalScrollBarPolicy">
@@ -932,11 +695,11 @@
           <attribute name="horizontalHeaderCascadingSectionResizes">
            <bool>false</bool>
           </attribute>
-          <attribute name="horizontalHeaderDefaultSectionSize">
-           <number>61</number>
-          </attribute>
           <attribute name="horizontalHeaderMinimumSectionSize">
            <number>23</number>
+          </attribute>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>61</number>
           </attribute>
           <attribute name="horizontalHeaderStretchLastSection">
            <bool>true</bool>
@@ -947,14 +710,14 @@
           <attribute name="verticalHeaderCascadingSectionResizes">
            <bool>false</bool>
           </attribute>
+          <attribute name="verticalHeaderMinimumSectionSize">
+           <number>15</number>
+          </attribute>
           <attribute name="verticalHeaderDefaultSectionSize">
            <number>22</number>
           </attribute>
           <attribute name="verticalHeaderHighlightSections">
            <bool>false</bool>
-          </attribute>
-          <attribute name="verticalHeaderMinimumSectionSize">
-           <number>15</number>
           </attribute>
           <attribute name="verticalHeaderShowSortIndicator" stdset="0">
            <bool>false</bool>
@@ -967,7 +730,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </row>
           <row>
@@ -983,14 +746,19 @@
           <row>
            <property name="text">
             <string/>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>AFT</string>
+           </property>
+           <property name="textAlignment">
+            <set>AlignCenter</set>
            </property>
           </row>
           <column>
            <property name="text">
             <string>Axis</string>
-           </property>
-           <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
            </property>
           </column>
           <column>
@@ -1023,7 +791,7 @@
             <string>tow</string>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="0" column="1">
@@ -1031,7 +799,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="0" column="2">
@@ -1039,7 +807,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="0" column="3">
@@ -1047,7 +815,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="0" column="4">
@@ -1055,7 +823,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="0" column="5">
@@ -1063,7 +831,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="1" column="0">
@@ -1071,7 +839,7 @@
             <string>turbine</string>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="1" column="1">
@@ -1079,7 +847,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="1" column="2">
@@ -1087,7 +855,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="1" column="3">
@@ -1095,7 +863,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="1" column="4">
@@ -1103,7 +871,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="1" column="5">
@@ -1111,7 +879,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="2" column="0">
@@ -1119,7 +887,7 @@
             <string>y</string>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="2" column="1">
@@ -1127,7 +895,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="2" column="2">
@@ -1135,7 +903,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="2" column="3">
@@ -1143,7 +911,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="2" column="4">
@@ -1151,7 +919,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="2" column="5">
@@ -1159,7 +927,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="3" column="0">
@@ -1167,7 +935,7 @@
             <string>z</string>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="3" column="1">
@@ -1175,7 +943,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="3" column="2">
@@ -1183,7 +951,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="3" column="3">
@@ -1191,7 +959,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="3" column="4">
@@ -1199,7 +967,7 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </item>
           <item row="3" column="5">
@@ -1207,7 +975,15 @@
             <string/>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
+           </property>
+          </item>
+          <item row="4" column="0">
+           <property name="text">
+            <string>AFT</string>
+           </property>
+           <property name="textAlignment">
+            <set>AlignCenter</set>
            </property>
           </item>
          </widget>
@@ -1380,6 +1156,224 @@
       </widget>
      </widget>
     </item>
+    <item row="0" column="2" rowspan="6">
+     <widget class="QDockWidget" name="dockWidgetNISignals">
+      <property name="floating">
+       <bool>false</bool>
+      </property>
+      <property name="features">
+       <set>QDockWidget::AllDockWidgetFeatures</set>
+      </property>
+      <property name="allowedAreas">
+       <set>Qt::AllDockWidgetAreas</set>
+      </property>
+      <property name="windowTitle">
+       <string>NI-DAQ</string>
+      </property>
+      <widget class="QWidget" name="dockWidgetContents_2">
+       <layout class="QGridLayout" name="gridLayout_8">
+        <item row="0" column="1">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>            Torque (Nm)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotTorque">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>            Drag (N)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotDrag">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>             Drag Left (N)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotDragL">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>            Drag Right (N)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotDragR">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>           Turbine RPM</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotRPM_ni">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="0" column="3" rowspan="6">
+     <widget class="QDockWidget" name="dockWidgetVectrino">
+      <property name="minimumSize">
+       <size>
+        <width>284</width>
+        <height>601</height>
+       </size>
+      </property>
+      <property name="features">
+       <set>QDockWidget::AllDockWidgetFeatures</set>
+      </property>
+      <property name="windowTitle">
+       <string>Vectrino</string>
+      </property>
+      <widget class="QWidget" name="dockWidgetContents">
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QLabel" name="label_vecu">
+            <property name="text">
+             <string>            u (m/s)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotVecU">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>          v (m/s)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotVecV">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>          w (m/s)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotVecW">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_15">
+            <property name="text">
+             <string>            Correlation (%)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotVecCorr">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>            SNR (dB)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CurveWidget" name="plotVecSNR">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
    </layout>
    <zorder>dockWidget_LF</zorder>
    <zorder>dockWidgetVectrino</zorder>
@@ -1394,7 +1388,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1501</width>
+     <width>1408</width>
      <height>21</height>
     </rect>
    </property>
@@ -1794,6 +1788,7 @@
    <class>CurveWidget</class>
    <extends>QSplitter</extends>
    <header>guiqwt.plot</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

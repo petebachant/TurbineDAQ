@@ -63,20 +63,21 @@ class MainWindow(QMainWindow):
 
         # Add labels to status bar
         self.add_labels_to_statusbar()
-        # Read in and apply settings from last session
-        self.load_settings()
         # Create timers
         self.timer = QtCore.QTimer()
         self.plot_timer = QtCore.QTimer()
         # Connect to controller
-        self.connect_to_controller()
-        # Import test plan
-        self.import_test_plan()
-        # Read turbine, vectrino, fbg, and odisi properties
+        self.connect_to_acs_controllers()
+        # Read turbine, vectrino, FBG, and ODIsi properties
         self.read_turbine_properties()
+        self.ui.comboBox_turbine.addItems(self.turbine_properties.keys())
         self.read_vectrino_properties()
         self.read_fbg_properties()
         self.read_odisi_properties()
+        # Read in and apply settings from last session
+        self.load_settings()
+        # Import test plan
+        self.load_test_plan()
         # Initialize plots
         self.initialize_plots()
         # Add checkboxes to ACS table widget
@@ -138,10 +139,13 @@ class MainWindow(QMainWindow):
     def load_settings(self):
         """Loads settings from JSON file."""
         self.pcid = platform.node()
+        print("Attempting to load settings from:", self.settings_fpath)
         try:
             with open(self.settings_fpath, "r") as fn:
                 self.settings = json.load(fn)
+                print("Loaded settings:", self.settings)
         except IOError:
+            print("Failed to load settings")
             self.settings = {}
         if "Last PC name" in self.settings:
             if self.settings["Last PC name"] == self.pcid:
@@ -167,12 +171,10 @@ class MainWindow(QMainWindow):
         if "Shakedown tow speed" in self.settings:
             val = self.settings["Shakedown tow speed"]
             self.ui.doubleSpinBox_singleRun_U.setValue(val)
-        if "Shakedown radius" in self.settings:
-            val = self.settings["Shakedown radius"]
-            self.ui.doubleSpinBox_turbineRadius.setValue(val)
-        if "Shakedown height" in self.settings:
-            val = self.settings["Shakedown height"]
-            self.ui.doubleSpinBox_turbineHeight.setValue(val)
+        if "Shakedown turbine" in self.settings:
+            self.ui.comboBox_turbine.setCurrentText(
+                self.settings["Shakedown turbine"]
+            )
         if "Shakedown TSR" in self.settings:
             val = self.settings["Shakedown TSR"]
             self.ui.doubleSpinBox_singleRun_tsr.setValue(val)
@@ -197,15 +199,22 @@ class MainWindow(QMainWindow):
 
     def read_turbine_properties(self):
         """Reads turbine properties from `Config/turbine_properties.json` in
-        the experiment's working directory."""
+        the experiment's working directory.
+
+        TODO: Make this more explicitly required to handle the AFT.
+        """
+        self.turbine_properties = {
+            "RVAT": {"kind": "CFT", "radius": 0.5, "height": 1.0},
+            "RM2": {"kind": "CFT", "diameter": 1.075, "height": 0.807},
+        }
         fpath = os.path.join(self.wdir, "Config", "turbine_properties.json")
         try:
             with open(fpath) as f:
-                self.turbine_properties = json.load(f)
+                new = json.load(f)
+            self.turbine_properties.update(new)
             print("Turbine properties loaded")
         except IOError:
             print("No turbine properties file found")
-            self.turbine_properties = {"RVAT": {"radius": 0.5, "height": 1.0}}
         # Calculate radius if only diameter supplied and vice versa
         for turbine in self.turbine_properties:
             if not "radius" in self.turbine_properties[turbine]:
@@ -261,8 +270,8 @@ class MainWindow(QMainWindow):
                 done = False
         return done
 
-    def import_test_plan(self):
-        """Imports test plan from CSVs in "Test plan" subdirectory"""
+    def load_test_plan(self):
+        """Load test plan from CSVs in "Test plan" subdirectory."""
         tpdir = os.path.join(self.wdir, "Config", "Test plan")
         self.test_plan_loaded = False
         self.test_plan = {}
@@ -408,7 +417,7 @@ class MainWindow(QMainWindow):
         self.ui.actionMonitor_LF.triggered.connect(self.on_monitor_ni)
         self.ui.actionStart.triggered.connect(self.on_start)
         self.ui.actionAbort.triggered.connect(self.on_abort)
-        self.ui.actionImportTestPlan.triggered.connect(self.import_test_plan)
+        self.ui.actionImportTestPlan.triggered.connect(self.load_test_plan)
         self.ui.comboBox_testPlanSection.currentIndexChanged.connect(
             self.test_plan_into_table
         )
@@ -440,7 +449,7 @@ class MainWindow(QMainWindow):
             self.line_edit_wdir.setText(self.wdir)
         self.wdir = str(self.line_edit_wdir.text())
         self.settings["Last working directory"] = self.wdir
-        self.import_test_plan()
+        self.load_test_plan()
         self.read_turbine_properties()
         self.read_vectrino_properties()
         self.read_fbg_properties()
@@ -514,17 +523,24 @@ class MainWindow(QMainWindow):
         self.label_runstatus.setText("Not running ")
         self.ui.statusbar.addWidget(self.label_runstatus)
 
-    def connect_to_controller(self):
+    def connect_to_acs_controllers(self):
         try:
-            self.hc = acsc.open_comm_ethernet_tcp()
+            self.hc = acsc.open_comm_ethernet_tcp("10.0.0.100")
+            ntm = "connected"
         except acsc.AcscError:
-            print("Cannot connect to ACS controller")
+            print("Cannot connect to ACS NTM controller")
             print("Attempting to connect to simulator")
-            self.label_acs_connect.setText(" Not connected to ACS controller ")
             self.hc = acsc.open_comm_simulator()
-            self.label_acs_connect.setText(" Connected to SPiiPlus simulator ")
-        else:
-            self.label_acs_connect.setText(" Connected to ACS controller ")
+            ntm = "simulated"
+        try:
+            self.hc_ec = acsc.open_comm_ethernet_tcp("10.0.0.101")
+            ec = "connected"
+        except acsc.AcscError:
+            print("Cannot connect to ACS EC controller")
+            self.hc_ec = acsc.open_comm_simulator()
+            ec = "simulated"
+        txt = f" ACS controllers: NTM: {ntm}, EC: {ec} "
+        self.label_acs_connect.setText(txt)
 
     def initialize_plots(self):
         # Torque trans plot
@@ -714,11 +730,7 @@ class MainWindow(QMainWindow):
         """Executes a single shakedown run."""
         U = self.ui.doubleSpinBox_singleRun_U.value()
         tsr = self.ui.doubleSpinBox_singleRun_tsr.value()
-        radius = self.ui.doubleSpinBox_turbineRadius.value()
-        height = self.ui.doubleSpinBox_turbineHeight.value()
-        self.turbine_properties["shakedown"] = {}
-        self.turbine_properties["shakedown"]["radius"] = radius
-        self.turbine_properties["shakedown"]["height"] = height
+        turbine = self.ui.comboBox_turbine.getCurrentText()
         y_R = self.ui.doubleSpinBox_singleRun_y_R.value()
         z_H = self.ui.doubleSpinBox_singleRun_z_H.value()
         vectrino = self.ui.checkBox_singleRunVectrino.isChecked()
@@ -737,11 +749,11 @@ class MainWindow(QMainWindow):
         self.savesubdir = os.path.join(self.savedir, str(self.currentrun))
         os.mkdir(self.savesubdir)
         self.do_turbine_tow(
-            U,
-            tsr,
-            y_R,
-            z_H,
-            turbine="shakedown",
+            U=U,
+            tsr=tsr,
+            y_R=y_R,
+            z_H=z_H,
+            turbine=turbine,
             vectrino=vectrino,
             fbg=fbg,
             odisi=odisi,
@@ -823,10 +835,10 @@ class MainWindow(QMainWindow):
                     odisi = False
                 settling = "settling" in section.lower()
                 self.do_turbine_tow(
-                    U,
-                    tsr,
-                    y_R,
-                    z_H,
+                    U=U,
+                    tsr=tsr,
+                    y_R=y_R,
+                    z_H=z_H,
                     vectrino=vectrino,
                     turbine=turbine,
                     fbg=fbg,
@@ -839,11 +851,11 @@ class MainWindow(QMainWindow):
 
     def do_turbine_tow(
         self,
-        U,
-        tsr,
-        y_R,
-        z_H,
-        turbine="RVAT",
+        U: float,
+        tsr: float,
+        y_R: float,
+        z_H: float,
+        turbine: str,
         vectrino=True,
         fbg=False,
         odisi=False,
@@ -855,11 +867,12 @@ class MainWindow(QMainWindow):
             vecsavepath = os.path.join(self.savesubdir, "vecdata")
             turbine_properties = self.turbine_properties[turbine]
             self.turbinetow = runtypes.TurbineTow(
-                self.hc,
-                U,
-                tsr,
-                y_R,
-                z_H,
+                acs_ntm_hcomm=self.hc,
+                acs_ec_hcomm=self.hc_ec,
+                U=U,
+                tsr=tsr,
+                y_R=y_R,
+                z_H=z_H,
                 nidaq=True,
                 vectrino=vectrino,
                 vecsavepath=vecsavepath,
@@ -1394,6 +1407,7 @@ class MainWindow(QMainWindow):
         ts.savehdf(fpath, datadict)
 
     def closeEvent(self, event):
+        self.settings["Last working directory"] = self.wdir
         self.settings["Last window location"] = [
             self.pos().x(),
             self.pos().y(),
@@ -1425,11 +1439,8 @@ class MainWindow(QMainWindow):
         self.settings["Shakedown tow speed"] = (
             self.ui.doubleSpinBox_singleRun_U.value()
         )
-        self.settings["Shakedown radius"] = (
-            self.ui.doubleSpinBox_turbineRadius.value()
-        )
-        self.settings["Shakedown height"] = (
-            self.ui.doubleSpinBox_turbineHeight.value()
+        self.settings["Shakedown turbine"] = (
+            self.ui.comboBox_turbine.currentText()
         )
         self.settings["Shakedown TSR"] = (
             self.ui.doubleSpinBox_singleRun_tsr.value()
@@ -1447,6 +1458,7 @@ class MainWindow(QMainWindow):
             self.ui.checkBox_singleRunFBG.isChecked()
         )
         settings_dir = os.path.dirname(self.settings_fpath)
+        print("Saving settings:", self.settings)
         if not os.path.isdir(settings_dir):
             os.mkdir(settings_dir)
         with open(self.settings_fpath, "w") as fn:
