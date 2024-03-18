@@ -742,10 +742,10 @@ class MainWindow(QMainWindow):
         self.savesubdir = os.path.join(self.savedir, str(self.currentrun))
         os.mkdir(self.savesubdir)
         self.do_turbine_tow(
-            U,
-            tsr,
-            y_R,
-            z_H,
+            U=U,
+            tsr=tsr,
+            y_R=y_R,
+            z_H=z_H,
             turbine=turbine,
             vectrino=vectrino,
             fbg=fbg,
@@ -828,10 +828,10 @@ class MainWindow(QMainWindow):
                     odisi = False
                 settling = "settling" in section.lower()
                 self.do_turbine_tow(
-                    U,
-                    tsr,
-                    y_R,
-                    z_H,
+                    U=U,
+                    tsr=tsr,
+                    y_R=y_R,
+                    z_H=z_H,
                     vectrino=vectrino,
                     turbine=turbine,
                     fbg=fbg,
@@ -844,11 +844,11 @@ class MainWindow(QMainWindow):
 
     def do_turbine_tow(
         self,
-        U,
-        tsr,
-        y_R,
-        z_H,
-        turbine="RVAT",  # TODO: Make this explicitly chosen
+        U: float,
+        tsr: float,
+        y_R: float,
+        z_H: float,
+        turbine: str,
         vectrino=True,
         fbg=False,
         odisi=False,
@@ -860,11 +860,11 @@ class MainWindow(QMainWindow):
             vecsavepath = os.path.join(self.savesubdir, "vecdata")
             turbine_properties = self.turbine_properties[turbine]
             self.turbinetow = runtypes.TurbineTow(
-                self.hc,
-                U,
-                tsr,
-                y_R,
-                z_H,
+                acs_hcomm=self.hc,
+                U=U,
+                tsr=tsr,
+                y_R=y_R,
+                z_H=z_H,
                 nidaq=True,
                 vectrino=vectrino,
                 vecsavepath=vecsavepath,
