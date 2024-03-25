@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-"""TurbineDAQ main app module."""
+"""TurbineDAQ main app module.
+
+More docs...
+"""
 
 import json
 import os
