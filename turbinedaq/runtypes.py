@@ -70,7 +70,7 @@ class TurbineTow(QtCore.QThread):
             "TurbineDAQ version": commit,
         }
         if self.turbine_type == "AFT":
-            self.aft_daq_thread = daqtasks.AftDaqThread(
+            self.aft_daq_thread = daqtasks.AftAcsDaqThread(
                 acs_hc=self.hc_ec, makeprg=False
             )
             self.aftdata = self.aft_daq_thread.data
@@ -78,7 +78,10 @@ class TurbineTow(QtCore.QThread):
             self.vec = PdControl()
             self.metadata["Vectrino metadata"] = {"y/R": y_R, "z/H": z_H}
         if self.nidaq:
-            self.daqthread = daqtasks.NiDaqThread(usetrigger=self.usetrigger)
+            if self.turbine_type == "AFT":
+                self.daqthread = daqtasks.AftNiDaqThread(usetrigger=self.usetrigger)
+            else:
+                self.daqthread = daqtasks.NiDaqThread(usetrigger=self.usetrigger)
             self.nidata = self.daqthread.data
             self.metadata["NI metadata"] = self.daqthread.metadata
         if self.fbg:
