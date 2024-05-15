@@ -385,11 +385,12 @@ class AftAcsDaqThread(QtCore.QThread):
     AFT test bed.
     """
 
-    def __init__(self, acs_hc, sample_rate=500, bufflen=100, makeprg=False):
+    def __init__(self, acs_hc, sample_rate=1000, bufflen=100, makeprg=False):
         QtCore.QThread.__init__(self)
         self.hc = acs_hc
         self.collectdata = True
         self.data = {
+            "time": np.array([]),
             "load_cell_ch1": np.array([]),
             "load_cell_ch2": np.array([]),
             "load_cell_ch3": np.array([]),
@@ -397,7 +398,6 @@ class AftAcsDaqThread(QtCore.QThread):
             "turbine_pos": np.array([]),
             "turbine_rpm": np.array([]),
             "carriage_vel": np.array([]),
-            "time": np.array([]),
         }
         self.dblen = bufflen
         self.sr = sample_rate
@@ -424,15 +424,30 @@ class AftAcsDaqThread(QtCore.QThread):
             time.sleep(self.sleeptime)
             t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
             newdata = acsc.readReal(
-                self.hc, acsc.NONE, "aft_data", 0, 2, 0, self.dblen // 2 - 1
+                self.hc, acsc.NONE, "aft_data", 0, 7, 0, self.dblen // 2 - 1
             )
             t = (newdata[0] - t0) / 1000.0
             self.data["time"] = np.append(self.data["time"], t)
-            self.data["carriage_vel"] = np.append(
-                self.data["carriage_vel"], newdata[1]
+            self.data["load_cell_ch1"] = np.append(
+                self.data["load_cell_ch1"], newdata[1]
+            )
+            self.data["load_cell_ch2"] = np.append(
+                self.data["load_cell_ch2"], newdata[2]
+            )
+            self.data["load_cell_ch3"] = np.append(
+                self.data["load_cell_ch3"], newdata[3]
+            )
+            self.data["load_cell_ch4"] = np.append(
+                self.data["load_cell_ch4"], newdata[4]
+            )
+            self.data["turbine_pos"] = np.append(
+                self.data["turbine_pos"], newdata[5]
             )
             self.data["turbine_rpm"] = np.append(
-                self.data["turbine_rpm"], newdata[2]
+                self.data["turbine_rpm"], newdata[6]
+            )
+            self.data["carriage_vel"] = np.append(
+                self.data["carriage_vel"], newdata[7]
             )
             time.sleep(self.sleeptime)
             newdata = acsc.readReal(
@@ -440,7 +455,7 @@ class AftAcsDaqThread(QtCore.QThread):
                 acsc.NONE,
                 "aft_data",
                 0,
-                8,
+                7,
                 self.dblen // 2,
                 self.dblen - 1,
             )
@@ -472,7 +487,7 @@ class AftAcsDaqThread(QtCore.QThread):
     def makedaqprg(self):
         """Create an ACSPL+ program to load into the controller"""
         self.prg = make_aft_prg(
-            sample_period_ms=1 / self.sr, n_buffer_rows=self.dblen
+            sample_period_ms=int(1 / self.sr * 1000), n_buffer_rows=self.dblen
         )
 
     def stop(self):
