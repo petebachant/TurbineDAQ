@@ -22,6 +22,8 @@ from pxl import fdiff
 from pxl import timeseries as ts
 from PyQt5 import QtCore
 
+from turbinedaq.acsprgs import make_aft_prg
+
 
 class NiDaqThread(QtCore.QThread):
     collecting = QtCore.pyqtSignal()
@@ -469,8 +471,9 @@ class AftAcsDaqThread(QtCore.QThread):
 
     def makedaqprg(self):
         """Create an ACSPL+ program to load into the controller"""
-        # TODO: Make this from the AFT template in `acsprgs`
-        self.prg = ""
+        self.prg = make_aft_prg(
+            sample_period_ms=1 / self.sr, n_buffer_rows=self.dblen
+        )
 
     def stop(self):
         self.collectdata = False
