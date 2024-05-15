@@ -7,7 +7,7 @@ import time
 import pandas as pd
 from acspy import acsc
 
-from modules.acsprgs import make_aft_prg
+from turbinedaq.acsprgs import make_aft_prg
 
 SAMPLE_PERIOD_MS = 2
 N_BUFFER_ROWS = 100
