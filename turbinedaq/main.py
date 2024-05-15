@@ -533,7 +533,7 @@ class MainWindow(QMainWindow):
             self.hc = acsc.open_comm_simulator()
             ntm = "simulated"
         try:
-            self.hc_ec = acsc.open_comm_ethernet_tcp("10.0.0.101")
+            self.hc_ec = acsc.open_comm_ethernet_tcp("10.0.0.102")
             ec = "connected"
         except acsc.AcscError:
             print("Cannot connect to ACS EC controller")

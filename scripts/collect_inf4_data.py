@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # Note that when we want to connect to both the NTM and EC we will need
     # to change the IP address or port for the EC so they aren't identical
     print("Connecting to the controller")
-    hc = acsc.openCommEthernetTCP("10.0.0.101")
+    hc = acsc.openCommEthernetTCP("10.0.0.102")
     target_serial_number = "ECM18038C"
     actual_serial_number = acsc.getSerialNumber(hc).strip()
     print("Connected to controller serial number:", actual_serial_number)
