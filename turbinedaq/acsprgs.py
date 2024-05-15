@@ -112,15 +112,25 @@ STOP
 
 
 def turbine_tow_prg(
-    tow_speed, tsr, turbine_radius, endpos=0.0, prgdir="./acsprgs"
+    tow_speed, tsr, turbine_radius, endpos=0.0, prgdir="./acsprgs", turbine_type="CFT",
 ):
     """This function builds an ACSPL+ program for turbine towing."""
-    with open(os.path.join(prgdir, "turbine_tow.prg")) as f:
-        prg = f.read().format(
+    if turbine_type == "CFT":
+        with open(os.path.join(prgdir, "turbine_tow.prg")) as f:
+            prg = f.read().format(
+                tow_speed=tow_speed,
+                tsr=tsr,
+                turbine_radius=turbine_radius,
+                endpos=endpos,
+            )
+    elif turbine_type == "AFT":
+        prg = AFT_TOW_TEMPLATE.format(
+            sample_period_ms=1,
             tow_speed=tow_speed,
             tsr=tsr,
             turbine_radius=turbine_radius,
             endpos=endpos,
+            n_buffer_rows=100,
         )
     return prg
 

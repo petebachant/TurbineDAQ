@@ -206,6 +206,7 @@ class MainWindow(QMainWindow):
         self.turbine_properties = {
             "RVAT": {"kind": "CFT", "radius": 0.5, "height": 1.0},
             "RM2": {"kind": "CFT", "diameter": 1.075, "height": 0.807},
+            "AFT": {"kind": "AFT", "diameter": 1.0},
         }
         fpath = os.path.join(self.wdir, "Config", "turbine_properties.json")
         try:
@@ -1096,7 +1097,9 @@ class MainWindow(QMainWindow):
                     )
                     idlesec = f_interp(tow_speed)
                 print("Waiting " + str(idlesec) + " seconds until next run")
-                QtCore.QTimer.singleShot(int(idlesec * 1000), self.on_idletimer)
+                QtCore.QTimer.singleShot(
+                    int(idlesec * 1000), self.on_idletimer
+                )
                 # Scroll test plan so completed run is in view
                 try:
                     i = int(self.currentrun) + 1
@@ -1405,9 +1408,9 @@ class MainWindow(QMainWindow):
             self.pos().x(),
             self.pos().y(),
         ]
-        self.settings["Last section index"] = (
-            self.ui.comboBox_testPlanSection.currentIndex()
-        )
+        self.settings[
+            "Last section index"
+        ] = self.ui.comboBox_testPlanSection.currentIndex()
         self.settings["Last tab index"] = self.ui.tabWidgetMode.currentIndex()
         self.settings["Last PC name"] = self.pcid
         self.settings["Last size"] = (
@@ -1416,40 +1419,40 @@ class MainWindow(QMainWindow):
         )
         self.settings["FBG visible"] = self.ui.dockWidget_FBG.isVisible()
         self.settings["ODiSI visible"] = self.ui.dockWidget_ODiSI.isVisible()
-        self.settings["Lateral forces visible"] = (
-            self.ui.dockWidget_LF.isVisible()
-        )
-        self.settings["Shakedown ODiSI"] = (
-            self.ui.checkBox_singleRunODiSI.isChecked()
-        )
+        self.settings[
+            "Lateral forces visible"
+        ] = self.ui.dockWidget_LF.isVisible()
+        self.settings[
+            "Shakedown ODiSI"
+        ] = self.ui.checkBox_singleRunODiSI.isChecked()
         # TODO: Checkbox below does not exist
         # self.settings[
         #     "Shakedown lateral forces"
         # ] = self.ui.checkBox_singleRunLF.isChecked()
-        self.settings["Vectrino visible"] = (
-            self.ui.dockWidgetVectrino.isVisible()
-        )
-        self.settings["Shakedown tow speed"] = (
-            self.ui.doubleSpinBox_singleRun_U.value()
-        )
-        self.settings["Shakedown turbine"] = (
-            self.ui.comboBox_turbine.currentText()
-        )
-        self.settings["Shakedown TSR"] = (
-            self.ui.doubleSpinBox_singleRun_tsr.value()
-        )
-        self.settings["Shakedown y/R"] = (
-            self.ui.doubleSpinBox_singleRun_y_R.value()
-        )
-        self.settings["Shakedown z/H"] = (
-            self.ui.doubleSpinBox_singleRun_z_H.value()
-        )
-        self.settings["Shakedown Vectrino"] = (
-            self.ui.checkBox_singleRunVectrino.isChecked()
-        )
-        self.settings["Shakedown FBG"] = (
-            self.ui.checkBox_singleRunFBG.isChecked()
-        )
+        self.settings[
+            "Vectrino visible"
+        ] = self.ui.dockWidgetVectrino.isVisible()
+        self.settings[
+            "Shakedown tow speed"
+        ] = self.ui.doubleSpinBox_singleRun_U.value()
+        self.settings[
+            "Shakedown turbine"
+        ] = self.ui.comboBox_turbine.currentText()
+        self.settings[
+            "Shakedown TSR"
+        ] = self.ui.doubleSpinBox_singleRun_tsr.value()
+        self.settings[
+            "Shakedown y/R"
+        ] = self.ui.doubleSpinBox_singleRun_y_R.value()
+        self.settings[
+            "Shakedown z/H"
+        ] = self.ui.doubleSpinBox_singleRun_z_H.value()
+        self.settings[
+            "Shakedown Vectrino"
+        ] = self.ui.checkBox_singleRunVectrino.isChecked()
+        self.settings[
+            "Shakedown FBG"
+        ] = self.ui.checkBox_singleRunFBG.isChecked()
         settings_dir = os.path.dirname(self.settings_fpath)
         print("Saving settings:", self.settings)
         if not os.path.isdir(settings_dir):

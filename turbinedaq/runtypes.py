@@ -51,7 +51,10 @@ class TurbineTow(QtCore.QThread):
         self.odisi = odisi
         self.settling = settling
         self.build_acsprg()
-        self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
+        if self.turbine_type == "AFT":
+            self.acsdaqthread = daqtasks.AftAcsDaqThread(self.hc)
+        else:
+            self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
         self.maxvel = U * 1.3
         self.usetrigger = True
         self.vecsavepath = vecsavepath
@@ -67,19 +70,18 @@ class TurbineTow(QtCore.QThread):
             "Time created": time.asctime(),
             "TurbineDAQ version": commit,
         }
-        if self.turbine_type == "AFT":
-            self.aft_daq_thread = daqtasks.AftAcsDaqThread(
-                acs_hc=self.hc, makeprg=False
-            )
-            self.aftdata = self.aft_daq_thread.data
         if self.vectrino:
             self.vec = PdControl()
             self.metadata["Vectrino metadata"] = {"y/R": y_R, "z/H": z_H}
         if self.nidaq:
             if self.turbine_type == "AFT":
-                self.daqthread = daqtasks.AftNiDaqThread(usetrigger=self.usetrigger)
+                self.daqthread = daqtasks.AftNiDaqThread(
+                    usetrigger=self.usetrigger
+                )
             else:
-                self.daqthread = daqtasks.NiDaqThread(usetrigger=self.usetrigger)
+                self.daqthread = daqtasks.NiDaqThread(
+                    usetrigger=self.usetrigger
+                )
             self.nidata = self.daqthread.data
             self.metadata["NI metadata"] = self.daqthread.metadata
         if self.fbg:
@@ -103,7 +105,11 @@ class TurbineTow(QtCore.QThread):
         else:
             endpos = 0.0
         self.acs_prg = acsprgs.turbine_tow_prg(
-            self.U, self.tsr, self.R, endpos=endpos
+            self.U,
+            self.tsr,
+            self.R,
+            endpos=endpos,
+            turbine_type=self.turbine_type,
         )
 
     def setvecconfig(self):
@@ -212,18 +218,13 @@ class TurbineTow(QtCore.QThread):
             self.start_motion()
 
     def start_motion(self):
-        if self.turbine_type == "AFT":
-            acsc.toPoint(self.hc_ec, flags=None, axis=0, target=0)
-            time.sleep(1)
-            self.aft_daq_thread.start()
-            # Sleep to acquire enough zero force data
-            time.sleep(2.5)
-            rpm = self.tsr*self.U/self.R*60/6.28318530718
-            acsc.jog(self.hc_ec, flags=None, axis=0, vel=rpm)
         self.acsdaqthread.start()
         nbuf = 19
         acsc.loadBuffer(self.hc, nbuf, self.acs_prg, 2048)
-        acsc.enable(self.hc, 4)
+        if not self.turbine_type != "AFT":
+            acsc.enable(self.hc, 4)
+        else:
+            acsc.enable(self.hc, 6)
         acsc.enable(self.hc, 5)
         acsc.runBuffer(self.hc, nbuf)
         # Wait until the program is done executing
@@ -232,8 +233,6 @@ class TurbineTow(QtCore.QThread):
             time.sleep(0.3)
             prgstate = acsc.getProgramState(self.hc, nbuf)
         self.acsdaqthread.stop()
-        if self.turbine_type == "AFT":
-            self.aft_daq_thread.stop()
         if self.nidaq:
             self.daqthread.clear()
             print("NI tasks cleared")
