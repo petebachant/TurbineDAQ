@@ -157,8 +157,7 @@ class TurbineTow(QtCore.QThread):
 
         Comms should be open already with the controller.
         """
-        if acsc.getOutput(self.hc, 1, 16):
-            acsc.setOutput(self.hc, 1, 16, 0)
+        acsc.setOutput(self.hc, 1, 16, 0)
         if self.vectrino:
             acsc.enable(self.hc, 0)
             acsc.enable(self.hc, 1)
@@ -212,6 +211,8 @@ class TurbineTow(QtCore.QThread):
                 self.fbgthread.start()
             if self.odisi:
                 self.odisithread.start()
+            # Sleep so the DAQ can start listening for the trigger
+            time.sleep(1)
             self.start_motion()
         else:
             # Start motion
