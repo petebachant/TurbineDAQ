@@ -80,7 +80,7 @@ WHILE collect_data
         ! Convert to mV
         ch1_force = 5e-6 * ch1_force
         ! Convert to engineering units [N-m]
-        ch1_force = ch1_force * 15.7085561
+        ch1_force = ch1_force * 15.7085561 * sign_value
         
         ! Channel 2
         ch2_force = (DI5 << 16) | (DI6 << 8) | DI7
@@ -93,20 +93,20 @@ WHILE collect_data
         ! Convert to mV
         ch2_force = 5e-6 * ch2_force 
         ! Convert to engineering units [N-m]
-        ch2_force = ch2_force * 15.7617411 
+        ch2_force = ch2_force * 15.7617411 * sign_value
         
         ! Channel 3
         ch3_force = (DI9 << 16) | (DI10 << 8) | DI11
         if DI8
-            sign_value = -1
+            sign_value = 1
             ch3_force = subtract_value - ch3_force
         else
-            sign_value = 1
+            sign_value = -1
         end
         ! Convert to mV
         ch3_force = 5e-6 * ch3_force
         ! Convert to engineering units [N]
-        ch3_force = ch3_force * 390.354011
+        ch3_force = ch3_force * 390.354011 * sign_value
 
         ! Channel 4
         ch4_force = (DI13 << 16) | (DI14 << 8) | DI15
@@ -119,7 +119,7 @@ WHILE collect_data
         ! Convert to mV
         ch4_force = 5e-6 * ch4_force
         ! Convert to engineering units [N-m]
-        ch4_force = ch4_force * 23.0479813 
+        ch4_force = ch4_force * 23.0479813 * sign_value
     END
 END
 
