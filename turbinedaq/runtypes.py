@@ -97,7 +97,9 @@ class TurbineTow(QtCore.QThread):
 
     def build_acsprg(self):
         """Create the ACSPL+ program for running the run.
-        This run should send a trigger pulse."""
+
+        This run should send a trigger pulse.
+        """
         if self.settling:
             endpos = 9.0
         else:
@@ -213,8 +215,13 @@ class TurbineTow(QtCore.QThread):
 
     def start_motion(self):
         if self.turbine_type == "AFT":
+            acsc.toPoint(self.hc_ec, flags=None, axis=0, target=0)
+            time.sleep(1)
             self.aft_daq_thread.start()
-            # TODO: Start jogging the AFT axis at the correct RPM
+            # Sleep to acquire enough zero force data
+            time.sleep(2.5)
+            rpm = self.tsr*self.U/self.R*60/6.28318530718
+            acsc.jog(self.hc_ec, flags=None, axis=0, vel=rpm)
         self.acsdaqthread.start()
         nbuf = 19
         acsc.loadBuffer(self.hc, nbuf, self.acs_prg, 2048)
