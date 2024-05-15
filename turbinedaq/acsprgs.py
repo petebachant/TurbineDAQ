@@ -55,7 +55,6 @@ ECOUT(ECGETOFFSET("1 Byte Out (6)", 1), DO6) ! Exchange Register 3rd Byte
 ECOUT(ECGETOFFSET("1 Byte Out (7)", 1), DO7) ! Exchange Register 4th Byte
 
 ! Put into high res mode
-! TODO: Check that this works okay
 DO1 = 25
 
 BLOCK
@@ -70,6 +69,7 @@ END
 WHILE collect_data
     BLOCK
         ! Compute all force values in the same controller cycle
+        ! Channel 1
         ch1_force = (DI1 << 16) | (DI2 << 8) | DI3
         if DI0
             sign_value = -1
@@ -79,6 +79,9 @@ WHILE collect_data
         end
         ! Convert to mV
         ch1_force = 5e-6 * ch1_force
+        ! Convert to engineering units [N-m]
+        ch1_force = ch1_force * 15.7085561
+        
         ! Channel 2
         ch2_force = (DI5 << 16) | (DI6 << 8) | DI7
         if DI4
@@ -87,7 +90,11 @@ WHILE collect_data
         else
             sign_value = 1
         end
-        ch2_force = 5e-6 * ch2_force
+        ! Convert to mV
+        ch2_force = 5e-6 * ch2_force 
+        ! Convert to engineering units [N-m]
+        ch2_force = ch2_force * 15.7617411 
+        
         ! Channel 3
         ch3_force = (DI9 << 16) | (DI10 << 8) | DI11
         if DI8
@@ -96,7 +103,12 @@ WHILE collect_data
         else
             sign_value = 1
         end
-        ch3_force = 5e-6 * ch3_force * (87.823)
+        ! Convert to mV
+        ch3_force = 5e-6 * ch3_force
+        ! Convert to engineering units [N]
+        ch3_force = ch3_force * 390.354011
+
+        ! Channel 4
         ch4_force = (DI13 << 16) | (DI14 << 8) | DI15
         if DI12
             sign_value = -1
@@ -104,7 +116,10 @@ WHILE collect_data
         else
             sign_value = 1
         end
+        ! Convert to mV
         ch4_force = 5e-6 * ch4_force
+        ! Convert to engineering units [N-m]
+        ch4_force = ch4_force * 23.0479813 
     END
 END
 
