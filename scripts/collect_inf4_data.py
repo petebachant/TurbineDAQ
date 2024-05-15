@@ -12,7 +12,7 @@ from turbinedaq.acsprgs import make_aft_prg
 
 SAMPLE_PERIOD_MS = 2
 N_BUFFER_ROWS = 100
-N_BUFFER_COLS = 5
+N_BUFFER_COLS = 6
 N_ITERATIONS = 10
 
 if __name__ == "__main__":
@@ -43,6 +43,7 @@ if __name__ == "__main__":
     ch2_force_vals = []
     ch3_force_vals = []
     ch4_force_vals = []
+    aft_rpm_vals = []
     sr = 1000 / SAMPLE_PERIOD_MS
     sleeptime = float(N_BUFFER_ROWS) / float(sr) / 2 * 1.05
     print(f"Sleeping for {sleeptime} seconds each iteration")
@@ -54,7 +55,7 @@ if __name__ == "__main__":
         newdata = acsc.readReal(
             hc,
             acsc.NONE,
-            "inf4_data_processed",
+            "aft_data",
             0,
             N_BUFFER_COLS - 1,
             0,
@@ -66,11 +67,12 @@ if __name__ == "__main__":
         ch2_force_vals += list(newdata[2])
         ch3_force_vals += list(newdata[3])
         ch4_force_vals += list(newdata[4])
+        aft_rpm_vals += list(newdata[5])
         time.sleep(sleeptime)
         newdata = acsc.readReal(
             hc,
             acsc.NONE,
-            "inf4_data_processed",
+            "aft_data",
             0,
             N_BUFFER_COLS - 1,
             N_BUFFER_ROWS // 2,
@@ -82,6 +84,7 @@ if __name__ == "__main__":
         ch2_force_vals += list(newdata[2])
         ch3_force_vals += list(newdata[3])
         ch4_force_vals += list(newdata[4])
+        aft_rpm_vals += list(newdata[5])
     # Set the variable in the controller that will stop data collection
     acsc.writeInteger(hc, "collect_data", 0)
     # Save data to CSV
@@ -91,6 +94,7 @@ if __name__ == "__main__":
     df["ch2_force"] = ch2_force_vals
     df["ch3_force"] = ch3_force_vals
     df["ch4_force"] = ch4_force_vals
+    df["aft_rpm"] = aft_rpm_vals
     print("Collected data:\n", df)
     fpath = "inf4-test-data.csv"
     print("Saving to", fpath)

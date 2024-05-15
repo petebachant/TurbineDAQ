@@ -13,14 +13,14 @@ global real start_time
 local int sample_period_ms
 sample_period_ms = {sample_period_ms}
 global real ch1_force, ch2_force, ch3_force, ch4_force
-global real inf4_data_processed({n_buffer_cols})({n_buffer_rows})
+global real aft_data({n_buffer_cols})({n_buffer_rows})
 
 BLOCK
     ! Define start time from now
     start_time = TIME
     collect_data = 1
     ! TODO: We probably want to collect FPOS and FVEL from the AFT axis as well
-    DC/c inf4_data_processed, {n_buffer_rows}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force
+    DC/c aft_data, {n_buffer_rows}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force, FVEL(6)
 END
 
 ! Continuously compute processed force values from the INF4
