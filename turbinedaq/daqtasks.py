@@ -378,7 +378,7 @@ class AcsDaqThread(QtCore.QThread):
             print("Could not write collect_data = 0")
 
 
-class AftDaqThread(QtCore.QThread):
+class AftAcsDaqThread(QtCore.QThread):
     """A thread for collecting data from the ACS EC controller that runs the
     AFT test bed.
     """
