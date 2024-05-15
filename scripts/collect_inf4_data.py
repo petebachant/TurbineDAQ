@@ -3,6 +3,7 @@ integration test.
 """
 
 import time
+import warnings
 
 import pandas as pd
 from acspy import acsc
@@ -26,7 +27,10 @@ if __name__ == "__main__":
     if actual_serial_number != target_serial_number:
         raise RuntimeError("Connected to the wrong controller")
     # Stop data collection if this failed last time
-    acsc.writeInteger(hc, "collect_data", 0)
+    try:
+        acsc.writeInteger(hc, "collect_data", 0)
+    except Exception as e:
+        warnings.warn(f"Can't write 'collect_data': {e}")
     # Create and load our program into buffer 9 (arbitrary for now)
     prg_txt = make_aft_prg(
         sample_period_ms=SAMPLE_PERIOD_MS,
@@ -34,7 +38,7 @@ if __name__ == "__main__":
         n_buffer_cols=N_BUFFER_COLS,
     )
     print("Loading program into buffer 9:\n", prg_txt)
-    acsc.loadBuffer(hc, 9, prg_txt, 4096)
+    acsc.loadBuffer(hc, 9, prg_txt, 6000)
     print("Running buffer 9")
     acsc.runBuffer(hc, 9)
     # Collect data for a bit then set collect_data=0 to stop data collection
