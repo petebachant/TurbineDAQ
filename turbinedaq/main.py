@@ -803,7 +803,7 @@ class MainWindow(QMainWindow):
                 if "turbine" in run_props:
                     turbine = run_props["turbine"]
                 else:
-                    turbine = self.turbine_properties.keys()[0]
+                    turbine = list(self.turbine_properties.keys())[0]
                 if "vectrino" in run_props:
                     vectrino = run_props.vectrino
                 else:
@@ -1090,7 +1090,7 @@ class MainWindow(QMainWindow):
                     )
                     idlesec = f_interp(tow_speed)
                 print("Waiting " + str(idlesec) + " seconds until next run")
-                QtCore.QTimer.singleShot(idlesec * 1000, self.on_idletimer)
+                QtCore.QTimer.singleShot(int(idlesec * 1000), self.on_idletimer)
                 # Scroll test plan so completed run is in view
                 try:
                     i = int(self.currentrun) + 1
