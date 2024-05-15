@@ -392,7 +392,9 @@ class AftAcsDaqThread(QtCore.QThread):
             "load_cell_ch2": np.array([]),
             "load_cell_ch3": np.array([]),
             "load_cell_ch4": np.array([]),
+            "turbine_pos": np.array([]),
             "turbine_rpm": np.array([]),
+            "carriage_vel": np.array([]),
             "time": np.array([]),
         }
         self.dblen = bufflen
@@ -420,7 +422,7 @@ class AftAcsDaqThread(QtCore.QThread):
             time.sleep(self.sleeptime)
             t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
             newdata = acsc.readReal(
-                self.hc, acsc.NONE, "data", 0, 2, 0, self.dblen // 2 - 1
+                self.hc, acsc.NONE, "aft_data", 0, 2, 0, self.dblen // 2 - 1
             )
             t = (newdata[0] - t0) / 1000.0
             self.data["time"] = np.append(self.data["time"], t)
@@ -434,18 +436,35 @@ class AftAcsDaqThread(QtCore.QThread):
             newdata = acsc.readReal(
                 self.hc,
                 acsc.NONE,
-                "data",
+                "aft_data",
                 0,
-                2,
+                8,
                 self.dblen // 2,
                 self.dblen - 1,
             )
             t = (newdata[0] - t0) / 1000.0
             self.data["time"] = np.append(self.data["time"], t)
             self.data["time"] = self.data["time"] - self.data["time"][0]
-            # TODO: Get load cell data
+            self.data["load_cell_ch1"] = np.append(
+                self.data["load_cell_ch1"], newdata[1]
+            )
+            self.data["load_cell_ch2"] = np.append(
+                self.data["load_cell_ch2"], newdata[2]
+            )
+            self.data["load_cell_ch3"] = np.append(
+                self.data["load_cell_ch3"], newdata[3]
+            )
+            self.data["load_cell_ch4"] = np.append(
+                self.data["load_cell_ch4"], newdata[4]
+            )
+            self.data["turbine_pos"] = np.append(
+                self.data["turbine_pos"], newdata[5]
+            )
             self.data["turbine_rpm"] = np.append(
-                self.data["turbine_rpm"], newdata[2]
+                self.data["turbine_rpm"], newdata[6]
+            )
+            self.data["carriage_vel"] = np.append(
+                self.data["carriage_vel"], newdata[7]
             )
 
     def makedaqprg(self):
