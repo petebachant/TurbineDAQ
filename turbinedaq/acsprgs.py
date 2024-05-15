@@ -18,6 +18,42 @@ global real inf4_data_processed({n_buffer_cols})({n_buffer_rows})
 local int subtract_value = 16777215
 local int sign_value
 
+ECIN(ECGETOFFSET("1 Byte In (0)", 1), DI0) ! CH1, Byte 1 in Hi-Res Mode
+ECIN(ECGETOFFSET("1 Byte In (1)", 1), DI1) ! CH1, Byte 2 in Hi-Res Mode
+ECIN(ECGETOFFSET("1 Byte In (2)", 1), DI2) ! CH1, Byte 3 in Hi-Res Mode
+ECIN(ECGETOFFSET("1 Byte In (3)", 1), DI3) ! CH1, Byte 4 in Hi-Res Mode
+
+ECIN(ECGETOFFSET("1 Byte In (4)", 1), DI4) ! CH2, Byte 1 in Hi-Res Mode
+ECIN(ECGETOFFSET("1 Byte In (5)", 1), DI5) ! CH2, Byte 2 in Hi-Res Mode
+ECIN(ECGETOFFSET("1 Byte In (6)", 1), DI6) ! CH2, Byte 3 in Hi-Res Mode
+ECIN(ECGETOFFSET("1 Byte In (7)", 1), DI7) ! CH2, Byte 4 in Hi-Res Mode
+
+ECIN(ECGETOFFSET("1 Byte In (8)", 1), DI8) ! CH3, Byte 1 in Hi-Res Mode
+ECIN(ECGETOFFSET("1 Byte In (9)", 1), DI9) ! CH3, Byte 2 in Hi-Res Mode
+ECIN(ECGETOFFSET("1 Byte In (10)", 1), DI10) ! CH3, Byte 3 in Hi-Res Mode
+ECIN(ECGETOFFSET("1 Byte In (11)", 1), DI11) ! CH3, Byte 4 in Hi-Res Mode
+
+ECIN(ECGETOFFSET("1 Byte In (12)", 1), DI12) ! CH4, Byte 1 in Hi-Res Mode
+ECIN(ECGETOFFSET("1 Byte In (13)", 1), DI13) ! CH4, Byte 2 in Hi-Res Mode
+ECIN(ECGETOFFSET("1 Byte In (14)", 1), DI14) ! CH4, Byte 3 in Hi-Res Mode
+ECIN(ECGETOFFSET("1 Byte In (15)", 1), DI15) ! CH4, Byte 4 in Hi-Res Mode
+
+ECIN(ECGETOFFSET("1 Byte In (16)", 1), DI16) ! Digital Outputs 1st Byte in Default Mode
+ECIN(ECGETOFFSET("1 Byte In (17)", 1), DI17) ! Digital Outputs 2nd Byte in Default Mode
+
+! Mapping all digital outputs from INF4 to ASCPL+ variables
+
+ECOUT(ECGETOFFSET("1 Byte Out (0)", 1), DO0) ! Command Register 1st Byte
+ECOUT(ECGETOFFSET("1 Byte Out (1)", 1), DO1) ! Command Register 2nd Byte
+
+ECOUT(ECGETOFFSET("1 Byte Out (2)", 1), DO2) ! Digital Outputs Command 1st Byte
+ECOUT(ECGETOFFSET("1 Byte Out (3)", 1), DO3) ! Digital Outputs Command 2nd Byte
+
+ECOUT(ECGETOFFSET("1 Byte Out (4)", 1), DO4) ! Exchange Register 1st Byte
+ECOUT(ECGETOFFSET("1 Byte Out (5)", 1), DO5) ! Exchange Register 2nd Byte
+ECOUT(ECGETOFFSET("1 Byte Out (6)", 1), DO6) ! Exchange Register 3rd Byte
+ECOUT(ECGETOFFSET("1 Byte Out (7)", 1), DO7) ! Exchange Register 4th Byte
+
 ! Put into high res mode
 ! TODO: Check that this works okay
 DO1 = 25
