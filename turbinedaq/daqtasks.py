@@ -416,8 +416,8 @@ class AftAcsDaqThread(QtCore.QThread):
 
         if self.makeprg:
             self.makedaqprg()
-            acsc.loadBuffer(self.hc, 8, self.prg, 1024)
-            acsc.runBuffer(self.hc, 8)
+            acsc.loadBuffer(self.hc, 17, self.prg, 1024)
+            acsc.runBuffer(self.hc, 17)
         while not collecting_data():
             time.sleep(0.01)
         while self.collectdata:
