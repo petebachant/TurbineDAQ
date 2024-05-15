@@ -21,7 +21,6 @@ class TurbineTow(QtCore.QThread):
     def __init__(
         self,
         acs_ntm_hcomm: int,
-        acs_ec_hcomm: int,
         U: float,
         tsr: float,
         y_R: float,
@@ -39,7 +38,6 @@ class TurbineTow(QtCore.QThread):
     ):
         QtCore.QThread.__init__(self)
         self.hc = acs_ntm_hcomm
-        self.hc_ec = acs_ec_hcomm
         self.U = float(U)
         self.tsr = tsr
         self.y_R = y_R
@@ -71,7 +69,7 @@ class TurbineTow(QtCore.QThread):
         }
         if self.turbine_type == "AFT":
             self.aft_daq_thread = daqtasks.AftAcsDaqThread(
-                acs_hc=self.hc_ec, makeprg=False
+                acs_hc=self.hc, makeprg=False
             )
             self.aftdata = self.aft_daq_thread.data
         if self.vectrino:

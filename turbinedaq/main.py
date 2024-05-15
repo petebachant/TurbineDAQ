@@ -532,14 +532,7 @@ class MainWindow(QMainWindow):
             print("Attempting to connect to simulator")
             self.hc = acsc.open_comm_simulator()
             ntm = "simulated"
-        try:
-            self.hc_ec = acsc.open_comm_ethernet_tcp("10.0.0.102")
-            ec = "connected"
-        except acsc.AcscError:
-            print("Cannot connect to ACS EC controller")
-            self.hc_ec = acsc.open_comm_simulator()
-            ec = "simulated"
-        txt = f" ACS controllers: NTM: {ntm}, EC: {ec} "
+        txt = f" ACS NTM controller: NTM: {ntm} "
         self.label_acs_connect.setText(txt)
 
     def initialize_plots(self):
