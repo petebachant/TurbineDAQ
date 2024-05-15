@@ -92,29 +92,29 @@ class NiDaqThread(QtCore.QThread):
             self.chaninfo[channame]["Scale slope"] = daqmx.GetScaleLinSlope(
                 scale
             )
-            self.chaninfo[channame]["Scale y-intercept"] = (
-                daqmx.GetScaleLinYIntercept(scale)
-            )
-            self.chaninfo[channame]["Scaled units"] = (
-                daqmx.GetScaleScaledUnits(scale)
-            )
-            self.chaninfo[channame]["Prescaled units"] = (
-                daqmx.GetScalePreScaledUnits(scale)
-            )
+            self.chaninfo[channame][
+                "Scale y-intercept"
+            ] = daqmx.GetScaleLinYIntercept(scale)
+            self.chaninfo[channame][
+                "Scaled units"
+            ] = daqmx.GetScaleScaledUnits(scale)
+            self.chaninfo[channame][
+                "Prescaled units"
+            ] = daqmx.GetScalePreScaledUnits(scale)
         self.chaninfo[self.turbangchan] = {}
-        self.chaninfo[self.turbangchan]["Pulses per rev"] = (
-            daqmx.GetCIAngEncoderPulsesPerRev(
-                self.turbangtask._handle, self.turbangchan
-            )
+        self.chaninfo[self.turbangchan][
+            "Pulses per rev"
+        ] = daqmx.GetCIAngEncoderPulsesPerRev(
+            self.turbangtask._handle, self.turbangchan
         )
         self.chaninfo[self.turbangchan]["Units"] = daqmx.GetCIAngEncoderUnits(
             self.turbangtask._handle, self.turbangchan
         )
         self.chaninfo[self.carposchan] = {}
-        self.chaninfo[self.carposchan]["Distance per pulse"] = (
-            daqmx.GetCILinEncoderDisPerPulse(
-                self.carpostask._handle, self.carposchan
-            )
+        self.chaninfo[self.carposchan][
+            "Distance per pulse"
+        ] = daqmx.GetCILinEncoderDisPerPulse(
+            self.carpostask._handle, self.carposchan
         )
         self.chaninfo[self.carposchan]["Units"] = daqmx.GetCILinEncoderUnits(
             self.carpostask._handle, self.carposchan
@@ -534,6 +534,176 @@ class ODiSIDaqThread(QtCore.QThread):
     # self.stoptask.stop
     # self.stoptask.close()
     # print("ODiSI interrogator stopping measurements...")
+
+
+class AftNiDaqThread(QtCore.QThread):
+    collecting = QtCore.pyqtSignal()
+    cleared = QtCore.pyqtSignal()
+
+    def __init__(self, usetrigger=True):
+        QtCore.QThread.__init__(self)
+        # Some parameters for the thread
+        self.usetrigger = usetrigger
+        self.collect = True
+        # Create some meta data for the run
+        self.metadata = {}
+        # Initialize sample rate
+        self.sr = 100
+        self.metadata["Sample rate (Hz)"] = self.sr
+        self.nsamps = int(self.sr / 10)
+        # Create a dict of arrays for storing data
+        self.data = {
+            "resistor_temp": np.array([]),
+            "yaskawa_temp": np.array([]),
+            "fore_temp": np.array([]),
+            "aft_temp": np.array([]),
+            "time": np.array([]),
+            "carriage_pos": np.array([]),
+        }
+        # Create tasks
+        self.analogtask = nidaqmx.Task("analog-inputs")
+        self.carpostask = nidaqmx.Task("carriage-pos")
+        # Add channels to tasks
+        self.analogchans = [
+            "resistor_temp",
+            "yaskawa_temp",
+            "fore_temp",
+            "aft_temp",
+        ]
+        self.carposchan = "carriage_pos"
+        self.analogtask.add_global_channels(
+            [GlobalVirtualChannel(c) for c in self.analogchans]
+        )
+        self.carpostask.add_global_channels(
+            [GlobalVirtualChannel(self.carposchan)]
+        )
+        # Get channel information to add to metadata
+        self.chaninfo = {}
+        for channame in self.analogchans:
+            self.chaninfo[channame] = {}
+            scale = channame + "_scale"
+            self.chaninfo[channame]["Scale name"] = scale
+            self.chaninfo[channame]["Scale slope"] = daqmx.GetScaleLinSlope(
+                scale
+            )
+            self.chaninfo[channame][
+                "Scale y-intercept"
+            ] = daqmx.GetScaleLinYIntercept(scale)
+            self.chaninfo[channame][
+                "Scaled units"
+            ] = daqmx.GetScaleScaledUnits(scale)
+            self.chaninfo[channame][
+                "Prescaled units"
+            ] = daqmx.GetScalePreScaledUnits(scale)
+        self.chaninfo[self.carposchan] = {}
+        self.chaninfo[self.carposchan][
+            "Distance per pulse"
+        ] = daqmx.GetCILinEncoderDisPerPulse(
+            self.carpostask._handle, self.carposchan
+        )
+        self.chaninfo[self.carposchan]["Units"] = daqmx.GetCILinEncoderUnits(
+            self.carpostask._handle, self.carposchan
+        )
+        self.metadata["Channel info"] = self.chaninfo
+        # Configure sample clock timing
+        daqmx.CfgSampClkTiming(
+            self.analogtask._handle,
+            "",
+            self.sr,
+            daqmx.Val_Rising,
+            daqmx.Val_ContSamps,
+            self.nsamps,
+        )
+        # Get source for analog sample clock
+        trigname = daqmx.GetTerminalNameWithDevPrefix(
+            self.analogtask._handle, "ai/SampleClock"
+        )
+        daqmx.CfgSampClkTiming(
+            self.carpostask._handle,
+            trigname,
+            self.sr,
+            daqmx.Val_Rising,
+            daqmx.Val_ContSamps,
+            self.nsamps,
+        )
+        # If using trigger for analog signals set source to chassis PFI0
+        if self.usetrigger:
+            daqmx.CfgDigEdgeStartTrig(
+                self.analogtask._handle,
+                "/cDAQ9188-16D66BB/PFI0",
+                daqmx.Val_Falling,
+            )
+        # Set trigger functions for counter channels
+        daqmx.SetStartTrigType(self.carpostask._handle, daqmx.Val_DigEdge)
+        trigsrc = daqmx.GetTrigSrcWithDevPrefix(
+            self.analogtask._handle, "ai/StartTrigger"
+        )
+        daqmx.SetDigEdgeStartTrigSrc(self.carpostask._handle, trigsrc)
+        daqmx.SetDigEdgeStartTrigEdge(
+            self.carpostask._handle, daqmx.Val_Rising
+        )
+
+    def run(self):
+        """Start DAQmx tasks."""
+        stream = self.analogtask.in_stream
+        reader = AnalogMultiChannelReader(stream)
+        stream_cp = self.carpostask.in_stream
+        reader_cp = CounterReader(stream_cp)
+        data = np.zeros((len(self.analogchans), self.nsamps))
+        carpos = np.zeros(self.nsamps)
+
+        def every_n_samples(
+            task_handle, every_n_samps_event_type, n_samps, callback_data
+        ):
+            """Function called every N samples"""
+            reader.read_many_sample(
+                data, number_of_samples_per_channel=n_samps
+            )
+            self.data["resistor_temp"] = np.append(
+                self.data["resistor_temp"], data[0, :], axis=0
+            )
+            self.data["yaskawa_temp"] = np.append(
+                self.data["yaskawa_temp"], data[1, :], axis=0
+            )
+            self.data["fore_temp"] = np.append(
+                self.data["fore_temp"], data[2, :], axis=0
+            )
+            self.data["aft_temp"] = np.append(
+                self.data["aft_temp"], data[3, :], axis=0
+            )
+            self.data["time"] = (
+                np.arange(len(self.data["resistor_temp"]), dtype=float)
+                / self.sr
+            )
+            reader_cp.read_many_sample_double(
+                carpos, number_of_samples_per_channel=n_samps
+            )
+            self.data["carriage_pos"] = np.append(
+                self.data["carriage_pos"], carpos
+            )
+            return 0  # The function should return an integer
+
+        self.analogtask.register_every_n_samples_acquired_into_buffer_event(
+            sample_interval=self.nsamps, callback_method=every_n_samples
+        )
+        # Start the tasks
+        self.carpostask.start()
+        self.analogtask.start()
+        self.collecting.emit()
+        # Keep the acquisition going until task is cleared
+        while self.collect:
+            time.sleep(0.2)
+
+    def stopdaq(self):
+        self.analogtask.stop()
+        self.carpostask.stop()
+
+    def clear(self):
+        self.stopdaq()
+        self.analogtask.close()
+        self.carpostask.close()
+        self.collect = False
+        self.cleared.emit()
 
 
 if __name__ == "__main__":
