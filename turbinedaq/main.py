@@ -93,6 +93,10 @@ class MainWindow(QMainWindow):
         self.gridLayout_AFT.addLayout(self.verticalLayout_AFT, 0, 0, 1, 1)
         self.dockWidget_AFT.setWidget(self.dockWidgetContents_AFT)
         self.ui.gridLayout_4.addWidget(self.dockWidget_AFT, 0, 4, 6, 1)
+        self.ui.actionViewAFT.toggled.connect(self.dockWidget_AFT.setVisible)
+        self.dockWidget_AFT.visibilityChanged.connect(
+            self.ui.actionViewAFT.setChecked
+        )
 
         # Create time vector
         self.t = np.array([])
