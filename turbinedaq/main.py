@@ -233,6 +233,8 @@ class MainWindow(QMainWindow):
         self.dockWidget_AFT.visibilityChanged.connect(
             self.ui.actionViewAFT.setChecked
         )
+        # Set invisible by default
+        self.dockWidget_AFT.setVisible(False)
 
     @property
     def settings_fpath(self) -> str:
