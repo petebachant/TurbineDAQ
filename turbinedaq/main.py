@@ -1021,7 +1021,6 @@ class MainWindow(QMainWindow):
             turbine_properties = self.turbine_properties[turbine]
             self.turbinetow = runtypes.TurbineTow(
                 acs_ntm_hcomm=self.hc,
-                acs_ec_hcomm=self.hc_ec,
                 U=U,
                 tsr=tsr,
                 y_R=y_R,
