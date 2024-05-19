@@ -1168,7 +1168,7 @@
        <set>Qt::AllDockWidgetAreas</set>
       </property>
       <property name="windowTitle">
-       <string>NI-DAQ</string>
+       <string>NI-DAQ (CFT)</string>
       </property>
       <widget class="QWidget" name="dockWidgetContents_2">
        <layout class="QGridLayout" name="gridLayout_8">
@@ -1706,7 +1706,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>NI-DAQ</string>
+    <string>NI-DAQ (CFT)</string>
    </property>
   </action>
   <action name="actionVectrino_View">
