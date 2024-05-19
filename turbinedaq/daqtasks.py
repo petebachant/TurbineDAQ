@@ -1,10 +1,12 @@
 """DAQ tasks."""
 
-import ctypes
 import time
 import warnings
 
-import daqmx
+try:
+    import daqmx
+except Exception as e:
+    warnings.warn(f"Could not import daqmx: {e}")
 import micronopt
 import nidaqmx
 import numpy as np
@@ -13,7 +15,6 @@ from acspy.acsc import AcscError
 from nidaqmx.stream_readers import (
     AnalogMultiChannelReader,
     CounterReader,
-    DigitalSingleChannelReader,
 )
 from nidaqmx.system.storage.persisted_channel import (
     PersistedChannel as GlobalVirtualChannel,
@@ -21,6 +22,8 @@ from nidaqmx.system.storage.persisted_channel import (
 from pxl import fdiff
 from pxl import timeseries as ts
 from PyQt5 import QtCore
+
+from turbinedaq.acsprgs import make_aft_prg
 
 
 class NiDaqThread(QtCore.QThread):
@@ -92,29 +95,29 @@ class NiDaqThread(QtCore.QThread):
             self.chaninfo[channame]["Scale slope"] = daqmx.GetScaleLinSlope(
                 scale
             )
-            self.chaninfo[channame][
-                "Scale y-intercept"
-            ] = daqmx.GetScaleLinYIntercept(scale)
-            self.chaninfo[channame][
-                "Scaled units"
-            ] = daqmx.GetScaleScaledUnits(scale)
-            self.chaninfo[channame][
-                "Prescaled units"
-            ] = daqmx.GetScalePreScaledUnits(scale)
+            self.chaninfo[channame]["Scale y-intercept"] = (
+                daqmx.GetScaleLinYIntercept(scale)
+            )
+            self.chaninfo[channame]["Scaled units"] = (
+                daqmx.GetScaleScaledUnits(scale)
+            )
+            self.chaninfo[channame]["Prescaled units"] = (
+                daqmx.GetScalePreScaledUnits(scale)
+            )
         self.chaninfo[self.turbangchan] = {}
-        self.chaninfo[self.turbangchan][
-            "Pulses per rev"
-        ] = daqmx.GetCIAngEncoderPulsesPerRev(
-            self.turbangtask._handle, self.turbangchan
+        self.chaninfo[self.turbangchan]["Pulses per rev"] = (
+            daqmx.GetCIAngEncoderPulsesPerRev(
+                self.turbangtask._handle, self.turbangchan
+            )
         )
         self.chaninfo[self.turbangchan]["Units"] = daqmx.GetCIAngEncoderUnits(
             self.turbangtask._handle, self.turbangchan
         )
         self.chaninfo[self.carposchan] = {}
-        self.chaninfo[self.carposchan][
-            "Distance per pulse"
-        ] = daqmx.GetCILinEncoderDisPerPulse(
-            self.carpostask._handle, self.carposchan
+        self.chaninfo[self.carposchan]["Distance per pulse"] = (
+            daqmx.GetCILinEncoderDisPerPulse(
+                self.carpostask._handle, self.carposchan
+            )
         )
         self.chaninfo[self.carposchan]["Units"] = daqmx.GetCILinEncoderUnits(
             self.carpostask._handle, self.carposchan
@@ -378,6 +381,124 @@ class AcsDaqThread(QtCore.QThread):
             print("Could not write collect_data = 0")
 
 
+class AftAcsDaqThread(QtCore.QThread):
+    """A thread for collecting data from the ACS EC controller that runs the
+    AFT test bed.
+    """
+
+    def __init__(self, acs_hc, sample_rate=1000, bufflen=100, makeprg=False):
+        QtCore.QThread.__init__(self)
+        self.hc = acs_hc
+        self.collectdata = True
+        self.data = {
+            "time": np.array([]),
+            "load_cell_ch1": np.array([]),
+            "load_cell_ch2": np.array([]),
+            "load_cell_ch3": np.array([]),
+            "load_cell_ch4": np.array([]),
+            "turbine_pos": np.array([]),
+            "turbine_rpm": np.array([]),
+            "carriage_vel": np.array([]),
+        }
+        self.dblen = bufflen
+        self.sr = sample_rate
+        self.sleeptime = float(self.dblen) / float(self.sr) / 2 * 1.05
+        self.makeprg = makeprg
+
+    def run(self):
+        def collecting_data() -> bool:
+            try:
+                return bool(
+                    acsc.readInteger(self.hc, acsc.NONE, "collect_data")
+                )
+            except AcscError as e:
+                warnings.warn(f"Failed to read 'collect_data': {e}")
+                return False
+
+        if self.makeprg:
+            self.makedaqprg()
+            acsc.loadBuffer(self.hc, 17, self.prg, 1024)
+            acsc.runBuffer(self.hc, 17)
+        while not collecting_data():
+            time.sleep(0.01)
+        while self.collectdata:
+            time.sleep(self.sleeptime)
+            t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
+            newdata = acsc.readReal(
+                self.hc, acsc.NONE, "aft_data", 0, 7, 0, self.dblen // 2 - 1
+            )
+            t = (newdata[0] - t0) / 1000.0
+            self.data["time"] = np.append(self.data["time"], t)
+            self.data["load_cell_ch1"] = np.append(
+                self.data["load_cell_ch1"], newdata[1]
+            )
+            self.data["load_cell_ch2"] = np.append(
+                self.data["load_cell_ch2"], newdata[2]
+            )
+            self.data["load_cell_ch3"] = np.append(
+                self.data["load_cell_ch3"], newdata[3]
+            )
+            self.data["load_cell_ch4"] = np.append(
+                self.data["load_cell_ch4"], newdata[4]
+            )
+            self.data["turbine_pos"] = np.append(
+                self.data["turbine_pos"], newdata[5]
+            )
+            self.data["turbine_rpm"] = np.append(
+                self.data["turbine_rpm"], newdata[6]
+            )
+            self.data["carriage_vel"] = np.append(
+                self.data["carriage_vel"], newdata[7]
+            )
+            time.sleep(self.sleeptime)
+            newdata = acsc.readReal(
+                self.hc,
+                acsc.NONE,
+                "aft_data",
+                0,
+                7,
+                self.dblen // 2,
+                self.dblen - 1,
+            )
+            t = (newdata[0] - t0) / 1000.0
+            self.data["time"] = np.append(self.data["time"], t)
+            self.data["time"] = self.data["time"] - self.data["time"][0]
+            self.data["load_cell_ch1"] = np.append(
+                self.data["load_cell_ch1"], newdata[1]
+            )
+            self.data["load_cell_ch2"] = np.append(
+                self.data["load_cell_ch2"], newdata[2]
+            )
+            self.data["load_cell_ch3"] = np.append(
+                self.data["load_cell_ch3"], newdata[3]
+            )
+            self.data["load_cell_ch4"] = np.append(
+                self.data["load_cell_ch4"], newdata[4]
+            )
+            self.data["turbine_pos"] = np.append(
+                self.data["turbine_pos"], newdata[5]
+            )
+            self.data["turbine_rpm"] = np.append(
+                self.data["turbine_rpm"], newdata[6]
+            )
+            self.data["carriage_vel"] = np.append(
+                self.data["carriage_vel"], newdata[7]
+            )
+
+    def makedaqprg(self):
+        """Create an ACSPL+ program to load into the controller"""
+        self.prg = make_aft_prg(
+            sample_period_ms=int(1 / self.sr * 1000), n_buffer_rows=self.dblen
+        )
+
+    def stop(self):
+        self.collectdata = False
+        try:
+            acsc.writeInteger(self.hc, "collect_data", 0)
+        except:
+            print("Could not write collect_data = 0")
+
+
 class FbgDaqThread(QtCore.QThread):
     def __init__(self, fbg_props, usetrigger=False):
         QtCore.QThread.__init__(self)
@@ -451,6 +572,176 @@ class ODiSIDaqThread(QtCore.QThread):
     # self.stoptask.stop
     # self.stoptask.close()
     # print("ODiSI interrogator stopping measurements...")
+
+
+class AftNiDaqThread(QtCore.QThread):
+    collecting = QtCore.pyqtSignal()
+    cleared = QtCore.pyqtSignal()
+
+    def __init__(self, usetrigger=True):
+        QtCore.QThread.__init__(self)
+        # Some parameters for the thread
+        self.usetrigger = usetrigger
+        self.collect = True
+        # Create some meta data for the run
+        self.metadata = {}
+        # Initialize sample rate
+        self.sr = 100
+        self.metadata["Sample rate (Hz)"] = self.sr
+        self.nsamps = int(self.sr / 10)
+        # Create a dict of arrays for storing data
+        self.data = {
+            "resistor_temp": np.array([]),
+            "yaskawa_temp": np.array([]),
+            "fore_temp": np.array([]),
+            "aft_temp": np.array([]),
+            "time": np.array([]),
+            "carriage_pos": np.array([]),
+        }
+        # Create tasks
+        self.analogtask = nidaqmx.Task("analog-inputs")
+        self.carpostask = nidaqmx.Task("carriage-pos")
+        # Add channels to tasks
+        self.analogchans = [
+            "resistor_temp",
+            "yaskawa_temp",
+            "fore_temp",
+            "aft_temp",
+        ]
+        self.carposchan = "carriage_pos"
+        self.analogtask.add_global_channels(
+            [GlobalVirtualChannel(c) for c in self.analogchans]
+        )
+        self.carpostask.add_global_channels(
+            [GlobalVirtualChannel(self.carposchan)]
+        )
+        # Get channel information to add to metadata
+        self.chaninfo = {}
+        for channame in self.analogchans:
+            self.chaninfo[channame] = {}
+            scale = channame + "_scale"
+            self.chaninfo[channame]["Scale name"] = scale
+            self.chaninfo[channame]["Scale slope"] = daqmx.GetScaleLinSlope(
+                scale
+            )
+            self.chaninfo[channame]["Scale y-intercept"] = (
+                daqmx.GetScaleLinYIntercept(scale)
+            )
+            self.chaninfo[channame]["Scaled units"] = (
+                daqmx.GetScaleScaledUnits(scale)
+            )
+            self.chaninfo[channame]["Prescaled units"] = (
+                daqmx.GetScalePreScaledUnits(scale)
+            )
+        self.chaninfo[self.carposchan] = {}
+        self.chaninfo[self.carposchan]["Distance per pulse"] = (
+            daqmx.GetCILinEncoderDisPerPulse(
+                self.carpostask._handle, self.carposchan
+            )
+        )
+        self.chaninfo[self.carposchan]["Units"] = daqmx.GetCILinEncoderUnits(
+            self.carpostask._handle, self.carposchan
+        )
+        self.metadata["Channel info"] = self.chaninfo
+        # Configure sample clock timing
+        daqmx.CfgSampClkTiming(
+            self.analogtask._handle,
+            "",
+            self.sr,
+            daqmx.Val_Rising,
+            daqmx.Val_ContSamps,
+            self.nsamps,
+        )
+        # Get source for analog sample clock
+        trigname = daqmx.GetTerminalNameWithDevPrefix(
+            self.analogtask._handle, "ai/SampleClock"
+        )
+        daqmx.CfgSampClkTiming(
+            self.carpostask._handle,
+            trigname,
+            self.sr,
+            daqmx.Val_Rising,
+            daqmx.Val_ContSamps,
+            self.nsamps,
+        )
+        # If using trigger for analog signals set source to chassis PFI0
+        if self.usetrigger:
+            daqmx.CfgDigEdgeStartTrig(
+                self.analogtask._handle,
+                "/cDAQ9188-16D66BB/PFI0",
+                daqmx.Val_Falling,
+            )
+        # Set trigger functions for counter channels
+        daqmx.SetStartTrigType(self.carpostask._handle, daqmx.Val_DigEdge)
+        trigsrc = daqmx.GetTrigSrcWithDevPrefix(
+            self.analogtask._handle, "ai/StartTrigger"
+        )
+        daqmx.SetDigEdgeStartTrigSrc(self.carpostask._handle, trigsrc)
+        daqmx.SetDigEdgeStartTrigEdge(
+            self.carpostask._handle, daqmx.Val_Rising
+        )
+
+    def run(self):
+        """Start DAQmx tasks."""
+        stream = self.analogtask.in_stream
+        reader = AnalogMultiChannelReader(stream)
+        stream_cp = self.carpostask.in_stream
+        reader_cp = CounterReader(stream_cp)
+        data = np.zeros((len(self.analogchans), self.nsamps))
+        carpos = np.zeros(self.nsamps)
+
+        def every_n_samples(
+            task_handle, every_n_samps_event_type, n_samps, callback_data
+        ):
+            """Function called every N samples"""
+            reader.read_many_sample(
+                data, number_of_samples_per_channel=n_samps
+            )
+            self.data["resistor_temp"] = np.append(
+                self.data["resistor_temp"], data[0, :], axis=0
+            )
+            self.data["yaskawa_temp"] = np.append(
+                self.data["yaskawa_temp"], data[1, :], axis=0
+            )
+            self.data["fore_temp"] = np.append(
+                self.data["fore_temp"], data[2, :], axis=0
+            )
+            self.data["aft_temp"] = np.append(
+                self.data["aft_temp"], data[3, :], axis=0
+            )
+            self.data["time"] = (
+                np.arange(len(self.data["resistor_temp"]), dtype=float)
+                / self.sr
+            )
+            reader_cp.read_many_sample_double(
+                carpos, number_of_samples_per_channel=n_samps
+            )
+            self.data["carriage_pos"] = np.append(
+                self.data["carriage_pos"], carpos
+            )
+            return 0  # The function should return an integer
+
+        self.analogtask.register_every_n_samples_acquired_into_buffer_event(
+            sample_interval=self.nsamps, callback_method=every_n_samples
+        )
+        # Start the tasks
+        self.carpostask.start()
+        self.analogtask.start()
+        self.collecting.emit()
+        # Keep the acquisition going until task is cleared
+        while self.collect:
+            time.sleep(0.2)
+
+    def stopdaq(self):
+        self.analogtask.stop()
+        self.carpostask.stop()
+
+    def clear(self):
+        self.stopdaq()
+        self.analogtask.close()
+        self.carpostask.close()
+        self.collect = False
+        self.cleared.emit()
 
 
 if __name__ == "__main__":

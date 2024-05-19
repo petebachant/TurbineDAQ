@@ -20,12 +20,12 @@ class TurbineTow(QtCore.QThread):
 
     def __init__(
         self,
-        acs_hcomm,
-        U,
-        tsr,
-        y_R,
-        z_H,
-        turbine_properties,
+        acs_ntm_hcomm: int,
+        U: float,
+        tsr: float,
+        y_R: float,
+        z_H: float,
+        turbine_properties: dict,
         nidaq=True,
         vectrino=True,
         vecsavepath="",
@@ -37,20 +37,24 @@ class TurbineTow(QtCore.QThread):
         vec_salinity=0.0,
     ):
         QtCore.QThread.__init__(self)
-        self.hc = acs_hcomm
+        self.hc = acs_ntm_hcomm
         self.U = float(U)
         self.tsr = tsr
         self.y_R = y_R
         self.z_H = z_H
         self.R = turbine_properties["radius"]
         self.H = turbine_properties["height"]
+        self.turbine_type = turbine_properties["kind"]
         self.vectrino = vectrino
         self.nidaq = nidaq
         self.fbg = fbg
         self.odisi = odisi
         self.settling = settling
         self.build_acsprg()
-        self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
+        if self.turbine_type == "AFT":
+            self.acsdaqthread = daqtasks.AftAcsDaqThread(self.hc)
+        else:
+            self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
         self.maxvel = U * 1.3
         self.usetrigger = True
         self.vecsavepath = vecsavepath
@@ -70,7 +74,14 @@ class TurbineTow(QtCore.QThread):
             self.vec = PdControl()
             self.metadata["Vectrino metadata"] = {"y/R": y_R, "z/H": z_H}
         if self.nidaq:
-            self.daqthread = daqtasks.NiDaqThread(usetrigger=self.usetrigger)
+            if self.turbine_type == "AFT":
+                self.daqthread = daqtasks.AftNiDaqThread(
+                    usetrigger=self.usetrigger
+                )
+            else:
+                self.daqthread = daqtasks.NiDaqThread(
+                    usetrigger=self.usetrigger
+                )
             self.nidata = self.daqthread.data
             self.metadata["NI metadata"] = self.daqthread.metadata
         if self.fbg:
@@ -86,13 +97,19 @@ class TurbineTow(QtCore.QThread):
 
     def build_acsprg(self):
         """Create the ACSPL+ program for running the run.
-        This run should send a trigger pulse."""
+
+        This run should send a trigger pulse.
+        """
         if self.settling:
             endpos = 9.0
         else:
             endpos = 0.0
         self.acs_prg = acsprgs.turbine_tow_prg(
-            self.U, self.tsr, self.R, endpos=endpos
+            self.U,
+            self.tsr,
+            self.R,
+            endpos=endpos,
+            turbine_type=self.turbine_type,
         )
 
     def setvecconfig(self):
@@ -140,8 +157,7 @@ class TurbineTow(QtCore.QThread):
 
         Comms should be open already with the controller.
         """
-        if acsc.getOutput(self.hc, 1, 16):
-            acsc.setOutput(self.hc, 1, 16, 0)
+        acsc.setOutput(self.hc, 1, 16, 0)
         if self.vectrino:
             acsc.enable(self.hc, 0)
             acsc.enable(self.hc, 1)
@@ -195,6 +211,8 @@ class TurbineTow(QtCore.QThread):
                 self.fbgthread.start()
             if self.odisi:
                 self.odisithread.start()
+            # Sleep so the DAQ can start listening for the trigger
+            time.sleep(1)
             self.start_motion()
         else:
             # Start motion
@@ -204,9 +222,13 @@ class TurbineTow(QtCore.QThread):
         self.acsdaqthread.start()
         nbuf = 19
         acsc.loadBuffer(self.hc, nbuf, self.acs_prg, 2048)
-        acsc.enable(self.hc, 4)
+        if not self.turbine_type != "AFT":
+            acsc.enable(self.hc, 4)
+        else:
+            acsc.enable(self.hc, 6)
         acsc.enable(self.hc, 5)
         acsc.runBuffer(self.hc, nbuf)
+        # Wait until the program is done executing
         prgstate = acsc.getProgramState(self.hc, nbuf)
         while prgstate == 3:
             time.sleep(0.3)

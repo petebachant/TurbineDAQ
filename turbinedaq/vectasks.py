@@ -12,9 +12,13 @@ import time
 
 class VectrinoThread(QtCore.QThread):
     """Thread for running Vectrino"""
+
     collecting = QtCore.pyqtSignal()
     connectsignal = QtCore.pyqtSignal(bool)
-    def __init__(self, maxvel=2.5, usetrigger=True, record=False, salinity=0.0):
+
+    def __init__(
+        self, maxvel=2.5, usetrigger=True, record=False, salinity=0.0
+    ):
         QtCore.QThread.__init__(self)
         print("Vectrino thread initialized")
         self.vec = PdControl()
@@ -101,6 +105,7 @@ class StopThread(QtCore.QThread):
 
 class ResetThread(QtCore.QThread):
     """Thread for resetting Vectrino"""
+
     def __init__(self):
         QtCore.QThread.__init__(self)
         print("Vectrino reset thread initialized")
@@ -142,6 +147,7 @@ class ResetThread(QtCore.QThread):
 
 class ConnectThread(QtCore.QThread):
     connected = QtCore.pyqtSignal()
+
     def __init__(self, vecthread):
         QtCore.QThread.__init__(self)
         self.vecthread = vecthread
