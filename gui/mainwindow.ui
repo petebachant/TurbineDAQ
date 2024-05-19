@@ -1779,6 +1779,9 @@
    </property>
   </action>
   <action name="actionViewAFT">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>AFT</string>
    </property>

@@ -763,6 +763,7 @@ class Ui_MainWindow(object):
         self.actionLF.setChecked(True)
         self.actionLF.setObjectName("actionLF")
         self.actionViewAFT = QtWidgets.QAction(MainWindow)
+        self.actionViewAFT.setCheckable(True)
         self.actionViewAFT.setObjectName("actionViewAFT")
         self.menuFile.addAction(self.actionQuit)
         self.menuHoming.addAction(self.actionHome_Tow)
