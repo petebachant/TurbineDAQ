@@ -7,9 +7,9 @@ A Python desktop app for automated turbine data acquisition in the UNH tow tank.
 ## Test plan
 
 A matrix of test parameters should be created and placed in the
-`Test plan` directory inside of an experiment directory.
+`test-plan` directory inside of an experiment directory.
 Each "section" of the experiment gets its own CSV file.
-See `test/Test plan` for an
+See `example/test-plan` for an
 example.
 The test plan, if one exists, is loaded into the GUI at startup.
 To change, it must be
@@ -18,20 +18,20 @@ edited externally and reloaded.
 ## Directory and file structure
 
 ```
-Experiment name/
-    Config/
-        Test plan/
-            Top level.csv
-            Perf-0.8.csv
-            Tare_drag.csv
+my-experiment-name/
+    config/
+        test-plan/
+            top-level.csv
+            perf-0.8.csv
+            tare-drag.csv
         fbg_properties.json
         turbine_properties.json
-    Data/
-        Processed/
-            Perf-0.8.csv
-            Tare_drag.csv
-        Raw/
-            Perf-0.8/
+    data/
+        processed/
+            perf-0.8.csv
+            tare_drag.csv
+        raw/
+            perf-0.8/
                 0/
                     metadata.json
                     acsdata.h5
@@ -46,7 +46,7 @@ Experiment name/
                     nidata.h5
                     vecdata.h5
                     vecdata.vno
-            Tare_drag/
+            tare-drag/
                 0/
                     metadata.json
                     acsdata.h5
