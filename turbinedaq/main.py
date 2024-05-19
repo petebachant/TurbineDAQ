@@ -372,6 +372,7 @@ class MainWindow(QMainWindow):
         self.checkbox_turbine_axis = QCheckBox()
         self.checkbox_y_axis = QCheckBox()
         self.checkbox_z_axis = QCheckBox()
+        self.checkbox_aft_axis = QCheckBox()
         # Tow axis checkbox widget centering
         widget_tow = QWidget()
         layout_tow = QHBoxLayout(widget_tow)
@@ -400,10 +401,19 @@ class MainWindow(QMainWindow):
         layout_z.setAlignment(QtCore.Qt.AlignCenter)
         layout_z.setContentsMargins(0, 0, 0, 0)
         widget_z.setLayout(layout_z)
+        # AFT axis checkbox widget centering
+        widget_aft = QWidget()
+        layout_aft = QHBoxLayout(widget_aft)
+        layout_aft.addWidget(self.checkbox_aft_axis)
+        layout_aft.setAlignment(QtCore.Qt.AlignCenter)
+        layout_aft.setContentsMargins(0, 0, 0, 0)
+        widget_aft.setLayout(layout_aft)
+        # Set cell widgets for all
         self.ui.tableWidget_acs.setCellWidget(0, 1, widget_tow)
         self.ui.tableWidget_acs.setCellWidget(1, 1, widget_turbine)
         self.ui.tableWidget_acs.setCellWidget(2, 1, widget_y)
         self.ui.tableWidget_acs.setCellWidget(3, 1, widget_z)
+        self.ui.tableWidget_acs.setCellWidget(4, 1, widget_aft)
 
     def connect_sigs_slots(self):
         """Connect signals to appropriate slots."""
