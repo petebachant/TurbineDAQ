@@ -179,7 +179,7 @@ class MainWindow(QMainWindow):
         self.label_AFT_1 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_1.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_1.setObjectName("label_AFT_1")
-        self.label_AFT_1.setText("AFT signal 1")  # TODO: Name properly
+        self.label_AFT_1.setText("INF4 Channel 1")
         self.verticalLayout_AFT.addWidget(self.label_AFT_1)
         self.plot_AFT_1 = CurveWidget(self.dockWidgetContents_AFT)
         self.plot_AFT_1.setOrientation(QtCore.Qt.Horizontal)
@@ -188,6 +188,7 @@ class MainWindow(QMainWindow):
         self.label_AFT_2 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_2.setObjectName("label_AFT_2")
+        self.label_AFT_2.setText("INF4 Channel 2")
         self.verticalLayout_AFT.addWidget(self.label_AFT_2)
         self.plot_AFT_2 = CurveWidget(self.dockWidgetContents_AFT)
         self.plot_AFT_2.setOrientation(QtCore.Qt.Horizontal)
@@ -196,6 +197,7 @@ class MainWindow(QMainWindow):
         self.label_AFT_3 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_3.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_3.setObjectName("label_AFT_3")
+        self.label_AFT_3.setText("INF4 Channel 3")
         self.verticalLayout_AFT.addWidget(self.label_AFT_3)
         self.plot_AFT_3 = CurveWidget(self.dockWidgetContents_AFT)
         self.plot_AFT_3.setOrientation(QtCore.Qt.Horizontal)
@@ -204,6 +206,7 @@ class MainWindow(QMainWindow):
         self.label_AFT_4 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_4.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_4.setObjectName("label_AFT_4")
+        self.label_AFT_4.setText("INF4 Channel 4")
         self.verticalLayout_AFT.addWidget(self.label_AFT_4)
         self.plot_AFT_4 = CurveWidget(self.dockWidgetContents_AFT)
         self.plot_AFT_4.setOrientation(QtCore.Qt.Horizontal)
@@ -217,9 +220,11 @@ class MainWindow(QMainWindow):
         self.plot_AFT_5.setOrientation(QtCore.Qt.Horizontal)
         self.plot_AFT_5.setObjectName("plot_AFT_5")
         self.verticalLayout_AFT.addWidget(self.plot_AFT_5)
+        # Finish and add to the central widget grid layout
         self.gridLayout_AFT.addLayout(self.verticalLayout_AFT, 0, 0, 1, 1)
         self.dockWidget_AFT.setWidget(self.dockWidgetContents_AFT)
         self.ui.gridLayout_4.addWidget(self.dockWidget_AFT, 0, 4, 6, 1)
+        # Connect signals and slots for view menu action
         self.ui.actionViewAFT.toggled.connect(self.dockWidget_AFT.setVisible)
         self.dockWidget_AFT.visibilityChanged.connect(
             self.ui.actionViewAFT.setChecked
