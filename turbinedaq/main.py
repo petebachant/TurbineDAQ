@@ -216,15 +216,6 @@ class MainWindow(QMainWindow):
         self.plot_AFT_4.setOrientation(QtCore.Qt.Horizontal)
         self.plot_AFT_4.setObjectName("plot_AFT_4")
         self.verticalLayout_AFT.addWidget(self.plot_AFT_4)
-        # Plot 5
-        self.label_AFT_5 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
-        self.label_AFT_5.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_AFT_5.setObjectName("label_AFT_5")
-        self.verticalLayout_AFT.addWidget(self.label_AFT_5)
-        self.plot_AFT_5 = CurveWidget(self.dockWidgetContents_AFT)
-        self.plot_AFT_5.setOrientation(QtCore.Qt.Horizontal)
-        self.plot_AFT_5.setObjectName("plot_AFT_5")
-        self.verticalLayout_AFT.addWidget(self.plot_AFT_5)
         # Finish and add to the central widget grid layout
         self.gridLayout_AFT.addLayout(self.verticalLayout_AFT, 0, 0, 1, 1)
         self.dockWidget_AFT.setWidget(self.dockWidgetContents_AFT)
@@ -789,11 +780,6 @@ class MainWindow(QMainWindow):
         self.curve_aft_4.setPen(QtGui.QPen(QtCore.Qt.black, 1))
         self.plot_aft_4 = self.plot_AFT_4.get_plot()
         self.plot_aft_4.add_item(self.curve_aft_4)
-        # AFT plot 5
-        self.curve_aft_5 = guiqwt.curve.CurveItem()
-        self.curve_aft_5.setPen(QtGui.QPen(QtCore.Qt.black, 1))
-        self.plot_aft_5 = self.plot_AFT_5.get_plot()
-        self.plot_aft_5.add_item(self.curve_aft_5)
 
     def on_start(self):
         """Start whatever is visible in the tab widget."""
