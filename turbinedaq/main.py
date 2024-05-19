@@ -37,69 +37,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         # Create AFT signals dock widget
-        self.dockWidget_AFT = QtWidgets.QDockWidget(self.ui.centralwidget)
-        self.dockWidget_AFT.setMinimumSize(QtCore.QSize(224, 601))
-        self.dockWidget_AFT.setFeatures(
-            QtWidgets.QDockWidget.AllDockWidgetFeatures
-        )
-        self.dockWidget_AFT.setObjectName("dockWidget_AFT")
-        self.dockWidget_AFT.setWindowTitle("AFT")
-        self.dockWidgetContents_AFT = QtWidgets.QWidget()
-        self.dockWidgetContents_AFT.setObjectName("dockWidgetContents_AFT")
-        self.gridLayout_AFT = QtWidgets.QGridLayout(
-            self.dockWidgetContents_AFT
-        )
-        self.gridLayout_AFT.setObjectName("gridLayout_AFT")
-        self.verticalLayout_AFT = QtWidgets.QVBoxLayout()
-        self.verticalLayout_AFT.setObjectName("verticalLayout_AFT")
-        self.label_AFT_1 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
-        self.label_AFT_1.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_AFT_1.setObjectName("label_AFT_1")
-        self.label_AFT_1.setText("AFT signal 1")  # TODO: Name properly
-        self.verticalLayout_AFT.addWidget(self.label_AFT_1)
-        self.plot_AFT_1 = CurveWidget(self.dockWidgetContents_AFT)
-        self.plot_AFT_1.setOrientation(QtCore.Qt.Horizontal)
-        self.plot_AFT_1.setObjectName("plot_AFT_1")
-        self.verticalLayout_AFT.addWidget(self.plot_AFT_1)
-        self.label_AFT_2 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
-        self.label_AFT_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_AFT_2.setObjectName("label_AFT_2")
-        self.verticalLayout_AFT.addWidget(self.label_AFT_2)
-        self.plot_AFT_2 = CurveWidget(self.dockWidgetContents_AFT)
-        self.plot_AFT_2.setOrientation(QtCore.Qt.Horizontal)
-        self.plot_AFT_2.setObjectName("plot_AFT_2")
-        self.verticalLayout_AFT.addWidget(self.plot_AFT_2)
-        self.label_AFT_3 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
-        self.label_AFT_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_AFT_3.setObjectName("label_AFT_3")
-        self.verticalLayout_AFT.addWidget(self.label_AFT_3)
-        self.plot_AFT_3 = CurveWidget(self.dockWidgetContents_AFT)
-        self.plot_AFT_3.setOrientation(QtCore.Qt.Horizontal)
-        self.plot_AFT_3.setObjectName("plot_AFT_3")
-        self.verticalLayout_AFT.addWidget(self.plot_AFT_3)
-        self.label_AFT_4 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
-        self.label_AFT_4.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_AFT_4.setObjectName("label_AFT_4")
-        self.verticalLayout_AFT.addWidget(self.label_AFT_4)
-        self.plot_AFT_4 = CurveWidget(self.dockWidgetContents_AFT)
-        self.plot_AFT_4.setOrientation(QtCore.Qt.Horizontal)
-        self.plot_AFT_4.setObjectName("plot_AFT_4")
-        self.verticalLayout_AFT.addWidget(self.plot_AFT_4)
-        self.label_AFT_5 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
-        self.label_AFT_5.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_AFT_5.setObjectName("label_AFT_5")
-        self.verticalLayout_AFT.addWidget(self.label_AFT_5)
-        self.plot_AFT_5 = CurveWidget(self.dockWidgetContents_AFT)
-        self.plot_AFT_5.setOrientation(QtCore.Qt.Horizontal)
-        self.plot_AFT_5.setObjectName("plot_AFT_5")
-        self.verticalLayout_AFT.addWidget(self.plot_AFT_5)
-        self.gridLayout_AFT.addLayout(self.verticalLayout_AFT, 0, 0, 1, 1)
-        self.dockWidget_AFT.setWidget(self.dockWidgetContents_AFT)
-        self.ui.gridLayout_4.addWidget(self.dockWidget_AFT, 0, 4, 6, 1)
-        self.ui.actionViewAFT.toggled.connect(self.dockWidget_AFT.setVisible)
-        self.dockWidget_AFT.visibilityChanged.connect(
-            self.ui.actionViewAFT.setChecked
-        )
+        self.create_aft_dock_widget()
 
         # Add initial items to AFT row of ACS table widget
         for n in range(1, 6):
@@ -221,6 +159,71 @@ class MainWindow(QMainWindow):
             self.ui.actionVectrino_View.setChecked(
                 self.settings["Vectrino visible"]
             )
+
+    def create_aft_dock_widget(self):
+        self.dockWidget_AFT = QtWidgets.QDockWidget(self.ui.centralwidget)
+        self.dockWidget_AFT.setMinimumSize(QtCore.QSize(224, 601))
+        self.dockWidget_AFT.setFeatures(
+            QtWidgets.QDockWidget.AllDockWidgetFeatures
+        )
+        self.dockWidget_AFT.setObjectName("dockWidget_AFT")
+        self.dockWidget_AFT.setWindowTitle("AFT")
+        self.dockWidgetContents_AFT = QtWidgets.QWidget()
+        self.dockWidgetContents_AFT.setObjectName("dockWidgetContents_AFT")
+        self.gridLayout_AFT = QtWidgets.QGridLayout(
+            self.dockWidgetContents_AFT
+        )
+        self.gridLayout_AFT.setObjectName("gridLayout_AFT")
+        self.verticalLayout_AFT = QtWidgets.QVBoxLayout()
+        self.verticalLayout_AFT.setObjectName("verticalLayout_AFT")
+        self.label_AFT_1 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
+        self.label_AFT_1.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_AFT_1.setObjectName("label_AFT_1")
+        self.label_AFT_1.setText("AFT signal 1")  # TODO: Name properly
+        self.verticalLayout_AFT.addWidget(self.label_AFT_1)
+        self.plot_AFT_1 = CurveWidget(self.dockWidgetContents_AFT)
+        self.plot_AFT_1.setOrientation(QtCore.Qt.Horizontal)
+        self.plot_AFT_1.setObjectName("plot_AFT_1")
+        self.verticalLayout_AFT.addWidget(self.plot_AFT_1)
+        self.label_AFT_2 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
+        self.label_AFT_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_AFT_2.setObjectName("label_AFT_2")
+        self.verticalLayout_AFT.addWidget(self.label_AFT_2)
+        self.plot_AFT_2 = CurveWidget(self.dockWidgetContents_AFT)
+        self.plot_AFT_2.setOrientation(QtCore.Qt.Horizontal)
+        self.plot_AFT_2.setObjectName("plot_AFT_2")
+        self.verticalLayout_AFT.addWidget(self.plot_AFT_2)
+        self.label_AFT_3 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
+        self.label_AFT_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_AFT_3.setObjectName("label_AFT_3")
+        self.verticalLayout_AFT.addWidget(self.label_AFT_3)
+        self.plot_AFT_3 = CurveWidget(self.dockWidgetContents_AFT)
+        self.plot_AFT_3.setOrientation(QtCore.Qt.Horizontal)
+        self.plot_AFT_3.setObjectName("plot_AFT_3")
+        self.verticalLayout_AFT.addWidget(self.plot_AFT_3)
+        self.label_AFT_4 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
+        self.label_AFT_4.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_AFT_4.setObjectName("label_AFT_4")
+        self.verticalLayout_AFT.addWidget(self.label_AFT_4)
+        self.plot_AFT_4 = CurveWidget(self.dockWidgetContents_AFT)
+        self.plot_AFT_4.setOrientation(QtCore.Qt.Horizontal)
+        self.plot_AFT_4.setObjectName("plot_AFT_4")
+        self.verticalLayout_AFT.addWidget(self.plot_AFT_4)
+        self.label_AFT_5 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
+        self.label_AFT_5.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_AFT_5.setObjectName("label_AFT_5")
+        self.verticalLayout_AFT.addWidget(self.label_AFT_5)
+        self.plot_AFT_5 = CurveWidget(self.dockWidgetContents_AFT)
+        self.plot_AFT_5.setOrientation(QtCore.Qt.Horizontal)
+        self.plot_AFT_5.setObjectName("plot_AFT_5")
+        self.verticalLayout_AFT.addWidget(self.plot_AFT_5)
+        self.gridLayout_AFT.addLayout(self.verticalLayout_AFT, 0, 0, 1, 1)
+        self.dockWidget_AFT.setWidget(self.dockWidgetContents_AFT)
+        self.ui.gridLayout_4.addWidget(self.dockWidget_AFT, 0, 4, 6, 1)
+        self.ui.actionViewAFT.toggled.connect(self.dockWidget_AFT.setVisible)
+        self.dockWidget_AFT.visibilityChanged.connect(
+            self.ui.actionViewAFT.setChecked
+        )
 
     @property
     def settings_fpath(self) -> str:
