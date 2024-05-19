@@ -1419,12 +1419,16 @@
     <addaction name="actionLF"/>
     <addaction name="actionViewAFT"/>
    </widget>
-   <widget class="QMenu" name="menuSetings">
+   <widget class="QMenu" name="menuSettings">
     <property name="title">
      <string>Settings</string>
     </property>
-    <addaction name="actionVectrino"/>
-    <addaction name="actionTurbine_Characteristics"/>
+    <widget class="QMenu" name="menuMode">
+     <property name="title">
+      <string>Mode</string>
+     </property>
+    </widget>
+    <addaction name="menuMode"/>
    </widget>
    <widget class="QMenu" name="menuTest_Plan">
     <property name="title">
@@ -1440,7 +1444,7 @@
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
-   <addaction name="menuSetings"/>
+   <addaction name="menuSettings"/>
    <addaction name="menuHoming"/>
    <addaction name="menuTest_Plan"/>
    <addaction name="menuHelp"/>

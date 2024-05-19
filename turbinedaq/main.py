@@ -106,6 +106,25 @@ class MainWindow(QMainWindow):
             item.setTextAlignment(QtCore.Qt.AlignCenter)
             self.ui.tableWidget_acs.setItem(4, n, item)
 
+        # Add action group for determining the mode
+        self.turbine_mode_action_group = QtWidgets.QActionGroup(
+            self.ui.menuMode
+        )
+        self.turbine_mode_action_group.setExclusive(True)
+        self.action_cft_mode = QtWidgets.QAction(
+            "CFT", self.ui.menuMode, checkable=True, checked=True
+        )
+        self.action_aft_mode = QtWidgets.QAction(
+            "AFT", self.ui.menuMode, checkable=True, checked=False
+        )
+        self.ui.menuMode.addAction(self.action_cft_mode)
+        self.ui.menuMode.addAction(self.action_aft_mode)
+        self.turbine_mode_action_group.addAction(self.action_cft_mode)
+        self.turbine_mode_action_group.addAction(self.action_aft_mode)
+        self.turbine_mode_action_group.triggered.connect(
+            self.on_turbine_mode_change
+        )
+
         # Create time vector
         self.t = np.array([])
         self.time_last_run = time.time()
@@ -326,13 +345,6 @@ class MainWindow(QMainWindow):
             print("ODiSI properties loaded")
         except IOError:
             self.odisi_properties = {}
-
-    @property
-    def aft_mode(self) -> bool:
-        """Determine if we are in AFT mode.
-
-        If we're running a turbine tow
-        """
 
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
@@ -604,6 +616,11 @@ class MainWindow(QMainWindow):
             self.ui.actionStart.setEnabled(True)
         if section in self.test_plan:
             self.test_plan_into_table()
+
+    def on_turbine_mode_change(self, action):
+        """Respond to a change in turbine mode."""
+        value = action.text()
+        print("Mode action group value:", value)
 
     def add_labels_to_statusbar(self):
         self.label_acs_connect = QLabel()
