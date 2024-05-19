@@ -317,7 +317,7 @@ class MainWindow(QMainWindow):
         self.turbine_properties = {
             "RVAT": {"kind": "CFT", "radius": 0.5, "height": 1.0},
             "RM2": {"kind": "CFT", "diameter": 1.075, "height": 0.807},
-            "AFT": {"kind": "AFT", "diameter": 1.0},
+            "AFT": {"kind": "AFT", "diameter": 1.0, "height": 1.0},
         }
         fpath = os.path.join(self.wdir, "Config", "turbine_properties.json")
         try:
