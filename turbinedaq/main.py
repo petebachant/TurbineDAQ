@@ -1280,9 +1280,12 @@ class MainWindow(QMainWindow):
 
     def on_monitor_acs(self):
         if self.ui.actionMonitor_ACS.isChecked():
-            self.acsthread = daqtasks.AcsDaqThread(
-                self.hc, makeprg=True, sample_rate=1000, bufflen=100
-            )
+            if self.mode == "CFT":
+                self.acsthread = daqtasks.AcsDaqThread(self.hc, makeprg=True)
+            else:
+                self.acsthread = daqtasks.AftAcsDaqThread(
+                    self.hc, makeprg=True
+                )
             self.acsdata = self.acsthread.data
             self.acsthread.start()
             self.monitoracs = True
@@ -1292,7 +1295,10 @@ class MainWindow(QMainWindow):
 
     def on_monitor_ni(self):
         if self.ui.actionMonitor_NI.isChecked():
-            self.daqthread = daqtasks.NiDaqThread(usetrigger=False)
+            if self.mode == "CFT":
+                self.daqthread = daqtasks.NiDaqThread(usetrigger=False)
+            else:
+                self.daqthread = daqtasks.AftNiDaqThread(usetrigger=False)
             self.nidata = self.daqthread.data
             self.daqthread.start()
             self.monitorni = True
