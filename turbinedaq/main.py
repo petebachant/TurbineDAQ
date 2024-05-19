@@ -1486,8 +1486,13 @@ class MainWindow(QMainWindow):
 
     def upate_plots_aft(self):
         """Update AFT plots."""
-        # TODO: Take data from self.nidata and self.acsdata and put into plots
-        pass
+        t = self.acsdata["time"]
+        for channel in [1, 2, 3, 4]:
+            curve = getattr(self, f"curve_aft_{channel}")
+            plot = getattr(self, f"plot_aft_{channel}")
+            data = self.acsdata[f"load_cell_ch{channel}"]
+            curve.set_data(t, data)
+            plot.replot()
 
     def update_acs(self):
         """Update all the non-time-critical ACS controller data."""
