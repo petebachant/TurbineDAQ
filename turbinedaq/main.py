@@ -176,6 +176,7 @@ class MainWindow(QMainWindow):
         self.gridLayout_AFT.setObjectName("gridLayout_AFT")
         self.verticalLayout_AFT = QtWidgets.QVBoxLayout()
         self.verticalLayout_AFT.setObjectName("verticalLayout_AFT")
+        # Plot 1
         self.label_AFT_1 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_1.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_1.setObjectName("label_AFT_1")
@@ -185,6 +186,7 @@ class MainWindow(QMainWindow):
         self.plot_AFT_1.setOrientation(QtCore.Qt.Horizontal)
         self.plot_AFT_1.setObjectName("plot_AFT_1")
         self.verticalLayout_AFT.addWidget(self.plot_AFT_1)
+        # Plot 2
         self.label_AFT_2 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_2.setObjectName("label_AFT_2")
@@ -194,6 +196,7 @@ class MainWindow(QMainWindow):
         self.plot_AFT_2.setOrientation(QtCore.Qt.Horizontal)
         self.plot_AFT_2.setObjectName("plot_AFT_2")
         self.verticalLayout_AFT.addWidget(self.plot_AFT_2)
+        # Plot 3
         self.label_AFT_3 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_3.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_3.setObjectName("label_AFT_3")
@@ -203,6 +206,7 @@ class MainWindow(QMainWindow):
         self.plot_AFT_3.setOrientation(QtCore.Qt.Horizontal)
         self.plot_AFT_3.setObjectName("plot_AFT_3")
         self.verticalLayout_AFT.addWidget(self.plot_AFT_3)
+        # Plot 4
         self.label_AFT_4 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_4.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_4.setObjectName("label_AFT_4")
@@ -212,6 +216,7 @@ class MainWindow(QMainWindow):
         self.plot_AFT_4.setOrientation(QtCore.Qt.Horizontal)
         self.plot_AFT_4.setObjectName("plot_AFT_4")
         self.verticalLayout_AFT.addWidget(self.plot_AFT_4)
+        # Plot 5
         self.label_AFT_5 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_5.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_5.setObjectName("label_AFT_5")
