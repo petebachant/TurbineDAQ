@@ -9,6 +9,7 @@ import subprocess
 import time
 
 import guiqwt
+import guiqwt.curve
 import numpy as np
 import pandas as pd
 import scipy.interpolate
@@ -696,6 +697,32 @@ class MainWindow(QMainWindow):
         self.curve_LF_right = guiqwt.curve.CurveItem()
         self.curve_LF_right.setPen(QtGui.QPen(QtCore.Qt.red, 1))
         self.plot_LF.add_item(self.curve_LF_right)
+        # AFT plots
+        # AFT plot 1
+        self.curve_aft_1 = guiqwt.curve.CurveItem()
+        self.curve_aft_1.setPen(QtGui.QPen(QtCore.Qt.black, 1))
+        self.plot_aft_1 = self.plot_AFT_1.get_plot()
+        self.plot_aft_1.add_item(self.curve_aft_1)
+        # AFT plot 2
+        self.curve_aft_2 = guiqwt.curve.CurveItem()
+        self.curve_aft_2.setPen(QtGui.QPen(QtCore.Qt.black, 1))
+        self.plot_aft_2 = self.plot_AFT_2.get_plot()
+        self.plot_aft_2.add_item(self.curve_aft_2)
+        # AFT pLot 3
+        self.curve_aft_3 = guiqwt.curve.CurveItem()
+        self.curve_aft_3.setPen(QtGui.QPen(QtCore.Qt.black, 1))
+        self.plot_aft_3 = self.plot_AFT_3.get_plot()
+        self.plot_aft_3.add_item(self.curve_aft_3)
+        # AFT plot 4
+        self.curve_aft_4 = guiqwt.curve.CurveItem()
+        self.curve_aft_4.setPen(QtGui.QPen(QtCore.Qt.black, 1))
+        self.plot_aft_4 = self.plot_AFT_4.get_plot()
+        self.plot_aft_4.add_item(self.curve_aft_4)
+        # AFT plot 5
+        self.curve_aft_5 = guiqwt.curve.CurveItem()
+        self.curve_aft_5.setPen(QtGui.QPen(QtCore.Qt.black, 1))
+        self.plot_aft_5 = self.plot_AFT_5.get_plot()
+        self.plot_aft_5.add_item(self.curve_aft_5)
 
     def on_start(self):
         """Start whatever is visible in the tab widget."""
