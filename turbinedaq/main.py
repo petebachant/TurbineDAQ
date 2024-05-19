@@ -313,7 +313,7 @@ class MainWindow(QMainWindow):
             self.action_aft_mode.setChecked(True)
 
     def read_turbine_properties(self):
-        """Reads turbine properties from `Config/turbine_properties.json` in
+        """Reads turbine properties from `config/turbine_properties.json` in
         the experiment's working directory.
 
         TODO: Make this more explicitly required to handle the AFT.
@@ -323,7 +323,7 @@ class MainWindow(QMainWindow):
             "RM2": {"kind": "CFT", "diameter": 1.075, "height": 0.807},
             "AFT": {"kind": "AFT", "diameter": 1.0, "height": 1.0},
         }
-        fpath = os.path.join(self.wdir, "Config", "turbine_properties.json")
+        fpath = os.path.join(self.wdir, "config", "turbine_properties.json")
         try:
             with open(fpath) as f:
                 new = json.load(f)
@@ -343,7 +343,7 @@ class MainWindow(QMainWindow):
                 )
 
     def read_vectrino_properties(self):
-        fpath = os.path.join(self.wdir, "Config", "vectrino_properties.json")
+        fpath = os.path.join(self.wdir, "config", "vectrino_properties.json")
         try:
             with open(fpath) as f:
                 vecprops = json.load(f)
@@ -353,7 +353,7 @@ class MainWindow(QMainWindow):
             self.vec_salinity = 0.0
 
     def read_fbg_properties(self):
-        fpath = os.path.join(self.wdir, "Config", "fbg_properties.json")
+        fpath = os.path.join(self.wdir, "config", "fbg_properties.json")
         try:
             with open(fpath) as f:
                 self.fbg_properties = json.load(f)
@@ -362,7 +362,7 @@ class MainWindow(QMainWindow):
             self.fbg_properties = {}
 
     def read_odisi_properties(self):
-        fpath = os.path.join(self.wdir, "Config", "odisi_properties.json")
+        fpath = os.path.join(self.wdir, "config", "odisi_properties.json")
         try:
             with open(fpath) as f:
                 self.odisi_properties = json.load(f)
@@ -372,7 +372,7 @@ class MainWindow(QMainWindow):
 
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
-        runpath = os.path.join(self.wdir, "Data", "Raw", section, str(number))
+        runpath = os.path.join(self.wdir, "data", "raw", section, str(number))
         if os.path.isdir(runpath) and "metadata.json" in os.listdir(runpath):
             return True
         else:
@@ -387,8 +387,14 @@ class MainWindow(QMainWindow):
         return done
 
     def load_test_plan(self):
-        """Load test plan from CSVs in "Test plan" subdirectory."""
-        tpdir = os.path.join(self.wdir, "Config", "Test plan")
+        """Load test plan from CSVs in the 'Test plan' or 'test-plan'
+        subdirectory.
+        """
+        tpdir = os.path.join(self.wdir, "config", "test-plan")
+        tpdir_legacy = os.path.join(self.wdir, "config", "test plan")
+        if not os.path.isdir(tpdir) and os.path.isdir(tpdir_legacy):
+            print("Using legacy test plan directory")
+            tpdir = tpdir_legacy
         self.test_plan_loaded = False
         self.test_plan = {}
         self.test_plan_sections = []
@@ -592,7 +598,7 @@ class MainWindow(QMainWindow):
         else:
             self.ui.actionStart.setEnabled(True)
         if tabitem == "Processing":
-            savedir = os.path.join(self.wdir, "Data", "Raw", "Shakedown")
+            savedir = os.path.join(self.wdir, "data", "raw", "shakedown")
             if os.path.isdir(savedir):
                 runsdone = sorted([int(n) for n in os.listdir(savedir)])
                 runsdone = [str(n) for n in runsdone]
@@ -616,7 +622,7 @@ class MainWindow(QMainWindow):
 
     def on_open_section_folder(self):
         section = str(self.ui.comboBox_testPlanSection.currentText())
-        subdir = os.path.join(self.wdir, "Data", "Raw", section)
+        subdir = os.path.join(self.wdir, "data", "raw", section)
         try:
             os.startfile(subdir)
         except WindowsError:
@@ -624,7 +630,7 @@ class MainWindow(QMainWindow):
             os.startfile(subdir)
 
     def on_open_shakedown(self):
-        subdir = os.path.join(self.wdir, "Data", "Raw", "Shakedown")
+        subdir = os.path.join(self.wdir, "data", "raw", "shakedown")
         try:
             os.startfile(subdir)
         except WindowsError:
@@ -888,7 +894,7 @@ class MainWindow(QMainWindow):
         vectrino = self.ui.checkBox_singleRunVectrino.isChecked()
         fbg = self.ui.checkBox_singleRunFBG.isChecked()
         odisi = self.ui.checkBox_singleRunODiSI.isChecked()
-        self.savedir = os.path.join(self.wdir, "Data", "Raw", "Shakedown")
+        self.savedir = os.path.join(self.wdir, "data", "raw", "shakedown")
         if not os.path.isdir(self.savedir):
             os.makedirs(self.savedir)
         runsdone = os.listdir(self.savedir)
@@ -928,7 +934,7 @@ class MainWindow(QMainWindow):
                     )
                     break
             print("Starting run", str(nextrun))
-            self.savedir = os.path.join(self.wdir, "Data", "Raw", section)
+            self.savedir = os.path.join(self.wdir, "data", "raw", section)
             self.currentrun = nextrun
             self.currentname = section + " run " + str(nextrun)
             self.label_runstatus.setText(self.currentname + " in progress ")
@@ -1246,7 +1252,7 @@ class MainWindow(QMainWindow):
                 else:
                     tow_speed = self.turbinetow.U
                     stpath = os.path.join(
-                        self.wdir, "Config", "settling_times.csv"
+                        self.wdir, "config", "settling_times.csv"
                     )
                     stdf = pd.read_csv(stpath)
                     f_interp = scipy.interpolate.interp1d(
