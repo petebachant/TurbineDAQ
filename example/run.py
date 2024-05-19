@@ -2,7 +2,7 @@
 """
 
 import argparse
-import Modules
+import py_package
 
 parser = argparse.ArgumentParser()
 parser.add_argument(

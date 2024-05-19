@@ -1225,7 +1225,7 @@ class MainWindow(QMainWindow):
                 nrun = str(self.currentrun)
                 print("Autoprocessing", section, "run", nrun)
                 pycmd = (
-                    "from Modules import processing; "
+                    "from py_package import processing; "
                     + "print(processing.process_run('{}',{}))".format(
                         section, nrun
                     )
