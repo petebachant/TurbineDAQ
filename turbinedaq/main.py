@@ -1318,6 +1318,8 @@ class MainWindow(QMainWindow):
     def update_acs(self):
         """This function updates all the non-time-critical
         ACS controller data"""
+        if self.hc is None:
+            return
         self.checkbox_y_axis.setChecked(
             acsc.getMotorState(self.hc, 0)["enabled"]
         )
