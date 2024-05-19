@@ -1416,6 +1416,7 @@
     <addaction name="actionFBG"/>
     <addaction name="actionODiSI"/>
     <addaction name="actionLF"/>
+    <addaction name="actionAFT"/>
    </widget>
    <widget class="QMenu" name="menuSetings">
     <property name="title">
@@ -1773,13 +1774,13 @@
    <property name="checked">
     <bool>true</bool>
    </property>
-   <property name="icon">
-    <iconset>
-     <normalon>:/icons/loadcell.png</normalon>
-    </iconset>
-   </property>
    <property name="text">
     <string>Lateral Forces</string>
+   </property>
+  </action>
+  <action name="actionAFT">
+   <property name="text">
+    <string>AFT</string>
    </property>
   </action>
  </widget>
