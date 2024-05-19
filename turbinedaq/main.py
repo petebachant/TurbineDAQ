@@ -327,6 +327,13 @@ class MainWindow(QMainWindow):
         except IOError:
             self.odisi_properties = {}
 
+    @property
+    def aft_mode(self) -> bool:
+        """Determine if we are in AFT mode.
+
+        If we're running a turbine tow
+        """
+
     def is_run_done(self, section, number):
         """Look as subfolders to determine progress of experiment."""
         runpath = os.path.join(self.wdir, "Data", "Raw", section, str(number))
@@ -620,7 +627,7 @@ class MainWindow(QMainWindow):
             print("Attempting to connect to simulator")
             self.hc = acsc.open_comm_simulator()
             ntm = "simulated"
-        txt = f" ACS NTM controller: NTM: {ntm} "
+        txt = f" ACS NTM controller: {ntm} "
         self.label_acs_connect.setText(txt)
 
     def initialize_plots(self):
