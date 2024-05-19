@@ -95,29 +95,29 @@ class NiDaqThread(QtCore.QThread):
             self.chaninfo[channame]["Scale slope"] = daqmx.GetScaleLinSlope(
                 scale
             )
-            self.chaninfo[channame][
-                "Scale y-intercept"
-            ] = daqmx.GetScaleLinYIntercept(scale)
-            self.chaninfo[channame][
-                "Scaled units"
-            ] = daqmx.GetScaleScaledUnits(scale)
-            self.chaninfo[channame][
-                "Prescaled units"
-            ] = daqmx.GetScalePreScaledUnits(scale)
+            self.chaninfo[channame]["Scale y-intercept"] = (
+                daqmx.GetScaleLinYIntercept(scale)
+            )
+            self.chaninfo[channame]["Scaled units"] = (
+                daqmx.GetScaleScaledUnits(scale)
+            )
+            self.chaninfo[channame]["Prescaled units"] = (
+                daqmx.GetScalePreScaledUnits(scale)
+            )
         self.chaninfo[self.turbangchan] = {}
-        self.chaninfo[self.turbangchan][
-            "Pulses per rev"
-        ] = daqmx.GetCIAngEncoderPulsesPerRev(
-            self.turbangtask._handle, self.turbangchan
+        self.chaninfo[self.turbangchan]["Pulses per rev"] = (
+            daqmx.GetCIAngEncoderPulsesPerRev(
+                self.turbangtask._handle, self.turbangchan
+            )
         )
         self.chaninfo[self.turbangchan]["Units"] = daqmx.GetCIAngEncoderUnits(
             self.turbangtask._handle, self.turbangchan
         )
         self.chaninfo[self.carposchan] = {}
-        self.chaninfo[self.carposchan][
-            "Distance per pulse"
-        ] = daqmx.GetCILinEncoderDisPerPulse(
-            self.carpostask._handle, self.carposchan
+        self.chaninfo[self.carposchan]["Distance per pulse"] = (
+            daqmx.GetCILinEncoderDisPerPulse(
+                self.carpostask._handle, self.carposchan
+            )
         )
         self.chaninfo[self.carposchan]["Units"] = daqmx.GetCILinEncoderUnits(
             self.carpostask._handle, self.carposchan
@@ -624,20 +624,20 @@ class AftNiDaqThread(QtCore.QThread):
             self.chaninfo[channame]["Scale slope"] = daqmx.GetScaleLinSlope(
                 scale
             )
-            self.chaninfo[channame][
-                "Scale y-intercept"
-            ] = daqmx.GetScaleLinYIntercept(scale)
-            self.chaninfo[channame][
-                "Scaled units"
-            ] = daqmx.GetScaleScaledUnits(scale)
-            self.chaninfo[channame][
-                "Prescaled units"
-            ] = daqmx.GetScalePreScaledUnits(scale)
+            self.chaninfo[channame]["Scale y-intercept"] = (
+                daqmx.GetScaleLinYIntercept(scale)
+            )
+            self.chaninfo[channame]["Scaled units"] = (
+                daqmx.GetScaleScaledUnits(scale)
+            )
+            self.chaninfo[channame]["Prescaled units"] = (
+                daqmx.GetScalePreScaledUnits(scale)
+            )
         self.chaninfo[self.carposchan] = {}
-        self.chaninfo[self.carposchan][
-            "Distance per pulse"
-        ] = daqmx.GetCILinEncoderDisPerPulse(
-            self.carpostask._handle, self.carposchan
+        self.chaninfo[self.carposchan]["Distance per pulse"] = (
+            daqmx.GetCILinEncoderDisPerPulse(
+                self.carpostask._handle, self.carposchan
+            )
         )
         self.chaninfo[self.carposchan]["Units"] = daqmx.GetCILinEncoderUnits(
             self.carpostask._handle, self.carposchan

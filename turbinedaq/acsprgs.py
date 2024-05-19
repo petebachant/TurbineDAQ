@@ -112,7 +112,12 @@ STOP
 
 
 def turbine_tow_prg(
-    tow_speed, tsr, turbine_radius, endpos=0.0, prgdir="./acsprgs", turbine_type="CFT",
+    tow_speed,
+    tsr,
+    turbine_radius,
+    endpos=0.0,
+    prgdir="./acsprgs",
+    turbine_type="CFT",
 ):
     """This function builds an ACSPL+ program for turbine towing."""
     if turbine_type == "CFT":
