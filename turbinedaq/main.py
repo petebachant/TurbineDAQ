@@ -54,6 +54,7 @@ class MainWindow(QMainWindow):
         self.label_AFT_1 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_1.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_1.setObjectName("label_AFT_1")
+        self.label_AFT_1.setText("AFT signal 1")  # TODO: Name properly
         self.verticalLayout_AFT.addWidget(self.label_AFT_1)
         self.plot_AFT_1 = CurveWidget(self.dockWidgetContents_AFT)
         self.plot_AFT_1.setOrientation(QtCore.Qt.Horizontal)
@@ -98,6 +99,12 @@ class MainWindow(QMainWindow):
         self.dockWidget_AFT.visibilityChanged.connect(
             self.ui.actionViewAFT.setChecked
         )
+
+        # Add initial items to AFT row of ACS table widget
+        for n in range(1, 6):
+            item = QtWidgets.QTableWidgetItem()
+            item.setTextAlignment(QtCore.Qt.AlignCenter)
+            self.ui.tableWidget_acs.setItem(4, n, item)
 
         # Create time vector
         self.t = np.array([])
@@ -1416,9 +1423,13 @@ class MainWindow(QMainWindow):
     #     self.curve_odisi.set_data(t, self.odisidata[odisi.name + "_strain"])
     #     self.plot_odisi.replot()
 
+    def upate_plots_aft(self):
+        """Update AFT plots."""
+        # TODO: Take data from self.nidata and self.acsdata and put into plots
+        pass
+
     def update_acs(self):
-        """This function updates all the non-time-critical
-        ACS controller data"""
+        """Update all the non-time-critical ACS controller data."""
         if self.hc is None:
             return
         self.checkbox_y_axis.setChecked(
@@ -1432,6 +1443,9 @@ class MainWindow(QMainWindow):
         )
         self.checkbox_tow_axis.setChecked(
             acsc.getMotorState(self.hc, 5)["enabled"]
+        )
+        self.checkbox_aft_axis.setChecked(
+            acsc.getMotorState(self.hc, 6)["enabled"]
         )
         # Put this data into table widget
         try:
@@ -1452,10 +1466,15 @@ class MainWindow(QMainWindow):
             hc_z = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_z")
         except acsc.AcscError:
             hc_z = 0
+        try:
+            hc_aft = acsc.readInteger(self.hc, acsc.NONE, "homeCounter_AFT")
+        except acsc.AcscError:
+            hc_aft = 0
         self.ui.tableWidget_acs.item(0, 2).setText(str(hc_tow))
         self.ui.tableWidget_acs.item(1, 2).setText(str(hc_turbine))
         self.ui.tableWidget_acs.item(2, 2).setText(str(hc_y))
         self.ui.tableWidget_acs.item(3, 2).setText(str(hc_z))
+        self.ui.tableWidget_acs.item(4, 2).setText(str(hc_aft))
         # Set reference position text
         self.ui.tableWidget_acs.item(0, 3).setText(
             str(acsc.getRPosition(self.hc, 5))
@@ -1468,6 +1487,9 @@ class MainWindow(QMainWindow):
         )
         self.ui.tableWidget_acs.item(3, 3).setText(
             str(acsc.getRPosition(self.hc, 1))
+        )
+        self.ui.tableWidget_acs.item(4, 3).setText(
+            str(acsc.getRPosition(self.hc, 6))
         )
         # Set feedback position text
         self.ui.tableWidget_acs.item(0, 4).setText(
@@ -1482,6 +1504,9 @@ class MainWindow(QMainWindow):
         self.ui.tableWidget_acs.item(3, 4).setText(
             str(acsc.getFPosition(self.hc, 1))
         )
+        self.ui.tableWidget_acs.item(4, 4).setText(
+            str(acsc.getFPosition(self.hc, 6))
+        )
         # Set feedback velocity text
         self.ui.tableWidget_acs.item(0, 5).setText(
             str(acsc.getFVelocity(self.hc, 5))
@@ -1494,6 +1519,9 @@ class MainWindow(QMainWindow):
         )
         self.ui.tableWidget_acs.item(3, 5).setText(
             str(acsc.getFVelocity(self.hc, 1))
+        )
+        self.ui.tableWidget_acs.item(4, 5).setText(
+            str(acsc.getFVelocity(self.hc, 6))
         )
 
     def save_raw_data(self, savedir, fname, datadict, verbose=True):
