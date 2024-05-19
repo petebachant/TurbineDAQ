@@ -1,10 +1,12 @@
 """DAQ tasks."""
 
-import ctypes
 import time
 import warnings
 
-import daqmx
+try:
+    import daqmx
+except Exception as e:
+    warnings.warn(f"Could not import daqmx: {e}")
 import micronopt
 import nidaqmx
 import numpy as np
@@ -13,7 +15,6 @@ from acspy.acsc import AcscError
 from nidaqmx.stream_readers import (
     AnalogMultiChannelReader,
     CounterReader,
-    DigitalSingleChannelReader,
 )
 from nidaqmx.system.storage.persisted_channel import (
     PersistedChannel as GlobalVirtualChannel,
