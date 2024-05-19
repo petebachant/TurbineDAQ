@@ -762,8 +762,8 @@ class Ui_MainWindow(object):
         self.actionLF.setCheckable(True)
         self.actionLF.setChecked(True)
         self.actionLF.setObjectName("actionLF")
-        self.actionAFT = QtWidgets.QAction(MainWindow)
-        self.actionAFT.setObjectName("actionAFT")
+        self.actionViewAFT = QtWidgets.QAction(MainWindow)
+        self.actionViewAFT.setObjectName("actionViewAFT")
         self.menuFile.addAction(self.actionQuit)
         self.menuHoming.addAction(self.actionHome_Tow)
         self.menuHoming.addAction(self.actionHome_Turbine)
@@ -774,7 +774,7 @@ class Ui_MainWindow(object):
         self.menuView.addAction(self.actionFBG)
         self.menuView.addAction(self.actionODiSI)
         self.menuView.addAction(self.actionLF)
-        self.menuView.addAction(self.actionAFT)
+        self.menuView.addAction(self.actionViewAFT)
         self.menuSetings.addAction(self.actionVectrino)
         self.menuSetings.addAction(self.actionTurbine_Characteristics)
         self.menuTest_Plan.addAction(self.actionImportTestPlan)
@@ -951,6 +951,6 @@ class Ui_MainWindow(object):
         self.actionMonitor_LF.setText(_translate("MainWindow", "Monitor LF"))
         self.actionMonitor_LF.setToolTip(_translate("MainWindow", "Monitor lateral force signals..."))
         self.actionLF.setText(_translate("MainWindow", "Lateral Forces"))
-        self.actionAFT.setText(_translate("MainWindow", "AFT"))
+        self.actionViewAFT.setText(_translate("MainWindow", "AFT"))
 from guiqwt.plot import CurveWidget
 from . import resources_rc

@@ -1416,7 +1416,7 @@
     <addaction name="actionFBG"/>
     <addaction name="actionODiSI"/>
     <addaction name="actionLF"/>
-    <addaction name="actionAFT"/>
+    <addaction name="actionViewAFT"/>
    </widget>
    <widget class="QMenu" name="menuSetings">
     <property name="title">
@@ -1778,7 +1778,7 @@
     <string>Lateral Forces</string>
    </property>
   </action>
-  <action name="actionAFT">
+  <action name="actionViewAFT">
    <property name="text">
     <string>AFT</string>
    </property>
