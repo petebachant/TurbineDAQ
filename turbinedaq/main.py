@@ -159,6 +159,14 @@ class MainWindow(QMainWindow):
             self.ui.actionVectrino_View.setChecked(
                 self.settings["Vectrino visible"]
             )
+        # Remember NI-DAQ dock widget visibility from last session
+        if "NI visible" in self.settings:
+            self.ui.dockWidgetNISignals.setVisible(self.settings["NI visible"])
+            self.ui.actionNI_Signals.setChecked(self.settings["NI visible"])
+        # Remember AFT dock widget visibility from last session
+        if "AFT visible" in self.settings:
+            self.dockWidget_AFT.setVisible(self.settings["AFT visible"])
+            self.ui.actionViewAFT.setChecked(self.settings["AFT visible"])
 
     def create_aft_dock_widget(self):
         self.dockWidget_AFT = QtWidgets.QDockWidget(self.ui.centralwidget)
@@ -1620,8 +1628,10 @@ class MainWindow(QMainWindow):
             self.size().height(),
             self.size().width(),
         )
+        self.settings["NI visible"] = self.ui.dockWidgetNISignals.isVisible()
         self.settings["FBG visible"] = self.ui.dockWidget_FBG.isVisible()
         self.settings["ODiSI visible"] = self.ui.dockWidget_ODiSI.isVisible()
+        self.settings["AFT visible"] = self.dockWidget_AFT.isVisible()
         self.settings["Lateral forces visible"] = (
             self.ui.dockWidget_LF.isVisible()
         )
