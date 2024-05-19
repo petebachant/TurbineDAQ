@@ -496,7 +496,7 @@ class MainWindow(QMainWindow):
         self.ui.actionMonitor_Vectrino.triggered.connect(self.on_monitor_vec)
         self.ui.actionMonitor_NI.triggered.connect(self.on_monitor_ni)
         self.ui.actionMonitor_FBG.triggered.connect(self.on_monitor_fbg)
-        self.ui.actionMonitor_ODiSI.triggered.connect(self.on_monitor_ODiSI)
+        self.ui.actionMonitor_ODiSI.triggered.connect(self.on_monitor_odisi)
         self.ui.actionMonitor_LF.triggered.connect(self.on_monitor_ni)
         self.ui.actionStart.triggered.connect(self.on_start)
         self.ui.actionAbort.triggered.connect(self.on_abort)
@@ -1283,7 +1283,7 @@ class MainWindow(QMainWindow):
             self.fbgthread.stop()
             self.monitorfbg = False
 
-    def on_monitor_ODiSI(self):
+    def on_monitor_odisi(self):
         if self.ui.actionMonitor_ODiSI.isChecked():
             odisi_props = self.odisi_properties
             self.odisithread = daqtasks.ODiSIDaqThread(odisi_props)
