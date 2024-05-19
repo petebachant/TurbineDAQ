@@ -7,6 +7,7 @@ import platform
 import shutil
 import subprocess
 import time
+from typing import Literal
 
 import guiqwt
 import guiqwt.curve
@@ -287,6 +288,25 @@ class MainWindow(QMainWindow):
         if "Shakedown lateral forces" in self.settings:
             val = self.settings["Shakedown lateral forces"]
             self.ui.checkBox_singleRunLF.setChecked(val)
+        if "Mode" in self.settings:
+            self.mode = self.settings["Mode"]
+
+    @property
+    def mode(self) -> Literal["CFT", "AFT"]:
+        aft_checked = self.action_aft_mode.isChecked()
+        cft_checked = self.action_cft_mode.isChecked()
+        assert int(aft_checked) + int(cft_checked) == 1
+        if aft_checked:
+            return "AFT"
+        elif cft_checked:
+            return "CFT"
+
+    @mode.setter
+    def mode(self, val: Literal["CFT", "AFT"]):
+        if val == "CFT":
+            self.action_cft_mode.setChecked(True)
+        elif val == "AFT":
+            self.action_aft_mode.setChecked(True)
 
     def read_turbine_properties(self):
         """Reads turbine properties from `Config/turbine_properties.json` in
@@ -619,8 +639,10 @@ class MainWindow(QMainWindow):
 
     def on_turbine_mode_change(self, action):
         """Respond to a change in turbine mode."""
-        value = action.text()
-        print("Mode action group value:", value)
+        mode = action.text()
+        print("Activating", mode, "mode")
+        # TODO: More here if necessary, e.g., updating the EtherCAT
+        # configuration in the controller
 
     def add_labels_to_statusbar(self):
         self.label_acs_connect = QLabel()
@@ -1619,6 +1641,7 @@ class MainWindow(QMainWindow):
         self.settings["Shakedown FBG"] = (
             self.ui.checkBox_singleRunFBG.isChecked()
         )
+        self.settings["Mode"] = self.mode
         settings_dir = os.path.dirname(self.settings_fpath)
         print("Saving settings:", self.settings)
         if not os.path.isdir(settings_dir):
