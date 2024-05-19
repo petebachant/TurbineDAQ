@@ -1462,6 +1462,7 @@ class MainWindow(QMainWindow):
         with open(self.settings_fpath, "w") as fn:
             json.dump(self.settings, fn, indent=4, default=str)
         acsc.closeComm(self.hc)
+        self.hc = None
         if self.monitorni and not self.run_in_progress:
             self.daqthread.clear()
         if self.monitorvec and not self.run_in_progress:
