@@ -525,6 +525,7 @@ class MainWindow(QMainWindow):
         )
         self.checkbox_y_axis.clicked.connect(self.on_checkbox_y_axis)
         self.checkbox_z_axis.clicked.connect(self.on_checkbox_z_axis)
+        self.checkbox_aft_axis.clicked.connect(self.on_checkbox_aft_axis)
 
     def on_tbutton_wdir(self):
         self.wdir = QFileDialog.getExistingDirectory()
@@ -1312,6 +1313,12 @@ class MainWindow(QMainWindow):
             acsc.enable(self.hc, 1)
         else:
             acsc.disable(self.hc, 1)
+
+    def on_checkbox_aft_axis(self):
+        if self.checkbox_aft_axis.isChecked():
+            acsc.enable(self.hc, 6)
+        else:
+            acsc.disable(self.hc, 6)
 
     def on_timer(self):
         self.update_acs()
