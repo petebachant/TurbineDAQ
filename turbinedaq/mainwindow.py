@@ -765,11 +765,14 @@ class Ui_MainWindow(object):
         self.actionViewAFT = QtWidgets.QAction(MainWindow)
         self.actionViewAFT.setCheckable(True)
         self.actionViewAFT.setObjectName("actionViewAFT")
+        self.actionHome_AFT_axis = QtWidgets.QAction(MainWindow)
+        self.actionHome_AFT_axis.setObjectName("actionHome_AFT_axis")
         self.menuFile.addAction(self.actionQuit)
         self.menuHoming.addAction(self.actionHome_Tow)
         self.menuHoming.addAction(self.actionHome_Turbine)
         self.menuHoming.addAction(self.actionHome_y)
         self.menuHoming.addAction(self.actionHome_z)
+        self.menuHoming.addAction(self.actionHome_AFT_axis)
         self.menuView.addAction(self.actionNI_Signals)
         self.menuView.addAction(self.actionVectrino_View)
         self.menuView.addAction(self.actionFBG)
@@ -953,5 +956,6 @@ class Ui_MainWindow(object):
         self.actionMonitor_LF.setToolTip(_translate("MainWindow", "Monitor lateral force signals..."))
         self.actionLF.setText(_translate("MainWindow", "Lateral Forces"))
         self.actionViewAFT.setText(_translate("MainWindow", "AFT"))
+        self.actionHome_AFT_axis.setText(_translate("MainWindow", "Home AFT Axis"))
 from guiqwt.plot import CurveWidget
 from . import resources_rc

@@ -517,6 +517,7 @@ class MainWindow(QMainWindow):
         self.ui.actionHome_Turbine.triggered.connect(self.on_home_turbine)
         self.ui.actionHome_y.triggered.connect(self.on_home_y)
         self.ui.actionHome_z.triggered.connect(self.on_home_z)
+        self.ui.actionHome_AFT_axis.triggered.connect(self.on_home_aft)
         self.ui.commandLinkButton_process.clicked.connect(self.on_process)
         self.badvecdata.connect(self.on_badvecdata)
         self.checkbox_tow_axis.clicked.connect(self.on_checkbox_tow_axis)
@@ -566,6 +567,9 @@ class MainWindow(QMainWindow):
 
     def on_home_z(self):
         acsc.runBuffer(self.hc, 11)
+
+    def on_home_aft(self):
+        acsc.runBuffer(self.hc, 21)
 
     def on_open_section_folder(self):
         section = str(self.ui.comboBox_testPlanSection.currentText())

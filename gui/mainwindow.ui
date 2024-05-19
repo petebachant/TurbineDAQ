@@ -1406,6 +1406,7 @@
     <addaction name="actionHome_Turbine"/>
     <addaction name="actionHome_y"/>
     <addaction name="actionHome_z"/>
+    <addaction name="actionHome_AFT_axis"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -1784,6 +1785,11 @@
    </property>
    <property name="text">
     <string>AFT</string>
+   </property>
+  </action>
+  <action name="actionHome_AFT_axis">
+   <property name="text">
+    <string>Home AFT Axis</string>
    </property>
   </action>
  </widget>
