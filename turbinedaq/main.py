@@ -98,14 +98,14 @@ class MainWindow(QMainWindow):
         self.plot_timer = QtCore.QTimer()
         # Connect to controller
         self.connect_to_acs_controllers()
+        # Read in and apply settings from last session
+        self.load_settings()
         # Read turbine, vectrino, FBG, and ODIsi properties
         self.read_turbine_properties()
         self.ui.comboBox_turbine.addItems(self.turbine_properties.keys())
         self.read_vectrino_properties()
         self.read_fbg_properties()
         self.read_odisi_properties()
-        # Read in and apply settings from last session
-        self.load_settings()
         # Import test plan
         self.load_test_plan()
         # Initialize plots
@@ -334,6 +334,7 @@ class MainWindow(QMainWindow):
             "AFT": {"kind": "AFT", "diameter": 1.0, "height": 1.0},
         }
         fpath = os.path.join(self.wdir, "config", "turbine_properties.json")
+        print(f"Attempting to read turbine properties from: {fpath}")
         try:
             with open(fpath) as f:
                 new = json.load(f)
