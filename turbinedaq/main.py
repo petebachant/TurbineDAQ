@@ -898,7 +898,7 @@ class MainWindow(QMainWindow):
         """Executes a single shakedown run."""
         U = self.ui.doubleSpinBox_singleRun_U.value()
         tsr = self.ui.doubleSpinBox_singleRun_tsr.value()
-        turbine = self.ui.comboBox_turbine.getCurrentText()
+        turbine = self.ui.comboBox_turbine.currentText()
         y_R = self.ui.doubleSpinBox_singleRun_y_R.value()
         z_H = self.ui.doubleSpinBox_singleRun_z_H.value()
         vectrino = self.ui.checkBox_singleRunVectrino.isChecked()
