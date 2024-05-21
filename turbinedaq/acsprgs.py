@@ -88,7 +88,7 @@ BLOCK
     ! Define start time from now
     start_time = TIME
     collect_data = 1
-    DC/c aft_data, {n_buffer_rows}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force, FPOS(6), FVEL(6), FVEL(5)
+    DC/c aft_data, {n_buffer_rows}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force, FPOS(6), FVEL(6), RVEL(5)
     ! Send trigger pulse for data acquisition
     OUT1.16 = 1
 END
