@@ -366,7 +366,7 @@ class AcsDaqThread(QtCore.QThread):
         self.prg.addline("GLOBAL INT collect_data")
         self.prg.addline("collect_data = 1")
         self.prg.add_dc(
-            "data", self.dblen, self.sr, "TIME, FVEL(5), FVEL(4)", "/c"
+            "data", self.dblen, self.sr, "TIME, RVEL(5), FVEL(4)", "/c"
         )
         self.prg.addline("start_time = TIME")
         self.prg.addline("TILL collect_data = 0")
