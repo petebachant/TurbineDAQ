@@ -171,7 +171,9 @@ class MainWindow(QMainWindow):
         # Remember AFT NI dock widget visibility from last session
         if "AFT NI visible" in self.settings:
             self.dockwidget_aft_ni.setVisible(self.settings["AFT NI visible"])
-            self.ui.actionNI_DAQ_AFT.setChecked(self.settings["AFT NI visible"])
+            self.ui.actionNI_DAQ_AFT.setChecked(
+                self.settings["AFT NI visible"]
+            )
 
     def create_aft_dock_widget(self):
         self.dockWidget_AFT = QtWidgets.QDockWidget(self.ui.centralwidget)
@@ -1559,8 +1561,19 @@ class MainWindow(QMainWindow):
             self.curve_LF_right.set_data(t, self.nidata["LF_right"])
             self.plot_LF.replot()
         elif self.mode == "AFT":
-            # TODO: Update AFT temperature plots recorded with NI-DAQ
-            pass
+            # Create a list of keys in order of the plots
+            signals = [
+                "resistor_temp",
+                "yaskawa_temp",
+                "fore_temp",
+                "aft_temp",
+            ]
+            for n, signal in enumerate(signals):
+                n_plot = n + 1  # These are 1-indexed per their names
+                curve = getattr(self, f"curve_aft_ni_{n_plot}")
+                curve.set_data(t, self.nidata[signal])
+                plot = getattr(self, f"plot_aft_ni_{n_plot}")
+                plot.replot()
 
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
