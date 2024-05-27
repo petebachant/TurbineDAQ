@@ -167,6 +167,10 @@ class MainWindow(QMainWindow):
         if "AFT visible" in self.settings:
             self.dockWidget_AFT.setVisible(self.settings["AFT visible"])
             self.ui.actionViewAFT.setChecked(self.settings["AFT visible"])
+        # Remember AFT NI dock widget visibility from last session
+        if "AFT NI visible" in self.settings:
+            self.dockwidget_aft_ni.setVisible(self.settings["AFT NI visible"])
+            self.ui.actionViewAFTNI.setChecked(self.settings["AFT NI visible"])
 
     def create_aft_dock_widget(self):
         self.dockWidget_AFT = QtWidgets.QDockWidget(self.ui.centralwidget)
