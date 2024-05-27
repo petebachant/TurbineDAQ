@@ -876,6 +876,17 @@ class MainWindow(QMainWindow):
         self.curve_aft_4.setPen(QtGui.QPen(QtCore.Qt.black, 1))
         self.plot_aft_4 = self.plot_AFT_4.get_plot()
         self.plot_aft_4.add_item(self.curve_aft_4)
+        # AFT NI plots
+        # Note that we do this a little differently here using getattr and
+        # setattr since creating each is so similar
+        for n in range(1, 5):
+            curve = guiqwt.curve.CurveItem()
+            curve.setPen(QtGui.QPen(QtCore.Qt.black, 1))
+            plot_widget = getattr(self, f"plot_aft_ni_{n}")
+            plot = plot_widget.get_plot()
+            plot.add_item(curve)
+            setattr(self, f"curve_aft_ni_{n}", curve)
+            setattr(self, f"plot_aft_ni_{n}", plot)
 
     def on_start(self):
         """Start whatever is visible in the tab widget."""
