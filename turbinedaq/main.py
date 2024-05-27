@@ -1450,23 +1450,27 @@ class MainWindow(QMainWindow):
 
     def update_plots_ni(self):
         t = self.nidata["time"]
-        self.curve_drag_left.set_data(t, self.nidata["drag_left"])
-        self.plot_drag_left.replot()
-        self.curve_torque_trans.set_data(t, self.nidata["torque_trans"])
-        self.curve_torque_arm.set_data(t, self.nidata["torque_arm"])
-        self.plot_torque.replot()
-        self.curve_drag_right.set_data(t, self.nidata["drag_right"])
-        self.plot_drag_right.replot()
-        if len(self.nidata["drag_left"]) == len(self.nidata["drag_right"]):
-            self.curve_drag.set_data(
-                t, self.nidata["drag_left"] + self.nidata["drag_right"]
-            )
-            self.plot_drag.replot()
-        self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
-        self.plot_rpm_ni.replot()
-        self.curve_LF_left.set_data(t, self.nidata["LF_left"])
-        self.curve_LF_right.set_data(t, self.nidata["LF_right"])
-        self.plot_LF.replot()
+        if self.mode == "CFT":
+            self.curve_drag_left.set_data(t, self.nidata["drag_left"])
+            self.plot_drag_left.replot()
+            self.curve_torque_trans.set_data(t, self.nidata["torque_trans"])
+            self.curve_torque_arm.set_data(t, self.nidata["torque_arm"])
+            self.plot_torque.replot()
+            self.curve_drag_right.set_data(t, self.nidata["drag_right"])
+            self.plot_drag_right.replot()
+            if len(self.nidata["drag_left"]) == len(self.nidata["drag_right"]):
+                self.curve_drag.set_data(
+                    t, self.nidata["drag_left"] + self.nidata["drag_right"]
+                )
+                self.plot_drag.replot()
+            self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
+            self.plot_rpm_ni.replot()
+            self.curve_LF_left.set_data(t, self.nidata["LF_left"])
+            self.curve_LF_right.set_data(t, self.nidata["LF_right"])
+            self.plot_LF.replot()
+        elif self.mode == "AFT":
+            # TODO: Update AFT temperature plots recorded with NI-DAQ
+            pass
 
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
