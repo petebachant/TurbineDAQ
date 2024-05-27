@@ -232,7 +232,7 @@ class MainWindow(QMainWindow):
         # Finish and add to the central widget grid layout
         self.gridLayout_AFT.addLayout(self.verticalLayout_AFT, 0, 0, 1, 1)
         self.dockWidget_AFT.setWidget(self.dockWidgetContents_AFT)
-        self.ui.gridLayout_4.addWidget(self.dockWidget_AFT, 0, 4, 6, 1)
+        self.ui.gridLayout_4.addWidget(self.dockWidget_AFT, 0, 5, 6, 1)
         # Connect signals and slots for view menu action
         self.ui.actionViewAFT.toggled.connect(self.dockWidget_AFT.setVisible)
         self.dockWidget_AFT.visibilityChanged.connect(
@@ -304,7 +304,7 @@ class MainWindow(QMainWindow):
             self.verticallayout_aft_ni, 0, 0, 1, 1
         )
         self.dockwidget_aft_ni.setWidget(self.dockwidgetcontents_aft_ni)
-        self.ui.gridLayout_4.addWidget(self.dockwidget_aft_ni, 0, 4, 6, 1)
+        self.ui.gridLayout_4.addWidget(self.dockwidget_aft_ni, 0, 6, 6, 1)
         # Connect signals and slots for view menu action
         self.ui.actionNI_DAQ_AFT.toggled.connect(
             self.dockwidget_aft_ni.setVisible
