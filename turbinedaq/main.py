@@ -36,8 +36,9 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        # Create AFT signals dock widget
+        # Create AFT dock widgets
         self.create_aft_dock_widget()
+        self.create_aft_ni_dock_widget()
 
         # Add initial items to AFT row of ACS table widget
         for n in range(1, 6):
