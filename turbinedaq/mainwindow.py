@@ -770,6 +770,7 @@ class Ui_MainWindow(object):
         self.actionHome_AFT_axis = QtWidgets.QAction(MainWindow)
         self.actionHome_AFT_axis.setObjectName("actionHome_AFT_axis")
         self.actionNI_DAQ_AFT = QtWidgets.QAction(MainWindow)
+        self.actionNI_DAQ_AFT.setCheckable(True)
         self.actionNI_DAQ_AFT.setObjectName("actionNI_DAQ_AFT")
         self.menuFile.addAction(self.actionQuit)
         self.menuHoming.addAction(self.actionHome_Tow)

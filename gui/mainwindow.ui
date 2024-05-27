@@ -1798,6 +1798,9 @@
    </property>
   </action>
   <action name="actionNI_DAQ_AFT">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>NI-DAQ (AFT)</string>
    </property>
