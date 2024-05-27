@@ -170,7 +170,7 @@ class MainWindow(QMainWindow):
         # Remember AFT NI dock widget visibility from last session
         if "AFT NI visible" in self.settings:
             self.dockwidget_aft_ni.setVisible(self.settings["AFT NI visible"])
-            self.ui.actionViewAFTNI.setChecked(self.settings["AFT NI visible"])
+            self.ui.actionNI_DAQ_AFT.setChecked(self.settings["AFT NI visible"])
 
     def create_aft_dock_widget(self):
         self.dockWidget_AFT = QtWidgets.QDockWidget(self.ui.centralwidget)
@@ -305,11 +305,11 @@ class MainWindow(QMainWindow):
         self.dockwidget_aft_ni.setWidget(self.dockwidgetcontents_aft_ni)
         self.ui.gridLayout_4.addWidget(self.dockwidget_aft_ni, 0, 4, 6, 1)
         # Connect signals and slots for view menu action
-        self.ui.actionViewAFTNI.toggled.connect(
+        self.ui.actionNI_DAQ_AFT.toggled.connect(
             self.dockwidget_aft_ni.setVisible
         )
         self.dockwidget_aft_ni.visibilityChanged.connect(
-            self.ui.actionViewAFTNI.setChecked
+            self.ui.actionNI_DAQ_AFT.setChecked
         )
         # Set invisible by default
         self.dockwidget_aft_ni.setVisible(False)

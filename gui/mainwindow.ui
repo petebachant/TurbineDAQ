@@ -1418,6 +1418,7 @@
     <addaction name="actionODiSI"/>
     <addaction name="actionLF"/>
     <addaction name="actionViewAFT"/>
+    <addaction name="actionNI_DAQ_AFT"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -1794,6 +1795,11 @@
   <action name="actionHome_AFT_axis">
    <property name="text">
     <string>Home AFT Axis</string>
+   </property>
+  </action>
+  <action name="actionNI_DAQ_AFT">
+   <property name="text">
+    <string>NI-DAQ (AFT)</string>
    </property>
   </action>
  </widget>

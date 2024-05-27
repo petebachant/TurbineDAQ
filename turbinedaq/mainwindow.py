@@ -769,6 +769,8 @@ class Ui_MainWindow(object):
         self.actionViewAFT.setObjectName("actionViewAFT")
         self.actionHome_AFT_axis = QtWidgets.QAction(MainWindow)
         self.actionHome_AFT_axis.setObjectName("actionHome_AFT_axis")
+        self.actionNI_DAQ_AFT = QtWidgets.QAction(MainWindow)
+        self.actionNI_DAQ_AFT.setObjectName("actionNI_DAQ_AFT")
         self.menuFile.addAction(self.actionQuit)
         self.menuHoming.addAction(self.actionHome_Tow)
         self.menuHoming.addAction(self.actionHome_Turbine)
@@ -781,6 +783,7 @@ class Ui_MainWindow(object):
         self.menuView.addAction(self.actionODiSI)
         self.menuView.addAction(self.actionLF)
         self.menuView.addAction(self.actionViewAFT)
+        self.menuView.addAction(self.actionNI_DAQ_AFT)
         self.menuSettings.addAction(self.menuMode.menuAction())
         self.menuTest_Plan.addAction(self.actionImportTestPlan)
         self.menuHelp.addAction(self.actionAbout)
@@ -959,5 +962,6 @@ class Ui_MainWindow(object):
         self.actionLF.setText(_translate("MainWindow", "Lateral Forces"))
         self.actionViewAFT.setText(_translate("MainWindow", "AFT"))
         self.actionHome_AFT_axis.setText(_translate("MainWindow", "Home AFT Axis"))
+        self.actionNI_DAQ_AFT.setText(_translate("MainWindow", "NI-DAQ (AFT)"))
 from guiqwt.plot import CurveWidget
 from . import resources_rc
