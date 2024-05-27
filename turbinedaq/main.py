@@ -35,17 +35,14 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
         # Create AFT dock widgets
         self.create_aft_dock_widget()
         self.create_aft_ni_dock_widget()
-
         # Add initial items to AFT row of ACS table widget
         for n in range(1, 6):
             item = QtWidgets.QTableWidgetItem()
             item.setTextAlignment(QtCore.Qt.AlignCenter)
             self.ui.tableWidget_acs.setItem(4, n, item)
-
         # Add action group for determining the mode
         self.turbine_mode_action_group = QtWidgets.QActionGroup(
             self.ui.menuMode
@@ -64,11 +61,9 @@ class MainWindow(QMainWindow):
         self.turbine_mode_action_group.triggered.connect(
             self.on_turbine_mode_change
         )
-
         # Create time vector
         self.t = np.array([])
         self.time_last_run = time.time()
-
         # Some operating parameters
         self.plot_len_sec = 30.0
         self.monitoracs = False
@@ -82,7 +77,7 @@ class MainWindow(QMainWindow):
         self.enabled_axes = {}
         self.test_plan = {}
         self.turbinetow = None
-
+        self.nidata = {}
         # Add file path combobox to toolbar
         self.line_edit_wdir = QLineEdit()
         self.ui.toolBar_directory.addWidget(self.line_edit_wdir)
@@ -91,7 +86,6 @@ class MainWindow(QMainWindow):
         self.toolbutton_wdir = QToolButton()
         self.ui.toolBar_directory.addWidget(self.toolbutton_wdir)
         self.toolbutton_wdir.setIcon(QIcon(":icons/folder_yellow.png"))
-
         # Add labels to status bar
         self.add_labels_to_statusbar()
         # Create timers
@@ -1542,7 +1536,7 @@ class MainWindow(QMainWindow):
 
     def update_plots_ni(self):
         t = self.nidata["time"]
-        if self.mode == "CFT":
+        if "drag_left" in self.nidata:
             self.curve_drag_left.set_data(t, self.nidata["drag_left"])
             self.plot_drag_left.replot()
             self.curve_torque_trans.set_data(t, self.nidata["torque_trans"])
@@ -1560,7 +1554,7 @@ class MainWindow(QMainWindow):
             self.curve_LF_left.set_data(t, self.nidata["LF_left"])
             self.curve_LF_right.set_data(t, self.nidata["LF_right"])
             self.plot_LF.replot()
-        elif self.mode == "AFT":
+        elif "resistor_temp" in self.nidata:
             # Create a list of keys in order of the plots
             signals = [
                 "resistor_temp",
