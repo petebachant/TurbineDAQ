@@ -236,6 +236,80 @@ class MainWindow(QMainWindow):
         # Set invisible by default
         self.dockWidget_AFT.setVisible(False)
 
+    def create_aft_ni_dock_widget(self) -> None:
+        self.dockwidget_aft_ni = QtWidgets.QDockWidget(self.ui.centralwidget)
+        self.dockwidget_aft_ni.setMinimumSize(QtCore.QSize(224, 601))
+        self.dockwidget_aft_ni.setFeatures(
+            QtWidgets.QDockWidget.AllDockWidgetFeatures
+        )
+        self.dockwidget_aft_ni.setObjectName("dockwidget_aft_ni")
+        self.dockwidget_aft_ni.setWindowTitle("NI-DAQ (AFT)")
+        self.dockwidgetcontents_aft_ni = QtWidgets.QWidget()
+        self.dockwidgetcontents_aft_ni.setObjectName(
+            "dockwidgetcontents_aft_ni"
+        )
+        self.gridlayout_aft_ni = QtWidgets.QGridLayout(
+            self.dockwidgetcontents_aft_ni
+        )
+        self.gridlayout_aft_ni.setObjectName("gridlayout_aft_ni")
+        self.verticallayout_aft_ni = QtWidgets.QVBoxLayout()
+        self.verticallayout_aft_ni.setObjectName("verticallayout_aft_ni")
+        # Plot 1
+        self.label_aft_ni_1 = QtWidgets.QLabel(self.dockwidgetcontents_aft_ni)
+        self.label_aft_ni_1.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_aft_ni_1.setObjectName("label_aft_ni_1")
+        self.label_aft_ni_1.setText("             Resistor temp.")
+        self.verticallayout_aft_ni.addWidget(self.label_aft_ni_1)
+        self.plot_aft_ni_1 = CurveWidget(self.dockwidgetcontents_aft_ni)
+        self.plot_aft_ni_1.setOrientation(QtCore.Qt.Horizontal)
+        self.plot_aft_ni_1.setObjectName("plot_aft_ni_1")
+        self.verticallayout_aft_ni.addWidget(self.plot_aft_ni_1)
+        # Plot 2
+        self.label_aft_ni_2 = QtWidgets.QLabel(self.dockwidgetcontents_aft_ni)
+        self.label_aft_ni_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_aft_ni_2.setObjectName("label_aft_ni_2")
+        self.label_aft_ni_2.setText("             Yaskawa temp.")
+        self.verticallayout_aft_ni.addWidget(self.label_aft_ni_2)
+        self.plot_aft_ni_2 = CurveWidget(self.dockwidgetcontents_aft_ni)
+        self.plot_aft_ni_2.setOrientation(QtCore.Qt.Horizontal)
+        self.plot_aft_ni_2.setObjectName("plot_aft_ni_2")
+        self.verticallayout_aft_ni.addWidget(self.plot_aft_ni_2)
+        # Plot 3
+        self.label_aft_ni_3 = QtWidgets.QLabel(self.dockwidgetcontents_aft_ni)
+        self.label_aft_ni_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_aft_ni_3.setObjectName("label_aft_ni_3")
+        self.label_aft_ni_3.setText("             Fore temp.")
+        self.verticallayout_aft_ni.addWidget(self.label_aft_ni_3)
+        self.plot_aft_ni_3 = CurveWidget(self.dockwidgetcontents_aft_ni)
+        self.plot_aft_ni_3.setOrientation(QtCore.Qt.Horizontal)
+        self.plot_aft_ni_3.setObjectName("plot_aft_ni_3")
+        self.verticallayout_aft_ni.addWidget(self.plot_aft_ni_3)
+        # Plot 4
+        self.label_aft_ni_4 = QtWidgets.QLabel(self.dockwidgetcontents_aft_ni)
+        self.label_aft_ni_4.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_aft_ni_4.setObjectName("label_aft_ni_4")
+        self.label_aft_ni_4.setText("             Aft temp.")
+        self.verticallayout_aft_ni.addWidget(self.label_aft_ni_4)
+        self.plot_aft_ni_4 = CurveWidget(self.dockwidgetcontents_aft_ni)
+        self.plot_aft_ni_4.setOrientation(QtCore.Qt.Horizontal)
+        self.plot_aft_ni_4.setObjectName("plot_aft_ni_4")
+        self.verticallayout_aft_ni.addWidget(self.plot_aft_ni_4)
+        # Finish and add to the central widget grid layout
+        self.gridlayout_aft_ni.addLayout(
+            self.verticallayout_aft_ni, 0, 0, 1, 1
+        )
+        self.dockwidget_aft_ni.setWidget(self.dockwidgetcontents_aft_ni)
+        self.ui.gridLayout_4.addWidget(self.dockwidget_aft_ni, 0, 4, 6, 1)
+        # Connect signals and slots for view menu action
+        self.ui.actionViewAFTNI.toggled.connect(
+            self.dockwidget_aft_ni.setVisible
+        )
+        self.dockwidget_aft_ni.visibilityChanged.connect(
+            self.ui.actionViewAFTNI.setChecked
+        )
+        # Set invisible by default
+        self.dockwidget_aft_ni.setVisible(False)
+
     @property
     def settings_fpath(self) -> str:
         return os.path.join(
@@ -1639,6 +1713,7 @@ class MainWindow(QMainWindow):
         self.settings["FBG visible"] = self.ui.dockWidget_FBG.isVisible()
         self.settings["ODiSI visible"] = self.ui.dockWidget_ODiSI.isVisible()
         self.settings["AFT visible"] = self.dockWidget_AFT.isVisible()
+        self.settings["AFT NI visible"] = self.dockwidget_aft_ni.isVisible()
         self.settings["Lateral forces visible"] = (
             self.ui.dockWidget_LF.isVisible()
         )
