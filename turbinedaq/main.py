@@ -855,7 +855,7 @@ class MainWindow(QMainWindow):
         # AFT plot 1
         self.curve_aft_1 = guiqwt.curve.CurveItem()
         self.curve_aft_1.setPen(QtGui.QPen(QtCore.Qt.black, 1))
-        self.plot_aft_1 = self.plot_AFT_1.get_plot()
+        self.plot_aft_1 = self.plot_aft_1.get_plot()
         self.plot_aft_1.add_item(self.curve_aft_1)
         # AFT plot 2
         self.curve_aft_2 = guiqwt.curve.CurveItem()
