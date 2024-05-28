@@ -35,16 +35,14 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
-        # Create AFT signals dock widget
+        # Create AFT dock widgets
         self.create_aft_dock_widget()
-
+        self.create_aft_ni_dock_widget()
         # Add initial items to AFT row of ACS table widget
         for n in range(1, 6):
             item = QtWidgets.QTableWidgetItem()
             item.setTextAlignment(QtCore.Qt.AlignCenter)
             self.ui.tableWidget_acs.setItem(4, n, item)
-
         # Add action group for determining the mode
         self.turbine_mode_action_group = QtWidgets.QActionGroup(
             self.ui.menuMode
@@ -63,11 +61,9 @@ class MainWindow(QMainWindow):
         self.turbine_mode_action_group.triggered.connect(
             self.on_turbine_mode_change
         )
-
         # Create time vector
         self.t = np.array([])
         self.time_last_run = time.time()
-
         # Some operating parameters
         self.plot_len_sec = 30.0
         self.monitoracs = False
@@ -81,7 +77,7 @@ class MainWindow(QMainWindow):
         self.enabled_axes = {}
         self.test_plan = {}
         self.turbinetow = None
-
+        self.nidata = {}
         # Add file path combobox to toolbar
         self.line_edit_wdir = QLineEdit()
         self.ui.toolBar_directory.addWidget(self.line_edit_wdir)
@@ -90,7 +86,6 @@ class MainWindow(QMainWindow):
         self.toolbutton_wdir = QToolButton()
         self.ui.toolBar_directory.addWidget(self.toolbutton_wdir)
         self.toolbutton_wdir.setIcon(QIcon(":icons/folder_yellow.png"))
-
         # Add labels to status bar
         self.add_labels_to_statusbar()
         # Create timers
@@ -167,6 +162,12 @@ class MainWindow(QMainWindow):
         if "AFT visible" in self.settings:
             self.dockWidget_AFT.setVisible(self.settings["AFT visible"])
             self.ui.actionViewAFT.setChecked(self.settings["AFT visible"])
+        # Remember AFT NI dock widget visibility from last session
+        if "AFT NI visible" in self.settings:
+            self.dockwidget_aft_ni.setVisible(self.settings["AFT NI visible"])
+            self.ui.actionNI_DAQ_AFT.setChecked(
+                self.settings["AFT NI visible"]
+            )
 
     def create_aft_dock_widget(self):
         self.dockWidget_AFT = QtWidgets.QDockWidget(self.ui.centralwidget)
@@ -188,7 +189,7 @@ class MainWindow(QMainWindow):
         self.label_AFT_1 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_1.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_1.setObjectName("label_AFT_1")
-        self.label_AFT_1.setText("             INF4 Channel 1")
+        self.label_AFT_1.setText("             Edgewise Bending Moment (Nm)")
         self.verticalLayout_AFT.addWidget(self.label_AFT_1)
         self.plot_AFT_1 = CurveWidget(self.dockWidgetContents_AFT)
         self.plot_AFT_1.setOrientation(QtCore.Qt.Horizontal)
@@ -198,7 +199,7 @@ class MainWindow(QMainWindow):
         self.label_AFT_2 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_2.setObjectName("label_AFT_2")
-        self.label_AFT_2.setText("             INF4 Channel 2")
+        self.label_AFT_2.setText("             Flapwise Bending Moment (Nm)")
         self.verticalLayout_AFT.addWidget(self.label_AFT_2)
         self.plot_AFT_2 = CurveWidget(self.dockWidgetContents_AFT)
         self.plot_AFT_2.setOrientation(QtCore.Qt.Horizontal)
@@ -208,7 +209,7 @@ class MainWindow(QMainWindow):
         self.label_AFT_3 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_3.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_3.setObjectName("label_AFT_3")
-        self.label_AFT_3.setText("             INF4 Channel 3")
+        self.label_AFT_3.setText("             Rotor Thrust (N)")
         self.verticalLayout_AFT.addWidget(self.label_AFT_3)
         self.plot_AFT_3 = CurveWidget(self.dockWidgetContents_AFT)
         self.plot_AFT_3.setOrientation(QtCore.Qt.Horizontal)
@@ -218,7 +219,7 @@ class MainWindow(QMainWindow):
         self.label_AFT_4 = QtWidgets.QLabel(self.dockWidgetContents_AFT)
         self.label_AFT_4.setAlignment(QtCore.Qt.AlignCenter)
         self.label_AFT_4.setObjectName("label_AFT_4")
-        self.label_AFT_4.setText("             INF4 Channel 4")
+        self.label_AFT_4.setText("             Rotor Torque (Nm)")
         self.verticalLayout_AFT.addWidget(self.label_AFT_4)
         self.plot_AFT_4 = CurveWidget(self.dockWidgetContents_AFT)
         self.plot_AFT_4.setOrientation(QtCore.Qt.Horizontal)
@@ -227,7 +228,7 @@ class MainWindow(QMainWindow):
         # Finish and add to the central widget grid layout
         self.gridLayout_AFT.addLayout(self.verticalLayout_AFT, 0, 0, 1, 1)
         self.dockWidget_AFT.setWidget(self.dockWidgetContents_AFT)
-        self.ui.gridLayout_4.addWidget(self.dockWidget_AFT, 0, 4, 6, 1)
+        self.ui.gridLayout_4.addWidget(self.dockWidget_AFT, 0, 5, 6, 1)
         # Connect signals and slots for view menu action
         self.ui.actionViewAFT.toggled.connect(self.dockWidget_AFT.setVisible)
         self.dockWidget_AFT.visibilityChanged.connect(
@@ -235,6 +236,80 @@ class MainWindow(QMainWindow):
         )
         # Set invisible by default
         self.dockWidget_AFT.setVisible(False)
+
+    def create_aft_ni_dock_widget(self) -> None:
+        self.dockwidget_aft_ni = QtWidgets.QDockWidget(self.ui.centralwidget)
+        self.dockwidget_aft_ni.setMinimumSize(QtCore.QSize(224, 601))
+        self.dockwidget_aft_ni.setFeatures(
+            QtWidgets.QDockWidget.AllDockWidgetFeatures
+        )
+        self.dockwidget_aft_ni.setObjectName("dockwidget_aft_ni")
+        self.dockwidget_aft_ni.setWindowTitle("NI-DAQ (AFT)")
+        self.dockwidgetcontents_aft_ni = QtWidgets.QWidget()
+        self.dockwidgetcontents_aft_ni.setObjectName(
+            "dockwidgetcontents_aft_ni"
+        )
+        self.gridlayout_aft_ni = QtWidgets.QGridLayout(
+            self.dockwidgetcontents_aft_ni
+        )
+        self.gridlayout_aft_ni.setObjectName("gridlayout_aft_ni")
+        self.verticallayout_aft_ni = QtWidgets.QVBoxLayout()
+        self.verticallayout_aft_ni.setObjectName("verticallayout_aft_ni")
+        # Plot 1
+        self.label_aft_ni_1 = QtWidgets.QLabel(self.dockwidgetcontents_aft_ni)
+        self.label_aft_ni_1.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_aft_ni_1.setObjectName("label_aft_ni_1")
+        self.label_aft_ni_1.setText("             Resistor Temp. (°F)")
+        self.verticallayout_aft_ni.addWidget(self.label_aft_ni_1)
+        self.plot_aft_ni_1 = CurveWidget(self.dockwidgetcontents_aft_ni)
+        self.plot_aft_ni_1.setOrientation(QtCore.Qt.Horizontal)
+        self.plot_aft_ni_1.setObjectName("plot_aft_ni_1")
+        self.verticallayout_aft_ni.addWidget(self.plot_aft_ni_1)
+        # Plot 2
+        self.label_aft_ni_2 = QtWidgets.QLabel(self.dockwidgetcontents_aft_ni)
+        self.label_aft_ni_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_aft_ni_2.setObjectName("label_aft_ni_2")
+        self.label_aft_ni_2.setText("             Yaskawa Temp. (°F)")
+        self.verticallayout_aft_ni.addWidget(self.label_aft_ni_2)
+        self.plot_aft_ni_2 = CurveWidget(self.dockwidgetcontents_aft_ni)
+        self.plot_aft_ni_2.setOrientation(QtCore.Qt.Horizontal)
+        self.plot_aft_ni_2.setObjectName("plot_aft_ni_2")
+        self.verticallayout_aft_ni.addWidget(self.plot_aft_ni_2)
+        # Plot 3
+        self.label_aft_ni_3 = QtWidgets.QLabel(self.dockwidgetcontents_aft_ni)
+        self.label_aft_ni_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_aft_ni_3.setObjectName("label_aft_ni_3")
+        self.label_aft_ni_3.setText("             Fore Temp. (°F)")
+        self.verticallayout_aft_ni.addWidget(self.label_aft_ni_3)
+        self.plot_aft_ni_3 = CurveWidget(self.dockwidgetcontents_aft_ni)
+        self.plot_aft_ni_3.setOrientation(QtCore.Qt.Horizontal)
+        self.plot_aft_ni_3.setObjectName("plot_aft_ni_3")
+        self.verticallayout_aft_ni.addWidget(self.plot_aft_ni_3)
+        # Plot 4
+        self.label_aft_ni_4 = QtWidgets.QLabel(self.dockwidgetcontents_aft_ni)
+        self.label_aft_ni_4.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_aft_ni_4.setObjectName("label_aft_ni_4")
+        self.label_aft_ni_4.setText("             Aft Temp. (°F)")
+        self.verticallayout_aft_ni.addWidget(self.label_aft_ni_4)
+        self.plot_aft_ni_4 = CurveWidget(self.dockwidgetcontents_aft_ni)
+        self.plot_aft_ni_4.setOrientation(QtCore.Qt.Horizontal)
+        self.plot_aft_ni_4.setObjectName("plot_aft_ni_4")
+        self.verticallayout_aft_ni.addWidget(self.plot_aft_ni_4)
+        # Finish and add to the central widget grid layout
+        self.gridlayout_aft_ni.addLayout(
+            self.verticallayout_aft_ni, 0, 0, 1, 1
+        )
+        self.dockwidget_aft_ni.setWidget(self.dockwidgetcontents_aft_ni)
+        self.ui.gridLayout_4.addWidget(self.dockwidget_aft_ni, 0, 6, 6, 1)
+        # Connect signals and slots for view menu action
+        self.ui.actionNI_DAQ_AFT.toggled.connect(
+            self.dockwidget_aft_ni.setVisible
+        )
+        self.dockwidget_aft_ni.visibilityChanged.connect(
+            self.ui.actionNI_DAQ_AFT.setChecked
+        )
+        # Set invisible by default
+        self.dockwidget_aft_ni.setVisible(False)
 
     @property
     def settings_fpath(self) -> str:
@@ -797,6 +872,17 @@ class MainWindow(QMainWindow):
         self.curve_aft_4.setPen(QtGui.QPen(QtCore.Qt.black, 1))
         self.plot_aft_4 = self.plot_AFT_4.get_plot()
         self.plot_aft_4.add_item(self.curve_aft_4)
+        # AFT NI plots
+        # Note that we do this a little differently here using getattr and
+        # setattr since creating each is so similar
+        for n in range(1, 5):
+            curve = guiqwt.curve.CurveItem()
+            curve.setPen(QtGui.QPen(QtCore.Qt.black, 1))
+            plot_widget = getattr(self, f"plot_aft_ni_{n}")
+            plot = plot_widget.get_plot()
+            plot.add_item(curve)
+            setattr(self, f"curve_aft_ni_{n}", curve)
+            setattr(self, f"plot_aft_ni_{n}", plot)
 
     def on_start(self):
         """Start whatever is visible in the tab widget."""
@@ -1450,23 +1536,38 @@ class MainWindow(QMainWindow):
 
     def update_plots_ni(self):
         t = self.nidata["time"]
-        self.curve_drag_left.set_data(t, self.nidata["drag_left"])
-        self.plot_drag_left.replot()
-        self.curve_torque_trans.set_data(t, self.nidata["torque_trans"])
-        self.curve_torque_arm.set_data(t, self.nidata["torque_arm"])
-        self.plot_torque.replot()
-        self.curve_drag_right.set_data(t, self.nidata["drag_right"])
-        self.plot_drag_right.replot()
-        if len(self.nidata["drag_left"]) == len(self.nidata["drag_right"]):
-            self.curve_drag.set_data(
-                t, self.nidata["drag_left"] + self.nidata["drag_right"]
-            )
-            self.plot_drag.replot()
-        self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
-        self.plot_rpm_ni.replot()
-        self.curve_LF_left.set_data(t, self.nidata["LF_left"])
-        self.curve_LF_right.set_data(t, self.nidata["LF_right"])
-        self.plot_LF.replot()
+        if "drag_left" in self.nidata:
+            self.curve_drag_left.set_data(t, self.nidata["drag_left"])
+            self.plot_drag_left.replot()
+            self.curve_torque_trans.set_data(t, self.nidata["torque_trans"])
+            self.curve_torque_arm.set_data(t, self.nidata["torque_arm"])
+            self.plot_torque.replot()
+            self.curve_drag_right.set_data(t, self.nidata["drag_right"])
+            self.plot_drag_right.replot()
+            if len(self.nidata["drag_left"]) == len(self.nidata["drag_right"]):
+                self.curve_drag.set_data(
+                    t, self.nidata["drag_left"] + self.nidata["drag_right"]
+                )
+                self.plot_drag.replot()
+            self.curve_rpm_ni.set_data(t, self.nidata["turbine_rpm"])
+            self.plot_rpm_ni.replot()
+            self.curve_LF_left.set_data(t, self.nidata["LF_left"])
+            self.curve_LF_right.set_data(t, self.nidata["LF_right"])
+            self.plot_LF.replot()
+        elif "resistor_temp" in self.nidata:
+            # Create a list of keys in order of the plots
+            signals = [
+                "resistor_temp",
+                "yaskawa_temp",
+                "fore_temp",
+                "aft_temp",
+            ]
+            for n, signal in enumerate(signals):
+                n_plot = n + 1  # These are 1-indexed per their names
+                curve = getattr(self, f"curve_aft_ni_{n_plot}")
+                curve.set_data(t, self.nidata[signal])
+                plot = getattr(self, f"plot_aft_ni_{n_plot}")
+                plot.replot()
 
     def update_plots_vec(self):
         """This function updates the Vectrino plots."""
@@ -1635,6 +1736,7 @@ class MainWindow(QMainWindow):
         self.settings["FBG visible"] = self.ui.dockWidget_FBG.isVisible()
         self.settings["ODiSI visible"] = self.ui.dockWidget_ODiSI.isVisible()
         self.settings["AFT visible"] = self.dockWidget_AFT.isVisible()
+        self.settings["AFT NI visible"] = self.dockwidget_aft_ni.isVisible()
         self.settings["Lateral forces visible"] = (
             self.ui.dockWidget_LF.isVisible()
         )
