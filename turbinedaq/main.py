@@ -78,6 +78,7 @@ class MainWindow(QMainWindow):
         self.test_plan = {}
         self.turbinetow = None
         self.nidata = {}
+        self.acsdata = {}
         # Add file path combobox to toolbar
         self.line_edit_wdir = QLineEdit()
         self.ui.toolBar_directory.addWidget(self.line_edit_wdir)
@@ -1605,6 +1606,8 @@ class MainWindow(QMainWindow):
 
     def update_plots_aft(self):
         """Update AFT plots."""
+        if "load_cell_ch1" not in self.acsdata:
+            return
         t = self.acsdata["time"]
         for channel in [1, 2, 3, 4]:
             curve = getattr(self, f"curve_aft_{channel}")
