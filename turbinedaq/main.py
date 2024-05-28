@@ -1606,8 +1606,8 @@ class MainWindow(QMainWindow):
         """Update AFT plots."""
         t = self.acsdata["time"]
         for channel in [1, 2, 3, 4]:
-            curve = getattr(self, f"curve_aft_{channel}")
-            plot = getattr(self, f"plot_aft_{channel}")
+            curve = getattr(self, f"curve_AFT_{channel}")
+            plot = getattr(self, f"plot_AFT_{channel}")
             data = self.acsdata[f"load_cell_ch{channel}"]
             curve.set_data(t, data)
             plot.replot()
