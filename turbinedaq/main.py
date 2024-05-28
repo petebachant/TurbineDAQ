@@ -1489,6 +1489,7 @@ class MainWindow(QMainWindow):
     def on_plot_timer(self):
         if self.monitoracs:
             self.update_plots_acs()
+            self.update_plots_aft()
         if self.monitorvec:
             self.update_plots_vec()
             try:
@@ -1602,7 +1603,7 @@ class MainWindow(QMainWindow):
     #     self.curve_odisi.set_data(t, self.odisidata[odisi.name + "_strain"])
     #     self.plot_odisi.replot()
 
-    def upate_plots_aft(self):
+    def update_plots_aft(self):
         """Update AFT plots."""
         t = self.acsdata["time"]
         for channel in [1, 2, 3, 4]:
