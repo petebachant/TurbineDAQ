@@ -101,8 +101,8 @@ HALT(6)
 ACC(5) = 0.3
 VEL(5) = 0.5
 VEL(6) = 10
-ptp 6, 0
 ptp/e 5, endpos
+ptp/e 6, 0
 STOPDC
 collect_data = 0
 OUT1.16 = 0
