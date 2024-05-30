@@ -373,7 +373,7 @@ class TareTorqueRun(QtCore.QThread):
             "Time created": time.asctime(),
             "TurbineDAQ version": commit,
         }
-        self.daqthread = daqtasks.NiDaqThread(usetrigger=True)
+        self.daqthread = daqtasks.NiDaqThread(usetrigger=False)
         self.nidata = self.daqthread.data
         self.metadata["NI metadata"] = self.daqthread.metadata
         self.odisithread = daqtasks.ODiSIDaqThread(odisi_properties)
