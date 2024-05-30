@@ -15,7 +15,7 @@ BLOCK
     collect_data = 1
     DC/c data, 100, 1.0, TIME, RVEL(5), FVEL(4)
     ! Send trigger pulse for data acquisition
-    OUT1.16 = 1
+    OUT1.16 = 0
 END
 
 WAIT tzero*1000
