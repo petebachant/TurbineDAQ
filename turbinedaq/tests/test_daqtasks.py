@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from acspy import acsc
 
-from turbinedaq.daqtasks import AftAcsDaqThread
+from turbinedaq.daqtasks import AcsDaqThread, AftAcsDaqThread
 
 
 @pytest.fixture
@@ -18,6 +18,14 @@ def acs_hcomm():
 
 def test_aftacsdaqthread(acs_hcomm):
     thread = AftAcsDaqThread(acs_hc=acs_hcomm, makeprg=True)
+    thread.start()
+    time.sleep(2)
+    thread.stop()
+    assert np.all(np.diff(thread.data["time"] == 0.001))
+
+
+def test_acsdaqthread(acs_hcomm):
+    thread = AcsDaqThread(acs_hc=acs_hcomm, makeprg=True)
     thread.start()
     time.sleep(2)
     thread.stop()
