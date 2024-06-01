@@ -102,7 +102,7 @@ ptp/e 5, target
 HALT(6)
 ACC(5) = 0.1 ! Reduce carriage axis motion param. on tow-back to prevent AFT shaft from being pulled out
 JERK(5)= ACC(5)*10
-VEL(5) = 0.3
+VEL(5) = 0.5
 VEL(6) = -10 ! CCW PTP move
 ptp/e 6, 0 ! Perform PTP(6) before carriage returns to right limit 
 ptp/e 5, endpos
