@@ -1197,7 +1197,7 @@ class MainWindow(QMainWindow):
         self.tarerun.start()
 
     def do_strut_torque_run(self, ref_speed, tsr, radius, revs):
-        """Executes a single strut torque run."""
+        """Execute a single strut torque run."""
         self.tarerun = runtypes.StrutTorqueRun(
             self.hc, ref_speed, tsr, radius, revs
         )
@@ -1213,8 +1213,7 @@ class MainWindow(QMainWindow):
         self.tarerun.start()
 
     def on_tare_run_finished(self):
-        """
-        Once a tare run is complete, saves data if necessary and updates
+        """Once a tare run is complete, save data if necessary and update
         the test plan table widget.
         """
         # Reset time of last run
