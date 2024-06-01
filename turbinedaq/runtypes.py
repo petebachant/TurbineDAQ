@@ -325,7 +325,8 @@ class TareDragRun(QtCore.QThread):
         if not acsc.getOutput(self.hc, 1, 16):
             acsc.setOutput(self.hc, 1, 16, 1)
         self.daqthread.start()
-        self.msleep(2000)  # Wait for NI to start waiting for trigger
+        # Wait for NI to start waiting for trigger
+        time.sleep(3)
         self.start_motion()
 
     def start_motion(self):
@@ -391,7 +392,8 @@ class TareTorqueRun(QtCore.QThread):
         if not acsc.getOutput(self.hc, 1, 16):
             acsc.setOutput(self.hc, 1, 16, 1)
         self.daqthread.start()
-        self.msleep(2000)  # Wait for NI to start waiting for trigger
+        # Wait for NI to start waiting for trigger
+        time.sleep(3)
         self.start_motion()
 
     def start_motion(self):
