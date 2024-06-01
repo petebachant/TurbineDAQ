@@ -304,7 +304,7 @@ class AcsDaqThread(QtCore.QThread):
         self.sr = sample_rate
         # Compute sleep time as slightly longer than the time it would take to
         # fill half of the data buffer
-        self.sleeptime = float(self.dblen) / float(self.sr) / 2 * 1.04
+        self.sleeptime = float(self.dblen) / float(self.sr) * 0.9
         self.makeprg = makeprg
 
     def run(self):
@@ -326,33 +326,21 @@ class AcsDaqThread(QtCore.QThread):
         # Get the time in the ACS controller where we started data collection
         # so we can subtract it off later
         t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
+        times_collected = np.array([])
         while self.collectdata:
             # Sleep to let half of the buffer fill
             time.sleep(self.sleeptime)
-            # Read the first half of the data buffer
+            # Read the entire data buffer
             newdata = acsc.readReal(
-                self.hc, acsc.NONE, "data", 0, 2, 0, self.dblen // 2 - 1
+                self.hc, acsc.NONE, "data", 0, 2, 0, self.dblen - 1
             )
-            t = (newdata[0] - t0) / 1000.0
-            self.data["time"] = np.append(self.data["time"], t)
-            self.data["carriage_vel"] = np.append(
-                self.data["carriage_vel"], newdata[1]
-            )
-            self.data["turbine_rpm"] = np.append(
-                self.data["turbine_rpm"], newdata[2]
-            )
-            # Sleep to let the second half of the buffer fill
-            time.sleep(self.sleeptime)
-            # Read the second half of the data buffer
-            newdata = acsc.readReal(
-                self.hc,
-                acsc.NONE,
-                "data",
-                0,
-                2,
-                self.dblen // 2,
-                self.dblen - 1,
-            )
+            # Slice out only the new data
+            idx = (newdata[0] > t0) & ~np.isin(newdata[0], times_collected)
+            newdata = newdata[:, idx]
+            # Sort by time
+            newdata = newdata[:, newdata[0].argsort()]
+            # Track times collected
+            times_collected = np.append(times_collected, newdata[0])
             t = (newdata[0] - t0) / 1000.0
             self.data["time"] = np.append(self.data["time"], t)
             self.data["carriage_vel"] = np.append(
