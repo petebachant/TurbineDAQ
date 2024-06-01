@@ -302,8 +302,8 @@ class AcsDaqThread(QtCore.QThread):
         }
         self.dblen = bufflen
         self.sr = sample_rate
-        # Compute sleep time as slightly longer than the time it would take to
-        # fill half of the data buffer
+        # Compute sleep time as slightly less than the time it would take to
+        # fill the data buffer
         self.sleeptime = float(self.dblen) / float(self.sr) * 0.9
         self.makeprg = makeprg
 
