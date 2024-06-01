@@ -21,7 +21,7 @@ def test_aftacsdaqthread(acs_hcomm):
     thread.start()
     time.sleep(2)
     thread.stop()
-    assert np.all(np.diff(thread.data["time"] == 0.001))
+    assert np.all(np.round(np.diff(thread.data["time"]), decimals=6) == 0.001)
 
 
 def test_acsdaqthread(acs_hcomm):
@@ -29,4 +29,4 @@ def test_acsdaqthread(acs_hcomm):
     thread.start()
     time.sleep(2)
     thread.stop()
-    assert np.all(np.diff(thread.data["time"] == 0.001))
+    assert np.all(np.round(np.diff(thread.data["time"]), decimals=6) == 0.001)
