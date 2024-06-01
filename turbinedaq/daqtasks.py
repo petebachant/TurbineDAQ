@@ -397,7 +397,9 @@ class AftAcsDaqThread(QtCore.QThread):
         }
         self.dblen = bufflen
         self.sr = sample_rate
-        self.sleeptime = float(self.dblen) / float(self.sr) / 2 * 1.05
+        # Compute sleep time as slightly less than the time it would take to
+        # fill the data buffer
+        self.sleeptime = float(self.dblen) / float(self.sr) * 0.9
         self.makeprg = makeprg
 
     def run(self):
@@ -416,48 +418,26 @@ class AftAcsDaqThread(QtCore.QThread):
             acsc.runBuffer(self.hc, 17)
         while not collecting_data():
             time.sleep(0.01)
+        # Get the time in the ACS controller where we started data collection
+        # so we can subtract it off later
+        t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
+        times_collected = np.array([])
         while self.collectdata:
+            # Sleep to let half of the buffer fill
             time.sleep(self.sleeptime)
-            t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
+            # Read the entire data buffer
             newdata = acsc.readReal(
-                self.hc, acsc.NONE, "aft_data", 0, 7, 0, self.dblen // 2 - 1
+                self.hc, acsc.NONE, "aft_data", 0, 7, 0, self.dblen - 1
             )
+            # Slice out only the new data
+            idx = (newdata[0] > t0) & ~np.isin(newdata[0], times_collected)
+            newdata = newdata[:, idx]
+            # Sort by time
+            newdata = newdata[:, newdata[0].argsort()]
+            # Track times collected
+            times_collected = np.append(times_collected, newdata[0])
             t = (newdata[0] - t0) / 1000.0
             self.data["time"] = np.append(self.data["time"], t)
-            self.data["load_cell_ch1"] = np.append(
-                self.data["load_cell_ch1"], newdata[1]
-            )
-            self.data["load_cell_ch2"] = np.append(
-                self.data["load_cell_ch2"], newdata[2]
-            )
-            self.data["load_cell_ch3"] = np.append(
-                self.data["load_cell_ch3"], newdata[3]
-            )
-            self.data["load_cell_ch4"] = np.append(
-                self.data["load_cell_ch4"], newdata[4]
-            )
-            self.data["turbine_pos"] = np.append(
-                self.data["turbine_pos"], newdata[5]
-            )
-            self.data["turbine_rpm"] = np.append(
-                self.data["turbine_rpm"], newdata[6]
-            )
-            self.data["carriage_vel"] = np.append(
-                self.data["carriage_vel"], newdata[7]
-            )
-            time.sleep(self.sleeptime)
-            newdata = acsc.readReal(
-                self.hc,
-                acsc.NONE,
-                "aft_data",
-                0,
-                7,
-                self.dblen // 2,
-                self.dblen - 1,
-            )
-            t = (newdata[0] - t0) / 1000.0
-            self.data["time"] = np.append(self.data["time"], t)
-            self.data["time"] = self.data["time"] - self.data["time"][0]
             self.data["load_cell_ch1"] = np.append(
                 self.data["load_cell_ch1"], newdata[1]
             )
