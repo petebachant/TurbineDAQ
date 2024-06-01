@@ -5,3 +5,4 @@ sync.ffs_db
 *.h5
 inf4-test-data.csv
 *.egg-info
+.vscode
