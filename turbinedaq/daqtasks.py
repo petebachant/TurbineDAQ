@@ -302,7 +302,9 @@ class AcsDaqThread(QtCore.QThread):
         }
         self.dblen = bufflen
         self.sr = sample_rate
-        self.sleeptime = float(self.dblen) / float(self.sr) / 2 * 1.05
+        # Compute sleep time as slightly longer than the time it would take to
+        # fill half of the data buffer
+        self.sleeptime = float(self.dblen) / float(self.sr) / 2 * 1.04
         self.makeprg = makeprg
 
     def run(self):
@@ -321,9 +323,13 @@ class AcsDaqThread(QtCore.QThread):
             acsc.runBuffer(self.hc, 19)
         while not collecting_data():
             time.sleep(0.01)
+        # Get the time in the ACS controller where we started data collection
+        # so we can subtract it off later
+        t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
         while self.collectdata:
+            # Sleep to let half of the buffer fill
             time.sleep(self.sleeptime)
-            t0 = acsc.readReal(self.hc, acsc.NONE, "start_time")
+            # Read the first half of the data buffer
             newdata = acsc.readReal(
                 self.hc, acsc.NONE, "data", 0, 2, 0, self.dblen // 2 - 1
             )
@@ -335,7 +341,9 @@ class AcsDaqThread(QtCore.QThread):
             self.data["turbine_rpm"] = np.append(
                 self.data["turbine_rpm"], newdata[2]
             )
+            # Sleep to let the second half of the buffer fill
             time.sleep(self.sleeptime)
+            # Read the second half of the data buffer
             newdata = acsc.readReal(
                 self.hc,
                 acsc.NONE,
@@ -347,7 +355,6 @@ class AcsDaqThread(QtCore.QThread):
             )
             t = (newdata[0] - t0) / 1000.0
             self.data["time"] = np.append(self.data["time"], t)
-            self.data["time"] = self.data["time"] - self.data["time"][0]
             self.data["carriage_vel"] = np.append(
                 self.data["carriage_vel"], newdata[1]
             )
