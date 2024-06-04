@@ -74,7 +74,7 @@ JERK(5)= ACC(5)*10
 ACC(6) = rpm/tacc
 VEL(6) = rpm
 DEC(6) = ACC(6) * 0.1
-JERK(6)= ACC(6)*10
+JERK(6)= ACC(6)*10 * 0.1
 
 ! Move turbine to zero if necessary
 if RPOS(6) <> 60 & RPOS(6) <> 0
