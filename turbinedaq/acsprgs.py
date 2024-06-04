@@ -73,7 +73,7 @@ JERK(5)= ACC(5)*10
 
 ACC(6) = rpm/tacc
 VEL(6) = rpm
-DEC(6) = ACC(6)
+DEC(6) = ACC(6) * 1.5
 JERK(6)= ACC(6)*10
 
 ! Move turbine to zero if necessary
