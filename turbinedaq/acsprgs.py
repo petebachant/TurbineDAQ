@@ -63,7 +63,7 @@ ptp/e 5, 0
 ACC(5) = 1.0
 DEC(5) = 0.5
 VEL(5) = U
-JERK(5)= ACC(5)*10
+JERK(5)= ACC(5)*10*0.75
 
 ! Set modulo on turbine axis (only needed if using simulator)
 ! DISABLE 6
@@ -73,7 +73,7 @@ JERK(5)= ACC(5)*10
 
 ACC(6) = rpm/tacc
 VEL(6) = rpm
-DEC(6) = ACC(6) * 2
+DEC(6) = ACC(6)
 JERK(6)= ACC(6)*10
 
 ! Move turbine to zero if necessary
