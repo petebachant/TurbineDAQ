@@ -26,9 +26,9 @@ BLOCK
     ! Define start time from now
     start_time = TIME
     collect_data = 1
-    DC/c data, 100, 1.0, TIME, FVEL(5), FVEL(4)
+    DC/c data, 100, 1.0, TIME, RVEL(5), FVEL(4)
     ! Send trigger pulse for data acquisition
-    OUT1.16 = 0
+    OUT1.16 = 1
 END
 
 wait tzero*1000
@@ -36,7 +36,7 @@ jog/v 4, rpm
 WAIT dur*1000
 HALT 4
 ptp/e 4, 0
-OUT1.16 = 1
+OUT1.16 = 0
 STOPDC
 collect_data = 0
 STOP

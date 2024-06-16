@@ -78,6 +78,7 @@ class MainWindow(QMainWindow):
         self.test_plan = {}
         self.turbinetow = None
         self.nidata = {}
+        self.acsdata = {}
         # Add file path combobox to toolbar
         self.line_edit_wdir = QLineEdit()
         self.ui.toolBar_directory.addWidget(self.line_edit_wdir)
@@ -1196,7 +1197,7 @@ class MainWindow(QMainWindow):
         self.tarerun.start()
 
     def do_strut_torque_run(self, ref_speed, tsr, radius, revs):
-        """Executes a single strut torque run."""
+        """Execute a single strut torque run."""
         self.tarerun = runtypes.StrutTorqueRun(
             self.hc, ref_speed, tsr, radius, revs
         )
@@ -1212,8 +1213,7 @@ class MainWindow(QMainWindow):
         self.tarerun.start()
 
     def on_tare_run_finished(self):
-        """
-        Once a tare run is complete, saves data if necessary and updates
+        """Once a tare run is complete, save data if necessary and update
         the test plan table widget.
         """
         # Reset time of last run
@@ -1489,6 +1489,7 @@ class MainWindow(QMainWindow):
     def on_plot_timer(self):
         if self.monitoracs:
             self.update_plots_acs()
+            self.update_plots_aft()
         if self.monitorvec:
             self.update_plots_vec()
             try:
@@ -1602,8 +1603,10 @@ class MainWindow(QMainWindow):
     #     self.curve_odisi.set_data(t, self.odisidata[odisi.name + "_strain"])
     #     self.plot_odisi.replot()
 
-    def upate_plots_aft(self):
+    def update_plots_aft(self):
         """Update AFT plots."""
+        if "load_cell_ch1" not in self.acsdata:
+            return
         t = self.acsdata["time"]
         for channel in [1, 2, 3, 4]:
             curve = getattr(self, f"curve_AFT_{channel}")
