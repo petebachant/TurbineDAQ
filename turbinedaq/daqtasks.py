@@ -302,7 +302,7 @@ class AcsDaqThread(QtCore.QThread):
         }
         self.dblen = bufflen
         self.sr = sample_rate
-        self.sleeptime = float(self.dblen) / float(self.sr) / 2 * 1.05
+        self.sleeptime = float(self.dblen) / float(self.sr) / 2 * 1.02
         self.makeprg = makeprg
 
     def run(self):
