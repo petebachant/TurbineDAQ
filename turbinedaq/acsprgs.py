@@ -78,7 +78,6 @@ JERK(6)= ACC(6)*10
 
 ! Move turbine to zero if necessary
 if RPOS(6) <> 60 & RPOS(6) <> 0
-    VEL(6) = -10 ! CCW PTP move
     ptp/e 6, 0
 end
 
@@ -100,11 +99,10 @@ jog/v 6, rpm
 wait tacc*1000
 ptp/e 5, target
 HALT(6)
-ACC(5) = 0.1 ! Reduce carriage axis motion param. on tow-back to prevent AFT shaft from being pulled out
-JERK(5)= ACC(5)*10
+ACC(5) = 0.3
 VEL(5) = 0.5
-VEL(6) = -10 ! CCW PTP move
-ptp/e 6, 0 ! Perform PTP(6) before carriage returns to right limit 
+VEL(6) = 10
+ptp/e 6, 0 ! Perform PTP(6) before carriage starts moving
 ptp/e 5, endpos
 STOPDC
 collect_data = 0
