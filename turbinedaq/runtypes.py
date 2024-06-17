@@ -52,7 +52,7 @@ class TurbineTow(QtCore.QThread):
         self.settling = settling
         self.build_acsprg()
         if self.turbine_type == "AFT":
-            self.acsdaqthread = daqtasks.AftAcsDaqThread(self.hc)
+            self.acsdaqthread = daqtasks.AftAcsDaqThread(self.hc, bufflen=5000)
         else:
             self.acsdaqthread = daqtasks.AcsDaqThread(self.hc)
         self.maxvel = U * 1.3
