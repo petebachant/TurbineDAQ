@@ -135,7 +135,7 @@ def turbine_tow_prg(
             tsr=tsr,
             turbine_radius=turbine_radius,
             endpos=endpos,
-            n_buffer_rows=100,
+            n_buffer_rows=5000,
         )
     return prg
 
