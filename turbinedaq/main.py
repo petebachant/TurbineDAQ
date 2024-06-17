@@ -1386,7 +1386,7 @@ class MainWindow(QMainWindow):
                 self.acsthread = daqtasks.AcsDaqThread(self.hc, makeprg=True)
             else:
                 self.acsthread = daqtasks.AftAcsDaqThread(
-                    self.hc, makeprg=True
+                    self.hc, bufflen=5000, makeprg=True
                 )
             self.acsdata = self.acsthread.data
             self.acsthread.start()
