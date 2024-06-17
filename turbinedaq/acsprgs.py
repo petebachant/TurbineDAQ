@@ -101,7 +101,7 @@ HALT(6)
 ACC(5) = 0.3
 VEL(5) = 0.5
 VEL(6) = 10
-ptp 6, 0
+ptp/e 6, 0 ! Perform PTP(6) before carriage starts moving
 ptp/e 5, endpos
 STOPDC
 collect_data = 0
