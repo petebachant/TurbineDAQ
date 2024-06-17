@@ -270,7 +270,7 @@ class MainWindow(QMainWindow):
         self.label_aft_ni_2 = QtWidgets.QLabel(self.dockwidgetcontents_aft_ni)
         self.label_aft_ni_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_aft_ni_2.setObjectName("label_aft_ni_2")
-        self.label_aft_ni_2.setText("             Yaskawa Temp. (°F)")
+        self.label_aft_ni_2.setText("             Water Temp. (°F)")
         self.verticallayout_aft_ni.addWidget(self.label_aft_ni_2)
         self.plot_aft_ni_2 = CurveWidget(self.dockwidgetcontents_aft_ni)
         self.plot_aft_ni_2.setOrientation(QtCore.Qt.Horizontal)
@@ -1559,7 +1559,7 @@ class MainWindow(QMainWindow):
             # Create a list of keys in order of the plots
             signals = [
                 "resistor_temp",
-                "yaskawa_temp",
+                "water_temp",
                 "fore_temp",
                 "aft_temp",
             ]

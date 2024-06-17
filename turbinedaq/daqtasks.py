@@ -592,7 +592,7 @@ class AftNiDaqThread(QtCore.QThread):
         # Create a dict of arrays for storing data
         self.data = {
             "resistor_temp": np.array([]),
-            "yaskawa_temp": np.array([]),
+            "water_temp": np.array([]),
             "fore_temp": np.array([]),
             "aft_temp": np.array([]),
             "time": np.array([]),
@@ -604,7 +604,7 @@ class AftNiDaqThread(QtCore.QThread):
         # Add channels to tasks
         self.analogchans = [
             "resistor_temp",
-            "yaskawa_temp",
+            "water_temp",
             "fore_temp",
             "aft_temp",
         ]
@@ -700,8 +700,8 @@ class AftNiDaqThread(QtCore.QThread):
             self.data["resistor_temp"] = np.append(
                 self.data["resistor_temp"], data[0, :], axis=0
             )
-            self.data["yaskawa_temp"] = np.append(
-                self.data["yaskawa_temp"], data[1, :], axis=0
+            self.data["water_temp"] = np.append(
+                self.data["water_temp"], data[1, :], axis=0
             )
             self.data["fore_temp"] = np.append(
                 self.data["fore_temp"], data[2, :], axis=0
