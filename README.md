@@ -73,7 +73,7 @@ Miniforge is a good choice.
 Next, create the `turbinedaq` conda environment with `conda env create` or
 `mamba env create`.
 Additional useful dev dependencies can be installed with
-`pip install isort black`.
+`pip install isort black pytest`.
 Next, install the `turbinedaq` package in editable mode with
 `pip install -e .`.
 The app can be run by running `turbinedaq` from the command line.
