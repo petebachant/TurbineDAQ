@@ -53,3 +53,10 @@ path = "turbinedaq/__init__.py"
 dev = [
     "pyinstaller>=6.12.0",
 ]
+
+[tool.ruff]
+line-length = 79
+exclude = [
+    "turbinedaq/mainwindow.py",
+    "turbinedaq/resources_rc.py",
+]

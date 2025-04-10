@@ -1,5 +1,4 @@
 # TurbineDAQ Makefile
-
 app:
 	uv run turbinedaq/main.py
 
@@ -11,10 +10,5 @@ ui:
 ui-resources:
 	uv run python -m PyQt5.pyrcc_main gui/icons/resources.qrc -o turbinedaq/resources_rc.py
 
-black:
-	black -l79 \
-	    turbinedaq/main.py \
-		turbinedaq/runtypes.py \
-		turbinedaq/daqtasks.py \
-		turbinedaq/vectasks.py \
-		turbinedaq/acsprgs.py
+format:
+	uvx ruff format turbinedaq
