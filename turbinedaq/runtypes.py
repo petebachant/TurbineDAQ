@@ -132,24 +132,24 @@ class TurbineTow(QtCore.QThread):
         elif self.maxvel <= 0.3 or self.settling:
             self.vec.vel_range = 3
         self.vec.set_config()
-        self.metadata["Vectrino metadata"][
-            "Velocity range (index)"
-        ] = self.vec.vel_range
-        self.metadata["Vectrino metadata"][
-            "Sample rate (Hz)"
-        ] = self.vec.sample_rate
-        self.metadata["Vectrino metadata"][
-            "Coordinate system"
-        ] = self.vec.coordinate_system
-        self.metadata["Vectrino metadata"][
-            "Salinity (ppt)"
-        ] = self.vec.salinity
-        self.metadata["Vectrino metadata"][
-            "Transmit length"
-        ] = self.vec.transmit_length
-        self.metadata["Vectrino metadata"][
-            "Sampling volume"
-        ] = self.vec.sampling_volume
+        self.metadata["Vectrino metadata"]["Velocity range (index)"] = (
+            self.vec.vel_range
+        )
+        self.metadata["Vectrino metadata"]["Sample rate (Hz)"] = (
+            self.vec.sample_rate
+        )
+        self.metadata["Vectrino metadata"]["Coordinate system"] = (
+            self.vec.coordinate_system
+        )
+        self.metadata["Vectrino metadata"]["Salinity (ppt)"] = (
+            self.vec.salinity
+        )
+        self.metadata["Vectrino metadata"]["Transmit length"] = (
+            self.vec.transmit_length
+        )
+        self.metadata["Vectrino metadata"]["Sampling volume"] = (
+            self.vec.sampling_volume
+        )
         print("Vectrino configuration set")
 
     def run(self):

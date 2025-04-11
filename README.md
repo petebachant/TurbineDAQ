@@ -4,6 +4,16 @@ A Python desktop app for automated turbine data acquisition in the UNH tow tank.
 
 ![Screenshot](https://raw.githubusercontent.com/petebachant/PhD-thesis/gh-pages/figures/TurbineDAQ.PNG)
 
+## Running the app
+
+[`uv`](https://docs.astral.sh/uv/) and Make must be installed.
+Once that's done, execute `make` from this directory.
+Alternatively, you can start the app with:
+
+```sh
+uv run --directory path/to/this/folder turbinedaq
+```
+
 ## Test plan
 
 A matrix of test parameters should be created and placed in the
@@ -65,17 +75,3 @@ Each of these subclass PyQt's `QThread`. For future experiments,
 there will likely be
 a `TurbineTowInWaves` or options in `TurbineTow` for wave generation with
 `makewaves`.
-
-## Developers
-
-To get started, install a Python distribution that includes Conda or Mamba.
-Miniforge is a good choice.
-Next, create the `turbinedaq` conda environment with `conda env create` or
-`mamba env create`.
-Additional useful dev dependencies can be installed with
-`pip install isort black pytest`.
-Next, install the `turbinedaq` package in editable mode with
-`pip install -e .`.
-The app can be run by running `turbinedaq` from the command line.
-Note that the `turbinedaq` environment should be activated before installation
-or running with `conda activate turbinedaq`.

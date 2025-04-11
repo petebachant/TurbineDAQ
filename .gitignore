@@ -6,3 +6,9 @@ sync.ffs_db
 inf4-test-data.csv
 *.egg-info
 .vscode
+.venv
+.pytest_cache
+*.spec
+build
+dist
+.ruff_cache

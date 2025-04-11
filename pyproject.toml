@@ -1,15 +1,62 @@
 [project]
-name = "turbinedaq"
+name = "TurbineDAQ"
 dynamic = ["version"]
+description = "An application for testing turbines in the UNH tow tank."
 readme = "README.md"
-license = {file = "LICENSE"}
-
-[build-system]
-requires = ["setuptools >= 61.0"]
-build-backend = "setuptools.build_meta"
+authors = [
+    { name = "Pete Bachant", email = "petebachant@gmail.com" }
+]
+requires-python = "==3.11.*"
+dependencies = [
+    "acspy>=0.0.9",
+    "daqmx",
+    "guidata",
+    "guiqwt",
+    "h5py",
+    "matplotlib",
+    "micronopt-python",
+    "nidaqmx",
+    "nortek",
+    "numpy<1.25",
+    "pandas",
+    "pillow",
+    "pxl>=0.0.10",
+    "pyqt5==5.15.11",
+    "pyqt5-qt5==5.15.2",
+    "pyqt5-sip>=12.17.0",
+    "pythonqwt",
+    "pywin32",
+    "qtpy",
+    "scipy",
+    "uncertainties",
+]
 
 [project.scripts]
-turbinedaq = "turbinedaq.main:main"
+turbinedaq = "turbinedaq:main"
 
-[tool.setuptools]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv.sources]
+daqmx = { git = "https://github.com/petebachant/daqmx" }
+nortek = { git = "https://github.com/petebachant/Nortek-Python" }
+micronopt-python = { git = "https://github.com/petebachant/MicronOpt-Python" }
+
+[tool.hatch.build.targets.wheel]
 packages = ["turbinedaq"]
+
+[tool.hatch.version]
+path = "turbinedaq/__init__.py"
+
+[dependency-groups]
+dev = [
+    "pyinstaller",
+]
+
+[tool.ruff]
+line-length = 79
+exclude = [
+    "turbinedaq/mainwindow.py",
+    "turbinedaq/resources_rc.py",
+]
