@@ -8,3 +8,7 @@ inf4-test-data.csv
 .vscode
 .venv
 .pytest_cache
+*.spec
+build
+dist
+.ruff_cache

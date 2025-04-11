@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "Pete Bachant", email = "petebachant@gmail.com" }
 ]
-requires-python = "==3.10.*"
+requires-python = "==3.11.*"
 dependencies = [
     "acspy>=0.0.9",
     "daqmx",
@@ -51,7 +51,7 @@ path = "turbinedaq/__init__.py"
 
 [dependency-groups]
 dev = [
-    "pyinstaller>=6.12.0",
+    "pyinstaller",
 ]
 
 [tool.ruff]
