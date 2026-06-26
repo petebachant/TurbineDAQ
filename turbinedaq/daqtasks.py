@@ -381,7 +381,7 @@ class AftAcsDaqThread(QtCore.QThread):
     AFT test bed.
     """
 
-    def __init__(self, acs_hc, sample_rate=1000, bufflen=100, makeprg=False):
+    def __init__(self, acs_hc, sample_rate=600, bufflen=100, makeprg=False):
         QtCore.QThread.__init__(self)
         self.hc = acs_hc
         self.collectdata = True
