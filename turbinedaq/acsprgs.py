@@ -82,9 +82,9 @@ DEC(6) = ACC(6)
 JERK(6)= ACC(6)*10
 
 ! Move turbine to zero if necessary
-if RPOS(6) <> 60 & RPOS(6) <> 0
-    ptp/e 6, 0
-end
+! if RPOS(6) <> 60 & RPOS(6) <> 0
+!   ptp/e 6, 0
+! end
 
 ! Allow oscillations in shaft to damp out
 wait 3000
