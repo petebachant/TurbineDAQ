@@ -49,7 +49,7 @@ local real target, tsr, U, rpm, tacc, endpos, tzero, R, revs, dist_to_0, remaind
 global real data(3)(100)
 global real start_time
 global int collect_data
-local int sample_period_ms, local int sample_period_ms, revs_int
+local int sample_period_ms, revs_int
 sample_period_ms = {sample_period_ms}
 global real ch1_force, ch2_force, ch3_force, ch4_force, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, position_actual, aft_motor_torque, aft_motor_vel, s700_pos, s700_torque
 global real aft_data(8)({n_buffer_rows})
