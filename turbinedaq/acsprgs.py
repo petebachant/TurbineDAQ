@@ -11,23 +11,26 @@ AFT_TEMPLATE = """
 global int collect_data
 global real start_time
 local int sample_period_ms
-sample_period_ms = {sample_period_ms}
-global real ch1_force, ch2_force, ch3_force, ch4_force, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, aft_motor_torque, aft_motor_vel
-global real aft_data(8)({n_buffer_rows})
-global real aft_data2(7)({n_buffer_rows}) ! 6/26/26 - New data array to collect load cell data in mV and AFT motor torque/speed
-global real s700_data(3)({n_buffer_rows}) ! 6/26/26 - New data array to collect S700 F_POS (to resolve feedback velocity) and F_TORQUE (monitoring purposes)
+sample_period_ms = 1
+global real ch1_force, ch2_force, ch3_force, ch4_force, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, aft_motor_torque, aft_motor_vel, s700_pos, s700_torque
+global real aft_data(8)(100)
+global real aft_data2(7)(100) ! 6/26/26 - New data array to collect load cell data in mV and AFT motor torque/speed
+global real s700_data(3)(100) ! 6/26/26 - New data array to collect S700 F_POS (to resolve feedback velocity) and F_TORQUE (monitoring purposes)
 
 ! Read torque and target motor speed process data from AFT motor 
 aft_motor_torque = COEREAD/2 (3, 0x6077, 0)
 aft_motor_vel = COEREAD/4 (3, 0x60FF, 0) 
 
+s700_pos = F_POS(5) * EFAC(5)
+s700_torque = F_TORQUE(5) * 0.001 * 38
+
 BLOCK
     ! Define start time from now
     start_time = TIME
     collect_data = 1
-    DC/c aft_data, {n_buffer_rows}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force, FPOS(6), FVEL(6), FVEL(5)
-    DC/c aft_data2, {n_buffer_rows}, sample_period_ms, TIME, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, aft_motor_torque, aft_motor_vel
-    DC/c s700_data, {n_buffer_rows}, sample_period_ms, TIME, F_POS(5) * EFAC(5), F_TORQUE(5) * 0.001 * 38 ! F_POS in units of meters, F_TORQUE in units of Nm
+    DC/c aft_data, 100, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force, FPOS(6), FVEL(6), FVEL(5)
+    DC/c aft_data2, 100, sample_period_ms, TIME, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, aft_motor_torque, aft_motor_vel
+    DC/c s700_data, 100, sample_period_ms, TIME, s700_pos, s700_torque ! F_POS in units of meters, F_TORQUE in units of Nm
 END
 
 ! Continuously compute processed force values from the INF4
@@ -48,7 +51,7 @@ global real start_time
 global int collect_data
 local int sample_period_ms, local int sample_period_ms, revs_int
 sample_period_ms = {sample_period_ms}
-global real ch1_force, ch2_force, ch3_force, ch4_force, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, position_actual, aft_motor_torque, aft_motor_vel
+global real ch1_force, ch2_force, ch3_force, ch4_force, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, position_actual, aft_motor_torque, aft_motor_vel, s700_pos, s700_torque
 global real aft_data(8)({n_buffer_rows})
 global real aft_data2(7)({n_buffer_rows}) ! 6/26/26 - New data array to collect load cell data in mV and AFT motor torque/speed
 global real s700_data(3)({n_buffer_rows}) ! 6/26/26 - New data array to collect S700 F_POS (to resolve feedback velocity) and F_TORQUE (monitoring purposes)
@@ -69,6 +72,9 @@ tzero = 2.5         ! Time (in seconds) to wait before starting
 ! Read torque and target motor speed process data from AFT motor 
 aft_motor_torque = COEREAD/2 (3, 0x6077, 0)
 aft_motor_vel = COEREAD/4 (3, 0x60FF, 0) 
+
+s700_pos = F_POS(5) * EFAC(5)
+s700_torque = F_TORQUE(5) * 0.001 * 38
 
 VEL(5) = 0.5
 ptp/e 5, 0
@@ -104,7 +110,7 @@ BLOCK
     collect_data = 1
     DC/c aft_data, {n_buffer_rows}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force, FPOS(6), FVEL(6), RVEL(5)
     DC/c aft_data2, {n_buffer_rows}, sample_period_ms, TIME, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, aft_motor_torque, aft_motor_vel
-    DC/c s700_data, {n_buffer_rows}, sample_period_ms, TIME, F_POS(5) * EFAC(5), F_TORQUE(5) * 0.001 * 38 ! F_POS in units of meters, F_TORQUE in units of Nm
+    DC/c s700_data, {n_buffer_rows}, sample_period_ms, TIME, s700_pos, s700_torque! F_POS in units of meters, F_TORQUE in units of Nm
     ! Send trigger pulse for data acquisition
     OUT1.16 = 1
 END
