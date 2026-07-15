@@ -110,6 +110,8 @@ ACC(5) = 0.3
 VEL(5) = 0.5
 VEL(6) = 10
 
+position_actual = COEREAD/4 (3, 0x6064, 0)
+
 revs_int = position_actual / 360000
 revs = position_actual / 360000
 if revs_int > revs 
