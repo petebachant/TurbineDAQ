@@ -11,7 +11,7 @@ AFT_TEMPLATE = """
 global int collect_data
 global real start_time
 local int sample_period_ms
-sample_period_ms = 1
+sample_period_ms = {sample_period_ms}
 global real ch1_force, ch2_force, ch3_force, ch4_force, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, aft_motor_torque, aft_motor_vel, s700_pos, s700_torque
 global real aft_data(8)(100)
 global real aft_data2(7)(100) ! 6/26/26 - New data array to collect load cell data in mV and AFT motor torque/speed
@@ -94,8 +94,8 @@ BLOCK
     ! Define start time from now
     start_time = TIME
     collect_data = 1
-    DC/c aft_data, {n_buffer_rows}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force, FPOS(6), FVEL(6), RVEL(5)
     DC/c aft_data2, {n_buffer_rows}, sample_period_ms, TIME, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, aft_motor_torque, aft_motor_vel
+    DC/c aft_data, {n_buffer_rows}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force, FPOS(6), FVEL(6), RVEL(5)
     DC/c s700_data, {n_buffer_rows}, sample_period_ms, TIME, s700_pos, s700_torque! F_POS in units of meters, F_TORQUE in units of Nm
     ! Send trigger pulse for data acquisition
     OUT1.16 = 1
