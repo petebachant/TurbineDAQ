@@ -69,13 +69,6 @@ endpos = {endpos}        ! Where to move carriage at end of tow
 tacc = 5            ! Time (in seconds) for turbine angular acceleration
 tzero = 2.5         ! Time (in seconds) to wait before starting
 
-! Read torque and target motor speed process data from AFT motor 
-aft_motor_torque = COEREAD/2 (3, 0x6077, 0)
-aft_motor_vel = COEREAD/4 (3, 0x60FF, 0) 
-
-s700_pos = F_POS(5) * EFAC(5)
-s700_torque = F_TORQUE(5) * 0.001 * 38
-
 VEL(5) = 0.5
 ptp/e 5, 0
 
