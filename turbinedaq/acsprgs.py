@@ -13,13 +13,13 @@ global real start_time
 local int sample_period_ms
 sample_period_ms = {sample_period_ms}
 global real ch1_force, ch2_force, ch3_force, ch4_force
-global real aft_data(8)(100)
+global real aft_data(8)({n_buffer_rows})
 
 BLOCK
     ! Define start time from now
     start_time = TIME
     collect_data = 1
-    DC/c aft_data, 100, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force, FPOS(6), FVEL(6), FVEL(5)
+    DC/c aft_data, {n_buffer_rows}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force, FPOS(6), FVEL(6), FVEL(5)
 END
 
 ! Continuously compute processed force values from the INF4
