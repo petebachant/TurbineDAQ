@@ -394,14 +394,6 @@ class AftAcsDaqThread(QtCore.QThread):
             "turbine_pos": np.array([]),
             "turbine_rpm": np.array([]),
             "carriage_vel": np.array([]),
-            "load_cell_ch1_mV": np.array([]), 
-            "load_cell_ch2_mV": np.array([]),
-            "load_cell_ch3_mV": np.array([]),
-            "load_cell_ch4_mV": np.array([]),
-            "aft_motor_torque": np.array([]),
-            "aft_motor_vel": np.array([]),
-            "s700_fpos": np.array([]),
-            "s700_ftorque": np.array([]),
         }
         self.dblen = bufflen
         self.sr = sample_rate
@@ -438,23 +430,11 @@ class AftAcsDaqThread(QtCore.QThread):
             newdata = acsc.readReal(
                 self.hc, acsc.NONE, "aft_data", 0, 7, 0, self.dblen - 1
             )
-            newdata2 = acsc.readReal(
-                self.hc, acsc.NONE, "aft_data2", 0, 6, 0, self.dblen - 1
-            )
-            newdata3 = acsc.readReal(
-                self.hc, acsc.NONE, "s700_data", 0, 2, 0, self.dblen - 1
-            )
             # Slice out only the new data
             idx = (newdata[0] > t0) & ~np.isin(newdata[0], times_collected)
-            idx2 = (newdata2[0] > t0) & ~np.isin(newdata2[0], times_collected)
-            idx3 = (newdata3[0] > t0) & ~np.isin(newdata3[0], times_collected)
             newdata = newdata[:, idx]
-            newdata2 = newdata2[:, idx2]
-            newdata3 = newdata3[:, idx3]
             # Sort by time
             newdata = newdata[:, newdata[0].argsort()]
-            newdata2 = newdata2[:, newdata2[0].argsort()]
-            newdata3 = newdata3[:, newdata3[0].argsort()]
             # Track times collected
             times_collected = np.append(times_collected, newdata[0])
             t = (newdata[0] - t0) / 1000.0
@@ -479,30 +459,6 @@ class AftAcsDaqThread(QtCore.QThread):
             )
             self.data["carriage_vel"] = np.append(
                 self.data["carriage_vel"], newdata[7]
-            )
-            self.data["load_cell_ch1_mV"] = np.append(
-                self.data["load_cell_ch1_mV"], newdata2[1]
-            )
-            self.data["load_cell_ch2_mV"] = np.append(
-                self.data["load_cell_ch2_mV"], newdata2[2]
-            )
-            self.data["load_cell_ch3_mV"] = np.append(
-                self.data["load_cell_ch3_mV"], newdata2[3]
-            )
-            self.data["load_cell_ch4_mV"] = np.append(
-                self.data["load_cell_ch4_mV"], newdata2[4]
-            )
-            self.data["aft_motor_torque"] = np.append(
-                self.data["aft_motor_torque"], newdata2[5]
-            )
-            self.data["aft_motor_vel"] = np.append(
-                self.data["aft_motor_vel"], newdata2[6]
-            )
-            self.data["s700_fpos"] = np.append(
-                self.data["s700_fpos"], newdata3[1]
-            )
-            self.data["s700_ftorque"] = np.append(
-                self.data["s700_ftorque"], newdata3[2]
             )
 
     def makedaqprg(self):
