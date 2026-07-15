@@ -26,7 +26,7 @@ BLOCK
     start_time = TIME
     collect_data = 1
     DC/c aft_data, {n_buffer_rows}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force, FPOS(6), FVEL(6), FVEL(5)
-    DC/c aft_data2, {n_buffer_rows}, sample_period_ms, TIME, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, aft_motor_torque, aft_motor_speed
+    DC/c aft_data2, {n_buffer_rows}, sample_period_ms, TIME, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, aft_motor_torque, aft_motor_vel
     DC/c s700_data, {n_buffer_rows}, sample_period_ms, TIME, F_POS(5) * EFAC(5), F_TORQUE(5) * 0.001 * 38 ! F_POS in units of meters, F_TORQUE in units of Nm
 END
 
@@ -103,7 +103,7 @@ BLOCK
     start_time = TIME
     collect_data = 1
     DC/c aft_data, {n_buffer_rows}, sample_period_ms, TIME, ch1_force, ch2_force, ch3_force, ch4_force, FPOS(6), FVEL(6), RVEL(5)
-    DC/c aft_data2, {n_buffer_rows}, sample_period_ms, TIME, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, aft_motor_torque, aft_motor_speed
+    DC/c aft_data2, {n_buffer_rows}, sample_period_ms, TIME, ch1_force_mV, ch2_force_mV, ch3_force_mV, ch4_force_mV, aft_motor_torque, aft_motor_vel
     DC/c s700_data, {n_buffer_rows}, sample_period_ms, TIME, F_POS(5) * EFAC(5), F_TORQUE(5) * 0.001 * 38 ! F_POS in units of meters, F_TORQUE in units of Nm
     ! Send trigger pulse for data acquisition
     OUT1.16 = 1
