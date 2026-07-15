@@ -17,13 +17,6 @@ global real aft_data(8)(100)
 global real aft_data2(7)(100) ! 6/26/26 - New data array to collect load cell data in mV and AFT motor torque/speed
 global real s700_data(3)(100) ! 6/26/26 - New data array to collect S700 F_POS (to resolve feedback velocity) and F_TORQUE (monitoring purposes)
 
-! Read torque and target motor speed process data from AFT motor 
-aft_motor_torque = COEREAD/2 (3, 0x6077, 0)
-aft_motor_vel = COEREAD/4 (3, 0x60FF, 0) 
-
-s700_pos = F_POS(5) * EFAC(5)
-s700_torque = F_TORQUE(5) * 0.001 * 38
-
 BLOCK
     ! Define start time from now
     start_time = TIME
