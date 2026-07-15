@@ -221,7 +221,7 @@ class TurbineTow(QtCore.QThread):
     def start_motion(self):
         self.acsdaqthread.start()
         nbuf = 19
-        acsc.loadBuffer(self.hc, nbuf, self.acs_prg, 2048)
+        acsc.loadBuffer(self.hc, nbuf, self.acs_prg, 4096)
         if not self.turbine_type != "AFT":
             acsc.enable(self.hc, 4)
         else:
