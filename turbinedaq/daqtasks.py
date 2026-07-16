@@ -381,7 +381,7 @@ class AftAcsDaqThread(QtCore.QThread):
     AFT test bed.
     """
 
-    def __init__(self, acs_hc, sample_rate=600, bufflen=100, makeprg=False):
+    def __init__(self, acs_hc, sample_rate=500, bufflen=100, makeprg=False):
         QtCore.QThread.__init__(self)
         self.hc = acs_hc
         self.collectdata = True
@@ -399,8 +399,8 @@ class AftAcsDaqThread(QtCore.QThread):
         self.sr = sample_rate
         # Compute sleep time as slightly less than the time it would take to
         # fill the data buffer
-        # 6/26/26 - changed sampling rate to 600 Hz (1.667 ms), so adjust sleep time below?
-        self.sleeptime = float(self.dblen) / float(self.sr) * 1.5667 
+        # 7/16/26 - changed sampling rate to 500 Hz (2 ms), so adjust sleep time below?
+        self.sleeptime = float(self.dblen) / float(self.sr) * 1.9
         self.makeprg = makeprg
 
     def run(self):
