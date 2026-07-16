@@ -133,7 +133,7 @@ def turbine_tow_prg(
             )
     elif turbine_type == "AFT":
         prg = AFT_TOW_TEMPLATE.format(
-            sample_period_ms=1/600*1000,
+            sample_period_ms=1/500*1000,
             tow_speed=tow_speed,
             tsr=tsr,
             turbine_radius=turbine_radius,
