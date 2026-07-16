@@ -36,7 +36,7 @@ AFT_TOW_TEMPLATE = """
 ! AUTO-GENERATED -- CHANGES WILL BE OVERWRITTEN
 local real target, tsr, U, rpm, tacc, endpos, tzero, R, revs, dist_to_0, remainder
 global real start_time
-global int collect_data
+global int collect_data, internal_offset
 local int sample_period_ms, revs_int
 sample_period_ms = {sample_period_ms}
 global real ch1_force, ch2_force, ch3_force, ch4_force
@@ -91,8 +91,10 @@ VEL(5) = 0.5
 VEL(6) = 10
 
 ! Move instrumented AFT blade to 0-degree position (12:00)
-revs_int = FPOS(6) / 60 
-revs = FPOS(6) / 60
+internal_offset = 89370 ! Encoder count when instrumented blade is at 0 degree position
+position_actual = COEREAD/4 (3, 0x6064, 0) - internal_offset
+revs_int = position_actual / 360000
+revs = position_actual / 360000
 if revs_int > revs 
     revs_int = revs_int - 1
 end
@@ -100,15 +102,15 @@ remainder = revs - revs_int
 dist_to_0 = 60 - (60 * remainder) ! 60 = 360 degrees, find relative distance to 0 
 ptp/re 6, dist_to_0 ! Perform PTP(6) before carriage starts moving, move instrumented blade to 0 degree position
 
-! "Reset" rotor position counter after tow is completed
-SET FPOS(6) = 0
-SET APOS(6) = 0
-SET RPOS(6) = 0
-
 ptp/e 5, endpos
 STOPDC
 collect_data = 0
 OUT1.16 = 0
+
+! "Reset" rotor position counter after tow is completed
+SET FPOS(6) = 0
+SET APOS(6) = 0
+SET RPOS(6) = 0
 
 STOP
 """
