@@ -89,6 +89,9 @@ HALT(6)
 ACC(5) = 0.3
 VEL(5) = 0.5
 ptp/e 5, endpos
+STOPDC
+collect_data = 0
+OUT1.16 = 0
 
 VEL(6) = 10
 ! Move instrumented AFT blade to 0-degree position (12:00)
@@ -102,10 +105,6 @@ end
 remainder = revs - revs_int
 dist_to_0 = 60 - (60 * remainder) ! 60 = 360 degrees, find relative distance to 0 
 ptp/re 6, dist_to_0 ! Perform PTP(6) before carriage starts moving, move instrumented blade to 0 degree position
-
-STOPDC
-collect_data = 0
-OUT1.16 = 0
 
 ! "Reset" rotor position counter after tow is completed
 SET FPOS(6) = 0
