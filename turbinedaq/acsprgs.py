@@ -91,10 +91,8 @@ VEL(5) = 0.5
 VEL(6) = 10
 
 ! Move instrumented AFT blade to 0-degree position (12:00)
-internal_offset = 89370 ! Encoder count when instrumented blade is at 0 degree position
-position_actual = COEREAD/4 (3, 0x6064, 0) - internal_offset
-revs_int = position_actual / 360000
-revs = position_actual / 360000
+revs_int = FPOS(6) / 60
+revs = FPOS(6) / 60
 if revs_int > revs 
     revs_int = revs_int - 1
 end
