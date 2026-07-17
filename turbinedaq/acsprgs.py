@@ -85,7 +85,8 @@ wait tzero*1000
 jog/v 6, rpm
 wait tacc*1000
 ptp/e 5, target
-HALT/e 6
+HALT(6)
+wait 5000
 ACC(5) = 0.3
 VEL(5) = 0.5
 ptp/e 5, endpos
