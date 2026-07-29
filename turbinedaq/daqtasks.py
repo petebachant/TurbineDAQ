@@ -399,8 +399,7 @@ class AftAcsDaqThread(QtCore.QThread):
         self.sr = sample_rate
         # Compute sleep time as slightly less than the time it would take to
         # fill the data buffer
-        # 7/16/26 - changed sampling rate to 500 Hz (2 ms), so adjust sleep time below?
-        self.sleeptime = float(self.dblen) / float(self.sr) * 1.9
+        self.sleeptime = float(self.dblen) / float(self.sr) * 0.9
         self.makeprg = makeprg
 
     def run(self):
