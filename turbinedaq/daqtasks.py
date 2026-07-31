@@ -561,7 +561,7 @@ class AftNiDaqThread(QtCore.QThread):
         # Create some meta data for the run
         self.metadata = {}
         # Initialize sample rate
-        self.sr = 100
+        self.sr = 500
         self.metadata["Sample rate (Hz)"] = self.sr
         self.nsamps = int(self.sr / 10)
         # Create a dict of arrays for storing data
