@@ -95,6 +95,10 @@ ptp/e 5, endpos
 STOPDC
 collect_data = 0
 OUT1.16 = 0
+
+?FAULT(6).#NT
+FCLEAR ALL
+
 STOP
 """
 
