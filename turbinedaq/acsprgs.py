@@ -96,7 +96,7 @@ STOPDC
 collect_data = 0
 OUT1.16 = 0
 
-?FAULT(6).#NT
+DISP FAULT(6).#NT
 FCLEAR ALL
 
 STOP
